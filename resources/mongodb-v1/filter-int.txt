@@ -1,0 +1,15 @@
+{{ define "filter-int" }}
+//----- {{.Attr.GetDefinition.Name}} of type {{.Attr.GetDefinition.Typ}}
+func (ca *Criteria) {{.Attr.GetDefinition.Name}}EqTo(i int) *Criteria {
+	c := func() bson.E { return bson.E { Key: {{- formatIdentifier (.Attr.GetName true) "_" "upperCase" "suppress" }}, Value: i } }
+	*ca = append(*ca, c)
+	return ca
+}
+
+func (ca *Criteria) ageGt(a int) *Criteria {
+	c := func() bson.E { return bson.E { Key: {{- formatIdentifier (.Attr.GetName true) "_" "upperCase" "suppress" }}, Value: bson.D { {"$gt", a }} } }
+	*ca = append(*ca, c)
+	return ca
+}
+{{ end }}
+

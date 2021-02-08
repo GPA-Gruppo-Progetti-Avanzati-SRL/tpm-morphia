@@ -1,0 +1,41 @@
+package {{ .Collection.GetPackageName }}
+
+const(
+// {{.Collection.Schema.Name}} struct: {{.Collection.Schema.Properties.StructName}}
+{{range $a := .Collection.DirectAttributes}}
+{{- formatIdentifier ($a.GetName true) "_" "upperCase" "suppress" }} = "{{ formatIdentifier ($a.GetBsonPropertyName true) "." "none" "suppress" -}}"
+{{if eq $a.GetDefinition.Typ "array" -}}
+{{ formatIdentifier ($a.Item.GetName true) "_" "upperCase" "indexIjk" }} = "{{ formatIdentifier ($a.Item.GetBsonPropertyName true) "." "none" "indexSprintf" }}"
+{{end }}
+{{- end -}}
+{{range $s := .Collection.GetStructAttributes}}
+// {{$s.GetName true}} struct: {{$s.GetDefinition.StructName}}
+{{- range $sa := $s.Attributes}}
+{{- $a := $sa }}
+{{- if eq $a.GetDefinition.Typ "array" -}}
+{{- $a := $a.Item }}
+{{- end}}
+{{ formatIdentifier ($a.GetName true) "_" "upperCase" "suppress" }} = "{{ formatIdentifier ($a.GetBsonPropertyName true) "." "none" "suppress" -}}"
+{{- if gt (numberOfArrayIndicesInQualifiedName ($a.GetName true)) 1  }}
+{{ formatIdentifier ($a.GetName true) "_" "upperCase" "indexIjkWoLast" }} = "{{ formatIdentifier ($a.GetBsonPropertyName true) "." "none" "indexSprintfWoLast" }}"
+{{- end}}
+{{- if gt (numberOfArrayIndicesInQualifiedName ($a.GetName true)) 0 }}
+{{ formatIdentifier ($a.GetName true) "_" "upperCase" "indexIjk" }} = "{{ formatIdentifier ($a.GetBsonPropertyName true) "." "none" "indexSprintf" }}"
+{{- end}}
+{{- end }}
+{{end }}
+)
+
+type {{.Collection.Schema.Properties.StructName}} struct {
+{{- range $a := .Collection.DirectAttributes}}
+{{ $a.GetGoAttributeName }} {{ $a.GetGoAttributeType }}  {{$a.GetGoAttributeTag}}
+{{- end}}
+}
+
+{{range $s := .Collection.GetStructAttributes}}
+type {{$s.GetDefinition.StructName}} struct {
+{{- range $a := $s.Attributes}}
+{{ $a.GetGoAttributeName }} {{ $a.GetGoAttributeType }}  {{$a.GetGoAttributeTag}}
+{{- end}}
+}
+{{end }}

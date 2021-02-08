@@ -1,0 +1,15 @@
+{{ define "struct-filter-int" }}
+//----- {{.Attr.GetDefinition.Name}} of type {{.Attr.GetDefinition.Typ}}
+func (sca {{.Attr.GetParent.GetDefinition.StructName}}Criteria) {{.Attr.GetDefinition.Name}}EqTo(i int) {{.Attr.GetParent.GetDefinition.StructName}}Criteria {
+	c := func() bson.E { return bson.E { Key: "{{.Attr.GetBsonPropertyName false}}", Value: i } }
+	*sca.criteria = append(*sca.criteria, c)
+	return sca
+}
+
+func (sca {{.Attr.GetParent.GetDefinition.StructName}}Criteria) ageGt(a int) {{.Attr.GetParent.GetDefinition.StructName}}Criteria {
+	c := func() bson.E { return bson.E { Key: "{{.Attr.GetBsonPropertyName false}}", Value: bson.D { {"$gt", a }} } }
+	*sca.criteria = append(*sca.criteria, c)
+	return sca
+}
+{{ end }}
+

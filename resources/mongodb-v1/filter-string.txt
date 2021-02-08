@@ -1,0 +1,15 @@
+{{ define "filter-string" }}
+//----- {{.Attr.GetDefinition.Name}} of type {{.Attr.GetDefinition.Typ}}
+func (ca *Criteria) {{.Attr.GetDefinition.Name}}EqTo(s string) *Criteria {
+	c := func() bson.E { return bson.E { Key: {{- formatIdentifier (.Attr.GetName true) "_" "upperCase" "suppress" }}, Value: s } }
+	*ca = append(*ca, c)
+	return ca
+}
+
+func (ca *Criteria) {{.Attr.GetDefinition.Name}}In(s []string) *Criteria {
+	c := func() bson.E { return bson.E { Key: {{- formatIdentifier (.Attr.GetName true) "_" "upperCase" "suppress" }}, Value: bson.D { {"$in", s} } } }
+	*ca = append(*ca, c)
+	return ca
+}
+{{ end }}
+
