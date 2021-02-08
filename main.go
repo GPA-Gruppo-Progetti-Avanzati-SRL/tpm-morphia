@@ -3,7 +3,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/config"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/resources"
 	"github.com/go-kit/kit/log/level"
@@ -14,7 +16,7 @@ import (
 func main() {
 
 	if !resources.Has("/resources/version.txt") {
-		_ = level.Info(system.GetLogger()).Log(system.DefaultLogMessageField, "Welcome To TPM-Exporter!", "goos", runtime.GOOS, "goarch", runtime.GOARCH)
+		_ = level.Info(system.GetLogger()).Log(system.DefaultLogMessageField, "Welcome To TPM-Morphia!", "goos", runtime.GOOS, "goarch", runtime.GOARCH)
 		_ = level.Error(system.GetLogger()).Log(system.DefaultLogMessageField, "go generate not invoked during the build!")
 		// os.Exit(-1)
 	} else {
@@ -22,4 +24,17 @@ func main() {
 		os.Stderr.WriteString(fmt.Sprintf("%s\n", versionInfo))
 	}
 
+	cfg, err := config.NewBuilder().Build(context.Background())
+	if err != nil {
+		_ = level.Error(system.GetLogger()).Log(system.DefaultLogMessageField, err.Error())
+		os.Exit(-1)
+	}
+
+	_, err = cfg.FindCollectionToProcess()
+	if err != nil {
+		_ = level.Error(system.GetLogger()).Log(system.DefaultLogMessageField, err.Error())
+		os.Exit(-1)
+	}
+
+	fmt.Println(cfg)
 }

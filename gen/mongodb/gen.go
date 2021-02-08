@@ -72,7 +72,7 @@ func Generate(logger log.Logger, cfg *config.Config, gen *CodeGenCollection) err
 	/*
 	 * Readme.md
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, "readme.md", modelTmplList(tmplVersion), cfg.FormatCode); err != nil {
+	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, "readme.md", readmeTmplList(tmplVersion), false); err != nil {
 		return err
 	}
 
