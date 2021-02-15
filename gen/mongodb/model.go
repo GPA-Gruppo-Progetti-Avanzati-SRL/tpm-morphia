@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	AttributeTypeStringGoType = "string"
-	AttributeTypeIntGoType    = "int32"
+	AttributeTypeStringGoType   = "string"
+	AttributeTypeIntGoType      = "int32"
+	AttributeTypeObjectIdGoType = "primitive.ObjectID"
 )
 
 type InfoCollectorVisitor struct {
@@ -22,13 +23,16 @@ type InfoCollectorVisitor struct {
 type CodeGenAttribute interface {
 	GetDefinition() schema.Field
 	GetBsonPropertyName(qualified bool) string
-	GetName(qualified bool) string
-
+	GetName(qualified bool, prefixed bool) string
+	GetPrefix(casing string) string
 	GetNumberOfDescendents() int
+	GetPaths(pathType string) []string
 
+	GetGoPackageImports() []string
 	GetGoAttributeName() string
 	GetGoAttributeType() string
 	GetGoAttributeTag() string
+	GetGoAttributeIsZeroCondition() string
 	IsArrayItem() bool
 }
 
@@ -51,10 +55,17 @@ type CodeGenAttributeImpl struct {
 	BSONNamespace       string
 	ArrayItem           bool
 	Tags                []schema.Tag
+	Prefix              string
+	PackageImports      []string
 }
 
 type ValueTypeAttribute struct {
 	CodeGenAttributeImpl
+}
+
+type RefStructAttribute struct {
+	CodeGenAttributeImpl
+	ReferredStruct CodeGenAttribute
 }
 
 type StructAttribute struct {
@@ -67,6 +78,11 @@ type ArrayAttribute struct {
 	Item CodeGenAttribute
 }
 
+type MapAttribute struct {
+	CodeGenAttributeImpl
+	Item CodeGenAttribute
+}
+
 func NewCodeGenCollection(aSchema *schema.Collection) (*CodeGenCollection, error) {
 
 	c := &CodeGenCollection{aSchema, nil, 0, nil}
@@ -74,54 +90,93 @@ func NewCodeGenCollection(aSchema *schema.Collection) (*CodeGenCollection, error
 	// va := NamespaceVisitor{}
 	numberOfDescendents := 0
 	for _, f := range aSchema.Attributes {
-		a := NewAttribute(nil, f, false /*, va */)
+		a := NewAttribute(nil, f, false, aSchema.Properties.Prefix /*, va */)
 		c.DirectAttributes = append(c.DirectAttributes, a)
 		numberOfDescendents += 1 + a.GetNumberOfDescendents()
 	}
 
 	c.totalNumberOfAttributes = numberOfDescendents
-	c.Attributes = c.FindAttributes()
-	fmt.Printf("number of descendents is: %d\n", numberOfDescendents)
+	c.Attributes = c.findAttributes()
+	// fmt.Printf("number of descendents is: %d\n", numberOfDescendents)
 	return c, nil
 }
 
-func NewAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool /* , visitor NamespaceVisitor */) CodeGenAttribute {
+func NewAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool, prefix string /* , visitor NamespaceVisitor */) CodeGenAttribute {
 
 	var a CodeGenAttribute
 	switch attrDefinition.Typ {
+	case schema.AttributeTypeRefStruct:
+		a = NewRefStructTypeAttribute(parentAttribute, attrDefinition, isArrayItem, prefix /*, visitor */)
 	case schema.AttributeTypeStruct:
-		a = NewStructAttribute(parentAttribute, attrDefinition, isArrayItem /*, visitor */)
+		a = NewStructAttribute(parentAttribute, attrDefinition, isArrayItem, prefix /*, visitor */)
 	case schema.AttributeTypeArray:
-		a = NewArrayAttribute(parentAttribute, attrDefinition, isArrayItem /*, visitor */)
+		a = NewArrayAttribute(parentAttribute, attrDefinition, isArrayItem, prefix /*, visitor */)
+	case schema.AttributeTypeMap:
+		a = NewMapAttribute(parentAttribute, attrDefinition, isArrayItem, prefix /*, visitor */)
 	default:
-		a = NewValueTypeAttribute(parentAttribute, attrDefinition, isArrayItem /*, visitor */)
+		a = NewValueTypeAttribute(parentAttribute, attrDefinition, isArrayItem, prefix /*, visitor */)
 	}
 
 	return a
 }
 
-func NewValueTypeAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool /*, visitor NamespaceVisitor*/) CodeGenAttribute {
+func NewValueTypeAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool, prefix string /*, visitor NamespaceVisitor*/) CodeGenAttribute {
 	v := &ValueTypeAttribute{}
 	v.AttrDefinition = attrDefinition
 	v.ArrayItem = isArrayItem
 	v.ParentAttribute = parentAttribute
+	v.Prefix = prefix
 	v.Tags = attrDefinition.GetTagsAsListOfTag(true, true, []string{"json", "bson"})
+
+	switch strings.ToLower(attrDefinition.Typ) {
+	case schema.AttributeTypeObjectId:
+		v.PackageImports = make([]string, 0, 1)
+		v.PackageImports = append(v.PackageImports, "go.mongodb.org/mongo-driver/bson/primitive")
+	}
 
 	// v.BSONNamespace = visitor.BSONNamespace
 	// v.AttributeNamespace = visitor.AttributeNamespace
 
 	if parentAttribute != nil {
 		v.BSONNamespace = parentAttribute.GetBsonPropertyName(true)
-		v.AttributeNamespace = parentAttribute.GetName(true)
+		v.AttributeNamespace = parentAttribute.GetName(true, false)
 	}
 	return v
 }
 
-func NewStructAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool /*, visitor NamespaceVisitor */) CodeGenAttribute {
+func NewRefStructTypeAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool, prefix string /*, visitor NamespaceVisitor*/) CodeGenAttribute {
+	v := &RefStructAttribute{}
+	v.AttrDefinition = attrDefinition
+	v.ArrayItem = isArrayItem
+	v.ParentAttribute = parentAttribute
+	v.Prefix = prefix
+	v.Tags = attrDefinition.GetTagsAsListOfTag(true, true, []string{"json", "bson"})
+
+	switch strings.ToLower(attrDefinition.Typ) {
+	case schema.AttributeTypeRefStruct:
+		if slashPos := strings.LastIndex(attrDefinition.StructName, "/"); slashPos > 0 {
+			v.PackageImports = make([]string, 0, 1)
+			v.PackageImports = append(v.PackageImports, attrDefinition.StructName[0:slashPos])
+		}
+
+	}
+
+	// v.BSONNamespace = visitor.BSONNamespace
+	// v.AttributeNamespace = visitor.AttributeNamespace
+
+	if parentAttribute != nil {
+		v.BSONNamespace = parentAttribute.GetBsonPropertyName(true)
+		v.AttributeNamespace = parentAttribute.GetName(true, false)
+	}
+	return v
+}
+
+func NewStructAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool, prefix string /*, visitor NamespaceVisitor */) CodeGenAttribute {
 	s := &StructAttribute{}
 	s.AttrDefinition = attrDefinition
 	s.ArrayItem = isArrayItem
 	s.ParentAttribute = parentAttribute
+	s.Prefix = prefix
 	s.Tags = attrDefinition.GetTagsAsListOfTag(true, true, []string{"json", "bson"})
 
 	/*
@@ -131,7 +186,7 @@ func NewStructAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.
 
 	if parentAttribute != nil {
 		s.BSONNamespace = parentAttribute.GetBsonPropertyName(true)
-		s.AttributeNamespace = parentAttribute.GetName(true)
+		s.AttributeNamespace = parentAttribute.GetName(true, false)
 	}
 
 	/*
@@ -141,7 +196,7 @@ func NewStructAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.
 	*/
 	s.NumberOfDescendents = len(attrDefinition.Attributes)
 	for _, f := range attrDefinition.Attributes {
-		a := NewAttribute(s, f, false /*, visitor */)
+		a := NewAttribute(s, f, false, prefix /*, visitor */)
 		s.Attributes = append(s.Attributes, a)
 
 		s.NumberOfDescendents += a.GetNumberOfDescendents()
@@ -150,11 +205,12 @@ func NewStructAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.
 	return s
 }
 
-func NewArrayAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool /*, visitor NamespaceVisitor */) CodeGenAttribute {
+func NewArrayAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool, prefix string /*, visitor NamespaceVisitor */) CodeGenAttribute {
 	a := &ArrayAttribute{}
 	a.AttrDefinition = attrDefinition
 	a.ArrayItem = isArrayItem
 	a.ParentAttribute = parentAttribute
+	a.Prefix = prefix
 	a.Tags = attrDefinition.GetTagsAsListOfTag(true, true, []string{"json", "bson"})
 
 	/*
@@ -164,7 +220,7 @@ func NewArrayAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.F
 
 	if parentAttribute != nil {
 		a.BSONNamespace = parentAttribute.GetBsonPropertyName(true)
-		a.AttributeNamespace = parentAttribute.GetName(true)
+		a.AttributeNamespace = parentAttribute.GetName(true, false)
 	}
 
 	/*
@@ -172,13 +228,45 @@ func NewArrayAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.F
 		visitor.BSONNamespace = util.AppendToNamespace(visitor.BSONNamespace, bsonPropertyName, ".")
 		visitor.AttributeNamespace = util.AppendToNamespace(visitor.AttributeNamespace, a.AttrDefinition.Name, ".")
 	*/
-	a.Item = NewAttribute(a, *attrDefinition.Item, true /*, visitor */)
+	a.Item = NewAttribute(a, *attrDefinition.Item, true, prefix /*, visitor */)
 	a.NumberOfDescendents = a.Item.GetNumberOfDescendents()
 
 	return a
 }
 
-func (c *CodeGenCollection) FindAttributes() []CodeGenAttribute {
+func NewMapAttribute(parentAttribute CodeGenAttribute, attrDefinition schema.Field, isArrayItem bool, prefix string /*, visitor NamespaceVisitor */) CodeGenAttribute {
+	a := &MapAttribute{}
+	a.AttrDefinition = attrDefinition
+	a.ArrayItem = isArrayItem
+	a.ParentAttribute = parentAttribute
+	a.Prefix = prefix
+	a.Tags = attrDefinition.GetTagsAsListOfTag(true, true, []string{"json", "bson"})
+
+	/*
+		a.BSONNamespace = visitor.BSONNamespace
+		a.AttributeNamespace = visitor.AttributeNamespace
+	*/
+
+	if parentAttribute != nil {
+		a.BSONNamespace = parentAttribute.GetBsonPropertyName(true)
+		a.AttributeNamespace = parentAttribute.GetName(true, false)
+	}
+
+	/*
+			bsonPropertyName := a.AttrDefinition.GetTagNameValue("bson")
+		visitor.BSONNamespace = util.AppendToNamespace(visitor.BSONNamespace, bsonPropertyName, ".")
+		visitor.AttributeNamespace = util.AppendToNamespace(visitor.AttributeNamespace, a.AttrDefinition.Name, ".")
+	*/
+	a.Item = NewAttribute(a, *attrDefinition.Item, false, prefix /*, visitor */)
+	a.NumberOfDescendents = a.Item.GetNumberOfDescendents()
+
+	return a
+}
+
+/*
+ * Methods of CodeGenCollection
+ */
+func (c *CodeGenCollection) findAttributes() []CodeGenAttribute {
 	infoCollector := InfoCollectorVisitor{Attributes: make([]CodeGenAttribute, 0, c.totalNumberOfAttributes)}
 	for _, a := range c.DirectAttributes {
 		infoCollector.Attributes = append(infoCollector.Attributes, a)
@@ -189,11 +277,28 @@ func (c *CodeGenCollection) FindAttributes() []CodeGenAttribute {
 			if sItem, ok := a1.Item.(*StructAttribute); ok {
 				infoCollector = sItem.FindAttributes(infoCollector)
 			}
+		case *MapAttribute:
+			if sItem, ok := a1.Item.(*StructAttribute); ok {
+				infoCollector = sItem.FindAttributes(infoCollector)
+			}
 		}
 	}
 
 	return infoCollector.Attributes
 }
+
+/*
+func (c *CodeGenCollection) findAttributeByStructName(s string) CodeGenAttribute {
+
+	for _, a := range c.Attributes {
+		if a.GetDefinition().Typ == schema.AttributeTypeStruct && a.GetDefinition().StructName == s {
+				return a
+		}
+	}
+
+	return nil
+}
+*/
 
 func (c *CodeGenCollection) GetStructAttributes() []CodeGenAttribute {
 	attrs := make([]CodeGenAttribute, 0, 10)
@@ -205,6 +310,11 @@ func (c *CodeGenCollection) GetStructAttributes() []CodeGenAttribute {
 			if i.GetDefinition().Typ == schema.AttributeTypeStruct {
 				attrs = append(attrs, i)
 			}
+		} else if a.GetDefinition().Typ == schema.AttributeTypeMap {
+			i := a.(*MapAttribute).Item
+			if i.GetDefinition().Typ == schema.AttributeTypeStruct {
+				attrs = append(attrs, i)
+			}
 		}
 	}
 
@@ -212,8 +322,40 @@ func (c *CodeGenCollection) GetStructAttributes() []CodeGenAttribute {
 }
 
 /*
- * Methods of CodeGenCollection
- */
+func (c *CodeGenCollection) GetStructRefAttributes() []CodeGenAttribute {
+	attrs := make([]CodeGenAttribute, 0, 10)
+	for _, a := range c.Attributes {
+		if a.GetDefinition().Typ == schema.AttributeTypeRefStruct {
+			referredAttr := c.findAttributeByStructName(a.GetDefinition().StructName)
+			if referredAttr != nil {
+				a.(*RefStructAttribute).ReferredStruct = referredAttr
+				attrs = append(attrs, a)
+			}
+		}
+	}
+
+	return attrs
+}
+*/
+
+func (c *CodeGenCollection) GetPackageImports(limitToQueriable bool) []string {
+
+	pkgs := make([]string, 0)
+	for _, a := range c.Attributes {
+		if a.GetDefinition().Queryable || !limitToQueriable {
+			if ap := a.GetGoPackageImports(); len(ap) > 0 {
+				pkgs = append(pkgs, ap...)
+			}
+		}
+	}
+
+	if len(pkgs) > 1 {
+		pkgs = util.RemoveDuplicates(pkgs)
+	}
+
+	return pkgs
+}
+
 func (c *CodeGenCollection) GetGeneratedContentPath(mountDir string) (string, error) {
 
 	subFolder := c.Schema.Properties.FolderPath
@@ -247,12 +389,76 @@ func (c *CodeGenCollection) GetPackageName() string {
 
 	as := util.SliceSegmentedName(s)
 	return as[len(as)-1]
+}
 
+func (c *CodeGenCollection) GetPrefix(casing string) string {
+
+	s := c.Schema.Properties.Prefix
+	if s != "" {
+		switch strings.ToLower(casing) {
+		case "lower":
+			s = strings.ToLower(s)
+		case "capital":
+			s = strings.Title(s)
+		default:
+			s = strings.ToUpper(s)
+		}
+	}
+
+	return s
+}
+
+func (c *CodeGenCollection) GetMorphiaPackage() string {
+	return c.Schema.Properties.MorphiaPackage
 }
 
 /*
  * CodeGenAttributeImpl
  */
+func (b *CodeGenAttributeImpl) GetGoAttributeIsZeroCondition() string {
+
+	s := ""
+	switch b.AttrDefinition.Typ {
+	case schema.AttributeTypeObjectId:
+		s = fmt.Sprintf("s.%s != primitive.NilObjectID", b.GetGoAttributeName())
+	case schema.AttributeTypeInt:
+		s = fmt.Sprintf("s.%s != 0", b.GetGoAttributeName())
+	case schema.AttributeTypeArray:
+		s = fmt.Sprintf("len(s.%s) != 0", b.GetGoAttributeName())
+	case schema.AttributeTypeStruct:
+		s = fmt.Sprintf("!s.%s.IsZero()", b.GetGoAttributeName())
+	case schema.AttributeTypeRefStruct:
+		s = fmt.Sprintf("!s.%s.IsZero()", b.GetGoAttributeName())
+	case schema.AttributeTypeString:
+		s = fmt.Sprintf("s.%s != \"\"", b.GetGoAttributeName())
+	case schema.AttributeTypeMap:
+		s = fmt.Sprintf("len(s.%s) != 0", b.GetGoAttributeName())
+	}
+
+	return s
+}
+
+func (b *CodeGenAttributeImpl) GetPrefix(casing string) string {
+
+	s := ""
+	if b.Prefix != "" {
+		switch strings.ToLower(casing) {
+		case "lower":
+			s = strings.ToLower(b.Prefix)
+		case "capital":
+			s = strings.Title(b.Prefix)
+		default:
+			s = strings.ToUpper(b.Prefix)
+		}
+	}
+
+	return s
+}
+
+func (b *CodeGenAttributeImpl) GetGoPackageImports() []string {
+	return b.PackageImports
+}
+
 func (b *CodeGenAttributeImpl) GetParent() CodeGenAttribute {
 	return b.ParentAttribute
 }
@@ -284,11 +490,46 @@ func (b *CodeGenAttributeImpl) GetBsonPropertyQualifiedName() string {
 	return util.AppendToNamespace( b.BSONNamespace, s , ".")
 }
 */
+func (b *CodeGenAttributeImpl) GetPaths(pathType string) []string {
 
-func (b *CodeGenAttributeImpl) GetName(qualified bool) string {
+	if len(b.AttrDefinition.Paths) > 0 {
+		arr := make([]string, 0, len(b.AttrDefinition.Paths))
+		isIndexed := false
+		for _, p1 := range b.AttrDefinition.Paths {
+			if strings.Contains(p1, "[]") {
+				isIndexed = true
+				if !strings.Contains(pathType, "omitIndexed") {
+					arr = append(arr, p1)
+				}
+			} else {
+				arr = append(arr, p1)
+			}
+		}
+
+		if isIndexed && strings.Contains(pathType, "preferIndexed") {
+			arr = make([]string, 0, len(b.AttrDefinition.Paths))
+			for _, p1 := range b.AttrDefinition.Paths {
+				if strings.Contains(p1, "[]") {
+					arr = append(arr, p1)
+				}
+			}
+		}
+
+		return arr
+	}
+
+	return nil
+}
+
+func (b *CodeGenAttributeImpl) GetName(qualified bool, prefixed bool) string {
 	s := b.AttrDefinition.Name
 	if qualified {
-		return util.AppendToNamespace(b.AttributeNamespace, b.AttrDefinition.Name, ".")
+		s = util.AppendToNamespace(b.AttributeNamespace, s, ".")
+
+		if prefixed && b.Prefix != "" {
+			s = strings.Join([]string{b.Prefix, s}, "_")
+		}
+
 	}
 
 	return s
@@ -347,6 +588,8 @@ func (v *ValueTypeAttribute) GetGoAttributeType() string {
 		t = AttributeTypeStringGoType
 	case schema.AttributeTypeInt:
 		t = AttributeTypeIntGoType
+	case schema.AttributeTypeObjectId:
+		t = AttributeTypeObjectIdGoType
 	default:
 		t = "-- NotYetImplemented --"
 	}
@@ -354,7 +597,14 @@ func (v *ValueTypeAttribute) GetGoAttributeType() string {
 }
 
 /*
- * Struct implmentation.
+ * RefStruct Implementation
+ */
+func (v *RefStructAttribute) GetGoAttributeType() string {
+	return v.AttrDefinition.StructRef.StructName
+}
+
+/*
+ * Struct implementation.
  */
 func (s *StructAttribute) GetGoAttributeType() string {
 	return s.AttrDefinition.StructName
@@ -371,15 +621,27 @@ func (s *StructAttribute) FindAttributes(infoCollector InfoCollectorVisitor) Inf
 			if sItem, ok := a1.Item.(*StructAttribute); ok {
 				infoCollector = sItem.FindAttributes(infoCollector)
 			}
+		case *MapAttribute:
+			if sItem, ok := a1.Item.(*StructAttribute); ok {
+				infoCollector = sItem.FindAttributes(infoCollector)
+			}
 		}
+
 	}
 
 	return infoCollector
 }
 
 /*
- * Array implmentation.
+ * Array implementation.
  */
 func (a *ArrayAttribute) GetGoAttributeType() string {
 	return "[]" + a.Item.GetGoAttributeType()
+}
+
+/*
+ * Map implementation.
+ */
+func (a *MapAttribute) GetGoAttributeType() string {
+	return "map[string]" + a.Item.GetGoAttributeType()
 }
