@@ -21,13 +21,17 @@ type GenerationContext struct {
 }
 
 const (
-	TmplCollectionReadme             = "/resources/mongodb-%s/readme.txt"
-	TmplCollectionModel              = "/resources/mongodb-%s/model.txt"
-	TmplCollectionFilter             = "/resources/mongodb-%s/filter.txt"
-	TmplCollectionFilterString       = "/resources/mongodb-%s/filter-string.txt"
-	TmplCollectionFilterInt          = "/resources/mongodb-%s/filter-int.txt"
-	TmplCollectionStructFilterString = "/resources/mongodb-%s/struct-filter-string.txt"
-	TmplCollectionStructFilterInt    = "/resources/mongodb-%s/struct-filter-int.txt"
+	TmplCollectionReadme               = "/resources/mongodb-%s/readme.txt"
+	TmplCollectionModel                = "/resources/mongodb-%s/model.txt"
+	TmplCollectionFilter               = "/resources/mongodb-%s/filter-methods.txt"
+	TmplCollectionCriteria             = "/resources/mongodb-%s/filter.txt"
+	TmplCollectionFilterString         = "/resources/mongodb-%s/filter-string.txt"
+	TmplCollectionFilterInt            = "/resources/mongodb-%s/filter-int.txt"
+	TmplCollectionStructFilterString   = "/resources/mongodb-%s/struct-filter-string.txt"
+	TmplCollectionStructFilterInt      = "/resources/mongodb-%s/struct-filter-int.txt"
+	TmplCollectionStructFilterObjectId = "/resources/mongodb-%s/filter-object-id.txt"
+	TmplCollectionUpdate               = "/resources/mongodb-%s/update.txt"
+	TmplCollectionUpdateMethods        = "/resources/mongodb-%s/update-methods.txt"
 )
 
 // List of templates for mongoDbGeneration
@@ -38,6 +42,13 @@ func filterTmplList(tmplVersion string) []string {
 	s = append(s, fmt.Sprintf(TmplCollectionFilterInt, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionStructFilterString, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionStructFilterInt, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionStructFilterObjectId, tmplVersion))
+	return s
+}
+
+func criteriaTmplList(tmplVersion string) []string {
+	s := make([]string, 0, 1)
+	s = append(s, fmt.Sprintf(TmplCollectionCriteria, tmplVersion))
 	return s
 }
 
@@ -50,6 +61,18 @@ func readmeTmplList(tmplVersion string) []string {
 func modelTmplList(tmplVersion string) []string {
 	s := make([]string, 0, 1)
 	s = append(s, fmt.Sprintf(TmplCollectionModel, tmplVersion))
+	return s
+}
+
+func updateTmplList(tmplVersion string) []string {
+	s := make([]string, 0, 1)
+	s = append(s, fmt.Sprintf(TmplCollectionUpdate, tmplVersion))
+	return s
+}
+
+func updateMethodsTmplList(tmplVersion string) []string {
+	s := make([]string, 0, 1)
+	s = append(s, fmt.Sprintf(TmplCollectionUpdateMethods, tmplVersion))
 	return s
 }
 
@@ -72,7 +95,7 @@ func Generate(logger log.Logger, cfg *config.Config, gen *CodeGenCollection) err
 	/*
 	 * Readme.md
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, "readme.md", readmeTmplList(tmplVersion), false); err != nil {
+	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "readme.md"), readmeTmplList(tmplVersion), false); err != nil {
 		return err
 	}
 
@@ -92,7 +115,7 @@ func Generate(logger log.Logger, cfg *config.Config, gen *CodeGenCollection) err
 	/*
 	 * model.go
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, "model.go", modelTmplList(tmplVersion), cfg.FormatCode); err != nil {
+	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "model.go"), modelTmplList(tmplVersion), cfg.FormatCode); err != nil {
 		return err
 	}
 
@@ -101,7 +124,7 @@ func Generate(logger log.Logger, cfg *config.Config, gen *CodeGenCollection) err
 			destinationFile := filepath.Join(genFolder, "model.go")
 			_ = level.Info(logger).Log("msg", "generating text from template", "tmpl", tmplName, "dest", destinationFile)
 
-			if err := ParseTemplateWithFuncMapsProcessWrite2File(t, geTemplateUtilityFunctions(), genCtx, destinationFile, cfg.FormatCode); err != nil {
+			if err := ParseTemplateWithFuncMapsProcessWrite2File(t, getTemplateUtilityFunctions(), genCtx, destinationFile, cfg.FormatCode); err != nil {
 				return err
 			}
 		} else {
@@ -110,29 +133,33 @@ func Generate(logger log.Logger, cfg *config.Config, gen *CodeGenCollection) err
 	*/
 
 	/*
-	 * filter.go
+	 * filter-methods.go
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, "filter.go", filterTmplList(tmplVersion), cfg.FormatCode); err != nil {
+	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "filter-methods.go"), filterTmplList(tmplVersion), cfg.FormatCode); err != nil {
 		return err
 	}
 
 	/*
-		if t, ok := loadTemplate(cfg.ResourceDirectory, filterTmplList(tmplVersion)...); ok {
-			destinationFile := filepath.Join(genFolder, "filter.go")
-			_ = level.Info(logger).Log("msg", "generating text from template", "tmpl", tmplName, "dest", destinationFile)
-
-			if err := ParseTemplateWithFuncMapsProcessWrite2File(t, geTemplateUtilityFunctions(), genCtx, destinationFile, cfg.FormatCode); err != nil {
-				return err
-			}
-		} else {
-			_ = level.Info(logger).Log("msg", "template not present...skipping", "tmpl", tmplName)
-		}
-	*/
-
-	attrs := gen.FindAttributes()
-	for _, a := range attrs {
-		fmt.Println(a)
+	 * filter.go: get generated without prefixing because is common across any collection that might be created.
+	 */
+	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename("", "filter.go"), criteriaTmplList(tmplVersion), cfg.FormatCode); err != nil {
+		return err
 	}
+
+	/*
+	 * Update get generated without prefixing because is common across any collection that might be created.
+	 */
+	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename("", "update.go"), updateTmplList(tmplVersion), cfg.FormatCode); err != nil {
+		return err
+	}
+
+	/*
+	 * update-methods.go
+	 */
+	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "update-methods.go"), updateMethodsTmplList(tmplVersion), cfg.FormatCode); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -141,7 +168,7 @@ func emit(logger log.Logger, genCtx GenerationContext, resDir string, outFolder 
 		destinationFile := filepath.Join(outFolder, generatedFileName)
 		_ = level.Info(logger).Log("msg", "generating text from template", "dest", destinationFile)
 
-		if err := ParseTemplateWithFuncMapsProcessWrite2File(t, geTemplateUtilityFunctions(), genCtx, destinationFile, formatCode); err != nil {
+		if err := parseTemplateWithFuncMapsProcessWrite2File(t, getTemplateUtilityFunctions(), genCtx, destinationFile, formatCode); err != nil {
 			return err
 		}
 	} else {
@@ -150,6 +177,14 @@ func emit(logger log.Logger, genCtx GenerationContext, resDir string, outFolder 
 	}
 
 	return nil
+}
+
+func getOutputFilename(prefix string, baseName string) string {
+	if prefix != "" {
+		return strings.Join([]string{prefix, baseName}, "-")
+	}
+
+	return baseName
 }
 
 func loadTemplate(resDirectory string, templatePath ...string) ([]util.TemplateInfo, bool) {
@@ -186,14 +221,14 @@ func loadTemplate(resDirectory string, templatePath ...string) ([]util.TemplateI
 	return res, true
 }
 
-func geTemplateUtilityFunctions() template.FuncMap {
+func getTemplateUtilityFunctions() template.FuncMap {
 
 	fMap := template.FuncMap{
-		"formatIdentifier": func(n string, sep string, casingMode util.FormatMode, indexesMode util.FormatMode) string {
-			return util.FormatIdentifier(n, sep, casingMode, indexesMode)
+		"formatIdentifier": func(n string, sep string, casingMode util.FormatMode, indexesMode util.FormatMode, indexesFormatMode util.FormatMode) string {
+			return util.FormatIdentifier(n, sep, casingMode, indexesMode, indexesFormatMode)
 		},
 		"numberOfArrayIndicesInQualifiedName": func(n string) int {
-			return strings.Count(n, "[]")
+			return strings.Count(n, "[]") + strings.Count(n, "%s")
 		},
 		"filterSubTemplateContext": func(attribute CodeGenAttribute, criteriaObjectName string) map[string]interface{} {
 			return map[string]interface{}{
@@ -201,12 +236,128 @@ func geTemplateUtilityFunctions() template.FuncMap {
 				"CriteriaStructRef": criteriaObjectName,
 			}
 		},
+		"isIdentifierIndexed": func(n string) bool {
+			return strings.Contains(n, "[]")
+		},
+		"firstToLower": func(n string) string {
+			return util.FirstToLower(n)
+		},
+		"criteriaMethodSignature": func(p string) string {
+			// Do a Camel case conversion with segments separated by '.'
+			s := util.FormatIdentifier(p, ".", "camelCase", "index", "indexIjk")
+			// Remove the period.
+			return strings.ReplaceAll(s, ".", "")
+		},
+		"criteriaMethodVarParams": func(p string, withType bool, commaHandling string) string {
+
+			if strings.Contains(p, "[]") || strings.Contains(p, "%s") {
+
+				var sb strings.Builder
+
+				arr := strings.Split(p, ".")
+
+				numIjk := 0
+				numStw := 0
+				for _, s := range arr {
+					if s == "[]" {
+						if (numIjk + numStw) > 0 {
+							sb.WriteString(", ")
+						}
+						sb.WriteString("ndx")
+						sb.WriteRune(rune('I' + numIjk))
+						if withType {
+							sb.WriteString(" int")
+						}
+						numIjk++
+					} else if s == "%s" {
+						if (numIjk + numStw) > 0 {
+							sb.WriteString(", ")
+						}
+						sb.WriteString("key")
+						sb.WriteRune(rune('S' + numStw))
+						if withType {
+							sb.WriteString(" string")
+						}
+						numStw++
+					}
+				}
+
+				if strings.Contains(commaHandling, "before") {
+					return ", " + sb.String()
+				} else if strings.Contains(commaHandling, "after") {
+					return sb.String() + ", "
+				}
+
+				return sb.String()
+			}
+
+			if strings.Contains(commaHandling, "addonempty") {
+				return ", "
+			}
+
+			return ""
+		},
+		"updateMethodSignature": func(p string) string {
+			// Do a Camel case conversion with segments separated by '.'
+			s := util.FormatIdentifier(p, ".", "camelCase", "index", "indexIjk")
+			// Remove the period.
+			return strings.ReplaceAll(s, ".", "")
+		},
+		"updateMethodVarParams": func(p string, withType bool, commaHandling string) string {
+
+			if strings.Contains(p, "[]") || strings.Contains(p, "%s") {
+
+				var sb strings.Builder
+
+				arr := strings.Split(p, ".")
+
+				numIjk := 0
+				numStw := 0
+				for _, s := range arr {
+					if s == "[]" {
+						if (numIjk + numStw) > 0 {
+							sb.WriteString(", ")
+						}
+						sb.WriteString("ndx")
+						sb.WriteRune(rune('I' + numIjk))
+						if withType {
+							sb.WriteString(" int")
+						}
+						numIjk++
+					} else if s == "%s" {
+						if (numIjk + numStw) > 0 {
+							sb.WriteString(", ")
+						}
+						sb.WriteString("key")
+						sb.WriteRune(rune('S' + numStw))
+						if withType {
+							sb.WriteString(" string")
+						}
+						numStw++
+					}
+				}
+
+				if strings.Contains(commaHandling, "before") {
+					return ", " + sb.String()
+				} else if strings.Contains(commaHandling, "after") {
+					return sb.String() + ", "
+				}
+
+				return sb.String()
+			}
+
+			if strings.Contains(commaHandling, "addonempty") {
+				return ", "
+			}
+
+			return ""
+		},
 	}
 
 	return fMap
 }
 
-func ParseTemplateWithFuncMapsProcessWrite2File(templates []util.TemplateInfo, fMaps template.FuncMap, templateData interface{}, outputFile string, formatSource bool) error {
+func parseTemplateWithFuncMapsProcessWrite2File(templates []util.TemplateInfo, fMaps template.FuncMap, templateData interface{}, outputFile string, formatSource bool) error {
 
 	if pkgTemplate, err := util.ParseTemplates(templates, fMaps); err != nil {
 		return err

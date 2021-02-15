@@ -3,12 +3,16 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/config"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/gen/mongodb"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/resources"
 	"github.com/go-kit/kit/log/level"
+	"io/ioutil"
 	"os"
 	"runtime"
 )
@@ -21,7 +25,7 @@ func main() {
 		// os.Exit(-1)
 	} else {
 		versionInfo, _ := resources.Get("/resources/version.txt")
-		os.Stderr.WriteString(fmt.Sprintf("%s\n", versionInfo))
+		_, _ = os.Stderr.WriteString(fmt.Sprintf("%s\n", versionInfo))
 	}
 
 	cfg, err := config.NewBuilder().Build(context.Background())
@@ -30,11 +34,33 @@ func main() {
 		os.Exit(-1)
 	}
 
-	_, err = cfg.FindCollectionToProcess()
+	cDefs, err := cfg.FindCollectionToProcess(system.GetLogger())
 	if err != nil {
 		_ = level.Error(system.GetLogger()).Log(system.DefaultLogMessageField, err.Error())
 		os.Exit(-1)
 	}
 
-	fmt.Println(cfg)
+	for _, collDefFile := range cDefs {
+		if schemaFile, err := ioutil.ReadFile(collDefFile); err != nil {
+			_ = level.Error(system.GetLogger()).Log(system.DefaultLogMessageField, err.Error())
+			return
+		} else {
+			r := bytes.NewReader(schemaFile)
+			cDef, err := schema.ReadCollectionDefinition(system.GetLogger(), r)
+			if err != nil {
+				_ = level.Error(system.GetLogger()).Log(system.DefaultLogMessageField, err.Error())
+				return
+			}
+
+			if genDriver, err := mongodb.NewCodeGenCollection(cDef); err != nil {
+				_ = level.Error(system.GetLogger()).Log(system.DefaultLogMessageField, err.Error())
+				return
+			} else {
+				if err := mongodb.Generate(system.GetLogger(), cfg, genDriver); err != nil {
+					_ = level.Error(system.GetLogger()).Log(system.DefaultLogMessageField, err.Error())
+					return
+				}
+			}
+		}
+	}
 }

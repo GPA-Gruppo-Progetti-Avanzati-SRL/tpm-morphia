@@ -1,18 +1,7 @@
-package mongodb
-
-import (
-	"bytes"
-	"fmt"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/config"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
-	"testing"
-)
-
-var example = `{
+{
   "name": "author",
   "properties": {
-    "folder-path": "./author",
+    "folder-path": "./example1",
     "struct-name": "Author"
   },
   "attributes": [
@@ -160,40 +149,4 @@ var example = `{
       }
     }
   ]
-}`
-
-func TestGeneration(t *testing.T) {
-
-	r := bytes.NewReader([]byte(example))
-	schema, e := schema.ReadCollectionDefinition(system.GetLogger(), r)
-	if e != nil {
-		t.Fatal(e)
-	}
-
-	genCfg := config.Config{TargetDirectory: ".", ResourceDirectory: "../..", FormatCode: false}
-	genDriver, e := NewCodeGenCollection(schema)
-	if e != nil {
-		t.Error(e)
-	} else {
-		e = Generate(system.GetLogger(), &genCfg, genDriver)
-		if e != nil {
-			t.Error(e)
-		}
-	}
-}
-
-func TestCodeGenTree(t *testing.T) {
-
-	r := bytes.NewReader([]byte(example))
-	schema, e := schema.ReadCollectionDefinition(system.GetLogger(), r)
-	if e != nil {
-		t.Error(e)
-	}
-
-	genDriver, e := NewCodeGenCollection(schema)
-	if e != nil {
-		t.Error(e)
-	}
-
-	fmt.Println(genDriver)
 }

@@ -1,8 +1,11 @@
 package util
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
 var PackageNamePathForm = regexp.MustCompile("^(./)?[a-zA-Z_0-9]+(/[a-zA-Z_0-9]+)*$")
@@ -51,29 +54,37 @@ func FieldNameWellFormed(n string) bool {
 type FormatMode string
 
 const (
-	none               FormatMode = "none"
-	camelCase                     = "camelCase"
-	lowerCase                     = "lowerCase"
-	upperCase                     = "upperCase"
-	suppress                      = "suppress"
-	indexIjk                      = "indexIjk"
-	indexSprintf                  = "indexSprintf"
-	indexIjkWoLast                = "indexIjkWoLast"
-	indexSprintfWoLast            = "indexSprintfWoLast"
+	none      FormatMode = "none"
+	camelCase            = "camelCase"
+	lowerCase            = "lowerCase"
+	upperCase            = "upperCase"
+
+	indexIjk     = "indexIjk"
+	indexSprintf = "indexSprintf"
+
+	suppress    = "suppress"
+	index       = "index"
+	indexWoLast = "indexWoLast"
 )
 
-func FormatIdentifier(aName string, aSeparator string, aComponentFormatMode FormatMode, anIndexingFormatMode FormatMode) string {
+func FormatIdentifier(aName string, aSeparator string, aCasingMode FormatMode, indexHandling FormatMode, indexFormat FormatMode) string {
 
 	if aName == "" {
 		return ""
 	}
 
+	if indexHandling == indexWoLast {
+		aName = strings.TrimSuffix(aName, ".[]")
+		indexHandling = index
+	}
+
 	nameComponents := strings.Split(aName, ".")
 
 	var stb strings.Builder
-	totalNumberOfBrackets := strings.Count(aName, "[")
+	// totalNumberOfBrackets := strings.Count(aName, "[") + strings.Count(aName, "%s")
 	numberOfParts := 0
-	numberOfBrackets := 0
+	numberOfArrayBrackets := 0
+	numberOfMapBrackets := 0
 
 	for _, s := range nameComponents {
 
@@ -81,71 +92,79 @@ func FormatIdentifier(aName string, aSeparator string, aComponentFormatMode Form
 			continue
 		}
 
-		actualFormattingMode := anIndexingFormatMode
-		if s == "[]" {
-			if numberOfBrackets == (totalNumberOfBrackets-1) &&
-				(anIndexingFormatMode == indexIjkWoLast || anIndexingFormatMode == indexSprintfWoLast) {
-				actualFormattingMode = suppress
-			}
+		actualFormattingMode := indexHandling
+		if s == "[]" || s == "%s" {
+			/*
+				if (numberOfArrayBrackets + numberOfMapBrackets) == (totalNumberOfBrackets-1) &&
+					(anIndexingHandlingMode == indexIjkWoLast || anIndexingHandlingMode == indexSprintfWoLast) {
+					actualFormattingMode = suppress
+				}
+			*/
 
-			if actualFormattingMode != suppress && numberOfParts > 0 && aSeparator != "" {
+			if (actualFormattingMode != suppress || s == "%s") && numberOfParts > 0 && aSeparator != "" {
 				stb.WriteString(aSeparator)
 			}
 
 			switch actualFormattingMode {
-			case indexIjkWoLast:
-				fallthrough
-			case indexIjk:
-				stb.WriteString(getIndexVariableName(numberOfBrackets, totalNumberOfBrackets))
-				numberOfParts++
+			case index:
+				if indexFormat == indexIjk {
+					if s == "[]" {
+						stb.WriteString(getIndexVariableName('i', numberOfArrayBrackets, aCasingMode))
+					} else {
+						stb.WriteString(getIndexVariableName('s', numberOfMapBrackets, aCasingMode))
+					}
+				} else {
+					if s == "[]" {
+						stb.WriteString("%d")
+					} else {
+						stb.WriteString("%s")
+					}
+				}
 
-			case indexSprintfWoLast:
-				fallthrough
-			case indexSprintf:
-				stb.WriteString("%d")
 				numberOfParts++
 
 			case suppress:
+				if s != "[]" {
+					if indexFormat == indexIjk {
+						stb.WriteString(getIndexVariableName('s', numberOfMapBrackets, aCasingMode))
+					} else {
+						stb.WriteString("%s")
+					}
+					numberOfParts++
+				}
 
 			default:
 				stb.WriteString(s)
 				numberOfParts++
 			}
 
-			numberOfBrackets++
+			if s == "[]" {
+				numberOfArrayBrackets++
+			} else {
+				numberOfMapBrackets++
+			}
 
 		} else {
 			if numberOfParts > 0 && aSeparator != "" {
 				stb.WriteString(aSeparator)
 			}
 
-			switch aComponentFormatMode {
-			case camelCase:
-				stb.WriteString(ToCapitalCase(s))
-
-			case upperCase:
-				stb.WriteString(strings.ToUpper(s))
-
-			case lowerCase:
-				stb.WriteString(strings.ToLower(s))
-
-			default:
-				stb.WriteString(s)
-			}
-
+			stb.WriteString(adaptCasing(s, aCasingMode))
 			numberOfParts++
 		}
 	}
 
-	return stb.String()
+	s := stb.String()
+	fmt.Printf("%-30s %s %-10s %-10s %-10s = %s\n", aName, aSeparator, aCasingMode, indexHandling, indexFormat, stb.String())
+	return s
 }
 
-func getIndexVariableName(variablePosition int, totalNumberOfVariables int) string {
+func getIndexVariableName(offsetChar int, variablePosition int, casingMode FormatMode) string {
 	if variablePosition < 0 {
 		return ""
 	}
 
-	return string('i' + variablePosition)
+	return adaptCasing(string(rune(offsetChar+variablePosition)), casingMode)
 }
 
 func AppendToNamespace(s1 string, s2 string, sep string) string {
@@ -155,4 +174,33 @@ func AppendToNamespace(s1 string, s2 string, sep string) string {
 	}
 
 	return s2
+}
+
+func FirstToLower(s string) string {
+	if len(s) > 0 {
+		r, size := utf8.DecodeRuneInString(s)
+		if r != utf8.RuneError || size > 1 {
+			lo := unicode.ToLower(r)
+			if lo != r {
+				s = string(lo) + s[size:]
+			}
+		}
+	}
+	return s
+}
+
+func adaptCasing(s string, casing FormatMode) string {
+
+	switch casing {
+	case camelCase:
+		s = ToCapitalCase(s)
+
+	case upperCase:
+		s = strings.ToUpper(s)
+
+	case lowerCase:
+		s = strings.ToLower(s)
+	}
+
+	return s
 }

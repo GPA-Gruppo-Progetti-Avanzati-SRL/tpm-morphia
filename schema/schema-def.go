@@ -2,6 +2,7 @@ package schema
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/util"
 	"github.com/go-kit/kit/log"
@@ -11,11 +12,13 @@ import (
 )
 
 const (
-	AttributeTypeArray    = "array"
-	AttributeTypeStruct   = "struct"
-	AttributeTypeString   = "string"
-	AttributeTypeInt      = "int"
-	AttributeTypeObjectId = "object-id"
+	AttributeTypeArray     = "array"
+	AttributeTypeMap       = "map"
+	AttributeTypeStruct    = "struct"
+	AttributeTypeString    = "string"
+	AttributeTypeInt       = "int"
+	AttributeTypeObjectId  = "object-id"
+	AttributeTypeRefStruct = "ref-struct"
 )
 
 type CollectionDefError struct {
@@ -28,26 +31,62 @@ func (ce *CollectionDefError) Error() string {
 }
 
 type CollectionProps struct {
-	FolderPath  string `json:"folderPath,omitempty"`
-	PackageName string `json:"packageName,omitempty"`
-	StructName  string `json:"struct-name,omitempty"`
+	FolderPath     string `json:"folder-path,omitempty"`
+	Prefix         string `json:"prefix,omitempty"`
+	PackageName    string `json:"packageName,omitempty"`
+	StructName     string `json:"struct-name,omitempty"`
+	MorphiaPackage string `json:"morphia-pkg,omitempty"`
 }
 
 type Collection struct {
 	Name       string          `json:"name,omitempty"`
 	Properties CollectionProps `json:"properties,omitempty"`
 	Attributes []Field         `json:"attributes,omitempty"`
+
+	AllAttributes []*Field `json:"-"`
+}
+
+type StructReference struct {
+	StructName string `json:"struct-name,omitempty"`
+	IsExternal bool   `json:"is-external,omitempty"`
+	Item       *Field
 }
 
 type Field struct {
-	Name       string   `json:"name,omitempty"`
-	StructName string   `json:"struct-name,omitempty"`
-	Typ        string   `json:"type,omitempty"`
-	IsKey      bool     `json:"is-key,omitempty"`
-	Tags       []string `json:"tags,omitempty"`
-	Attributes []Field  `json:"attributes,omitempty"`
-	Item       *Field   `json:"item,omitempty"`
-	Queryable  bool     `json:"queryable,omitempty"`
+	Name       string          `json:"name,omitempty"`
+	StructName string          `json:"struct-name,omitempty"`
+	Typ        string          `json:"type,omitempty"`
+	IsKey      bool            `json:"is-key,omitempty"`
+	Tags       []string        `json:"tags,omitempty"`
+	Attributes []Field         `json:"attributes,omitempty"`
+	Item       *Field          `json:"item,omitempty"`
+	Queryable  bool            `json:"queryable,omitempty"`
+	StructRef  StructReference `json:"struct-ref,omitempty"`
+	Paths      []string        `json:"-"`
+	BsonPaths  []string        `json:"-"`
+}
+
+type InfoCollectorVisitor struct {
+	Attributes []*Field
+}
+
+/*type VisitPhase int
+const (
+  StartVisit VisitPhase = iota
+  DoVisit
+  EndVisit
+)
+
+type VisitorState interface {
+
+}
+
+*/
+
+type Visitor interface {
+	startVisit(f *Field)
+	visit(f *Field)
+	endVisit(f *Field)
 }
 
 /*
@@ -103,13 +142,56 @@ func NewTag(tn string, s string) Tag {
 /*
  * Collection Methods
  */
-func (sch *Collection) ToJsonString(prefix string, indent string) string {
+func (c *Collection) ToJsonString(prefix string, indent string) string {
 
-	if s, e := json.MarshalIndent(sch, prefix, indent); e != nil {
+	if s, e := json.MarshalIndent(c, prefix, indent); e != nil {
 		return e.Error()
 	} else {
 		return string(s)
 	}
+}
+
+func (c *Collection) findAttributes() []*Field {
+	infoCollector := InfoCollectorVisitor{Attributes: make([]*Field, 0)}
+	for i := range c.Attributes {
+		infoCollector.Attributes = append(infoCollector.Attributes, &c.Attributes[i])
+		infoCollector = c.Attributes[i].FindAttributes(infoCollector)
+	}
+
+	return infoCollector.Attributes
+}
+
+func (c *Collection) visit(v Visitor) {
+	for i := range c.Attributes {
+		v.visit(&c.Attributes[i])
+		c.Attributes[i].visit(v)
+	}
+}
+
+func (c *Collection) wireReference2Structs(fields []*Field) error {
+	refs := make(map[string]*Field)
+	for _, f := range fields {
+		if f.Typ == AttributeTypeStruct {
+			refs[f.StructName] = f
+		}
+	}
+
+	for _, f := range fields {
+		if f.Typ == AttributeTypeRefStruct {
+			if item, ok := refs[f.StructRef.StructName]; !ok {
+				// Unresolved reference. Can be declared externally to current file.
+				// Another approach could be to process two schemas as a bundle but is way to elaborate.
+				// Should probably add a dependency in terms of a package import
+				if !f.StructRef.IsExternal {
+					return errors.New(fmt.Sprintf("the field %s refers to undefined struct %s", f.Name, f.StructName))
+				}
+			} else {
+				f.StructRef.Item = item
+			}
+		}
+	}
+
+	return nil
 }
 
 /*
@@ -125,8 +207,14 @@ func (f *Field) GetTagsAsListOfTag(forceFieldNameIfMissing bool, forceOmitIfEmpt
 				nt.Value = f.Name
 			}
 
-			if !strings.Contains(f.Tags[i+1], "omitempty") && forceOmitIfEmpty {
-				nt.Options = append(nt.Options, "omitempty")
+			if strings.HasPrefix(f.Tags[i+1], "-") {
+				if strings.Contains(f.Tags[i+1], ",omitempty") {
+					f.Tags[i+1] = strings.ReplaceAll(f.Tags[i+1], ",omitempty", "")
+				}
+			} else {
+				if !strings.Contains(f.Tags[i+1], "omitempty") && (forceOmitIfEmpty || strings.HasPrefix(f.Tags[i+1], "_id")) {
+					nt.Options = append(nt.Options, "omitempty")
+				}
 			}
 
 			tags = append(tags, nt)
@@ -190,6 +278,53 @@ func (f *Field) GetTagNameValue(tagName string) string {
 }
 
 /*
+ *
+ */
+func (f *Field) FindAttributes(infoCollector InfoCollectorVisitor) InfoCollectorVisitor {
+
+	for i := range f.Attributes {
+		infoCollector.Attributes = append(infoCollector.Attributes, &f.Attributes[i])
+		infoCollector = f.Attributes[i].FindAttributes(infoCollector)
+	}
+
+	if f.Item != nil {
+		infoCollector = f.Item.FindAttributes(infoCollector)
+	}
+
+	return infoCollector
+}
+
+func (f *Field) visit(v Visitor) {
+	v.startVisit(f)
+
+	// Se il riferimento e' esterno allora non lo 'seguo'. L'elemento e' nil.
+	if f.Typ == AttributeTypeRefStruct {
+		if f.StructRef.Item != nil {
+			for i := range f.StructRef.Item.Attributes {
+				v.visit(&f.StructRef.Item.Attributes[i])
+				f.StructRef.Item.Attributes[i].visit(v)
+			}
+		}
+	} else {
+		for i := range f.Attributes {
+			v.visit(&f.Attributes[i])
+			f.Attributes[i].visit(v)
+		}
+
+		if f.Item != nil {
+			f.Item.visit(v)
+		}
+	}
+
+	v.endVisit(f)
+
+}
+
+func (f Field) String() string {
+	return fmt.Sprintf("%s - %s - %s", f.Name, f.Typ, f.StructName)
+}
+
+/*
  * Read and Validate Function
  */
 func ReadCollectionDefinition(logger log.Logger, reader io.Reader) (*Collection, error) {
@@ -210,9 +345,33 @@ func ReadCollectionDefinition(logger log.Logger, reader io.Reader) (*Collection,
 		return nil, &CollectionDefError{msg: err.Error()}
 	}
 
+	/* Since I just deserialized stuff, just try to check that pretty much che stuff is correct or at least
+	 * not massively wrong.
+	 */
 	if e := validateCollectionDef(logger, schema); e != nil {
 		return nil, e
 	}
+
+	/* Now traverse the tree and get the list of attrs. yes, it could have been done in the validation phase.
+	 * May be later on will get into that processing.
+	 */
+	fields := schema.findAttributes()
+	schema.AllAttributes = fields
+	for _, f := range fields {
+		fmt.Println(f)
+	}
+
+	/*
+	 * Now it's time to wire the references to structs in order to calculate all the paths or heirarchies to the leaves.
+	 * In principle the wiring should detect loops in the config. Loops at the moment might cause a stack issue, but nevertheless
+	 * should be handled as pointer to struct in the generation.
+	 */
+	if err := schema.wireReference2Structs(fields); err != nil {
+		return nil, err
+	}
+
+	lf := PathFinderVisitor{}
+	schema.visit(&lf)
 
 	return schema, nil
 }
@@ -259,7 +418,7 @@ func validateProperties(logger log.Logger, c *Collection) error {
 
 func validateAttributes(logger log.Logger, props []Field, pPath string, parentField *Field) error {
 
-	_ = level.Debug(logger).Log("msg", "start validating properties", "path", pPath)
+	_ = level.Debug(logger).Log("msg", "start validating attributes", "path", pPath)
 
 	if len(props) == 0 {
 		return &CollectionDefError{ctx: pPath, msg: "attributes missing from schema"}
@@ -279,7 +438,7 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 
 	arrayItemDefinition := false
 
-	if parentField != nil && parentField.Typ == AttributeTypeArray {
+	if parentField != nil && (parentField.Typ == AttributeTypeArray || parentField.Typ == AttributeTypeMap) {
 		arrayItemDefinition = true
 	}
 
@@ -294,7 +453,7 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 	}
 
 	if arrayItemDefinition {
-		if len(f.Name) != 0 && f.Name != "[]" {
+		if len(f.Name) != 0 && f.Name != "[]" && f.Name != "%s" {
 			return &CollectionDefError{ctx: pPath, msg: "field name is provided but is not required"}
 		}
 	} else {
@@ -311,6 +470,15 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 	case AttributeTypeObjectId:
 	case AttributeTypeString:
 	case AttributeTypeInt:
+	case AttributeTypeRefStruct:
+		sn := f.StructRef.StructName
+		if sn == "" {
+			sn = f.StructName
+			f.StructRef.StructName = sn
+		}
+		if sn == "" {
+			vErr = &CollectionDefError{ctx: pPath, msg: "struct name required for " + f.Typ}
+		}
 	case AttributeTypeStruct:
 		if f.IsKey {
 			vErr = &CollectionDefError{ctx: pPath, msg: "is-key not supported on " + f.Typ}
@@ -333,6 +501,12 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 		} else {
 			vErr = validateItem(logger, f.Item, pPath, f)
 		}
+	case AttributeTypeMap:
+		if f.IsKey {
+			vErr = &CollectionDefError{ctx: pPath, msg: "is-key not supported on " + f.Typ}
+		} else {
+			vErr = validateItem(logger, f.Item, pPath, f)
+		}
 	default:
 		vErr = &CollectionDefError{ctx: pPath, msg: "unsupported type: " + f.Typ}
 	}
@@ -340,7 +514,7 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 	return vErr
 }
 
-func validateItem(logger log.Logger, f *Field, pPath string, arrayField *Field) error {
+func validateItem(logger log.Logger, f *Field, pPath string, containerField *Field) error {
 
 	_ = level.Debug(logger).Log("msg", "start validating array item definition", "path", pPath)
 
@@ -351,8 +525,13 @@ func validateItem(logger log.Logger, f *Field, pPath string, arrayField *Field) 
 	/*
 	 * The item gets assigned a special name as field. Sort of indexer.
 	 */
-	f.Name = "[]"
+	if containerField.Typ == "array" {
+		f.Name = "[]"
+		pPath = strings.Join([]string{pPath, "[i]"}, ".")
+	} else {
+		f.Name = "%s"
+		pPath = strings.Join([]string{pPath, "%s"}, ".")
+	}
 
-	pPath = strings.Join([]string{pPath, "[i]"}, ".")
-	return validateField(logger, f, pPath, arrayField)
+	return validateField(logger, f, pPath, containerField)
 }

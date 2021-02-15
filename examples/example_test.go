@@ -18,7 +18,7 @@ func TestExample(t *testing.T) {
 	genCfg.FormatCode = true
 	genCfg.CollectionDefScanPath = "."
 
-	colls, err := genCfg.FindCollectionToProcess()
+	colls, err := genCfg.FindCollectionToProcess(system.GetLogger())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,7 +45,5 @@ func TestExample(t *testing.T) {
 				}
 			}
 		}
-
 	}
-
 }

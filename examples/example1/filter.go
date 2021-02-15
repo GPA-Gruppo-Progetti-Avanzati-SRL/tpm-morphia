@@ -1,4 +1,4 @@
-package {{ .Collection.GetPackageName }}
+package example1
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ type Filter struct {
 	listOfCriteria []Criteria
 }
 
-func (f *Filter)Or() *Criteria {
+func (f *Filter) Or() *Criteria {
 	ca := make(Criteria, 0)
 
 	/*
@@ -40,12 +40,12 @@ func (f *Filter)Or() *Criteria {
 
 	// Should check top criteria if empty...
 	f.listOfCriteria = append(f.listOfCriteria, ca)
-	return &f.listOfCriteria[len(f.listOfCriteria) - 1]
+	return &f.listOfCriteria[len(f.listOfCriteria)-1]
 }
 
 var emptyFilter = bson.D{}
 
-func (f *Filter)Build() bson.D {
+func (f *Filter) Build() bson.D {
 
 	if len(f.listOfCriteria) == 0 {
 		return emptyFilter
@@ -64,6 +64,5 @@ func (f *Filter)Build() bson.D {
 		return docA[0].(bson.D)
 	}
 
-	return bson.D{ { "$or", docA }}
+	return bson.D{{"$or", docA}}
 }
-

@@ -10,8 +10,10 @@ import (
 var example = `{
    "name": "author",
    "properties": {
-       "folderPath": "./author"
+       "folder-path": "./author"
+      ,"prefix": "author"
       ,"struct-name": "Author"
+      ,"morphia-pkg": "../morphia"
    },
    "attributes": [
        { "name": "firstName", "type": "string", "tags": [ "json", "fn", "bson", "fn" ], "queryable": true }
@@ -24,6 +26,7 @@ var example = `{
            ,{ "name": "strt", "type": "string" }
          ]
       }
+      ,{ "name": "amazon",  "type": "ref-struct", "tags": [ "json", "amazon", "bson", "amz" ], "struct-name": "Address" }
       ,{ 
         "name": "books", "type": "array",
         "item": {
@@ -36,6 +39,17 @@ var example = `{
            ]
         }
       }
+      ,{ 
+        "name": "props", "type": "map",
+        "item": {
+           "type": "struct"
+          ,"struct-name": "Property"
+          ,"attributes": [
+               { "name": "ptitle", "type": "string" }
+              ,{ "name": "pisbn", "type": "string" } 
+           ]
+        }
+      } 
    ] 
 }`
 

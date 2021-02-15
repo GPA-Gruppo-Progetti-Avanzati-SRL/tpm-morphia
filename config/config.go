@@ -224,7 +224,7 @@ func (cfg *Config) checkValid() error {
 	return nil
 }
 
-func (cfg *Config) FindCollectionToProcess() ([]string, error) {
+func (cfg *Config) FindCollectionToProcess(logger log.Logger) ([]string, error) {
 
 	if cfg.CollectionDefFile != "" {
 		if _, err := os.Stat(cfg.CollectionDefFile); err == nil {
@@ -243,13 +243,14 @@ func (cfg *Config) FindCollectionToProcess() ([]string, error) {
 			}
 			if filterPath(info.Name(), info.IsDir()) {
 				if !info.IsDir() {
-					fmt.Printf("visited file or dir: %q\n", path)
+					_ = level.Debug(logger).Log("msg", "visited file or dir", "name", path)
 					defs = append(defs, path)
 				}
 				return nil
 			} else {
 				if info.IsDir() {
-					fmt.Printf("skipping dir: %+v \n", info.Name())
+					// fmt.Printf("skipping dir: %+v \n", info.Name())
+					_ = level.Debug(logger).Log("msg", "skipping dir", "name", info.Name())
 					return filepath.SkipDir
 				}
 			}
