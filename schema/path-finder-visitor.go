@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -42,7 +41,7 @@ func (pv *PathFinderVisitor) startVisit(f *Field) {
 			f.Paths = strings.Join([]string{ f.Paths, p }, ";")
 		}
 	*/
-	fmt.Printf("Path of %s of type %s = %v %v\n", f.Name, f.Typ, f.Paths, f.BsonPaths)
+	// fmt.Printf("Path of %s of type %s = %v %v\n", f.Name, f.Typ, f.Paths, f.BsonPaths)
 }
 
 func (pv *PathFinderVisitor) endVisit(f *Field) {

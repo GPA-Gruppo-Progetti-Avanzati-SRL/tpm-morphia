@@ -4,5 +4,5 @@
 package system
 
 func init() {
-	SysInfo = Info{TPMMorphia: "0.0.3-SNAPSHOT", BuildNum: "UNDEF", GitSHA: "UNDEF", GOOS: "darwin", GOARCH: "arm64"}
+	SysInfo = Info{TPMMorphia: "0.0.4-SNAPSHOT", BuildNum: "UNDEF", GitSHA: "UNDEF", GOOS: "darwin", GOARCH: "arm64"}
 }

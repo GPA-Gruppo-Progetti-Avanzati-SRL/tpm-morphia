@@ -2,7 +2,6 @@ package schema
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
 	"testing"
 )
@@ -26,7 +25,7 @@ var example = `{
            ,{ "name": "strt", "type": "string" }
          ]
       }
-      ,{ "name": "amazon",  "type": "ref-struct", "tags": [ "json", "amazon", "bson", "amz" ], "struct-name": "Address" }
+      ,{ "name": "amazon",  "type": "ref-struct", "tags": [ "json", "amazon", "bson", "amz" ], "struct-ref": { "struct-name": "Address", "is-external": true, "package": "zucca/pkg" }}
       ,{ 
         "name": "books", "type": "array",
         "item": {
@@ -56,10 +55,9 @@ var example = `{
 func TestParse(t *testing.T) {
 
 	r := bytes.NewReader([]byte(example))
-	schema, e := ReadCollectionDefinition(system.GetLogger(), r)
+	_, e := ReadCollectionDefinition(system.GetLogger(), r)
 	if e != nil {
 		t.Error(e)
 	}
 
-	fmt.Println(schema)
 }

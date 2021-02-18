@@ -49,6 +49,7 @@ type Collection struct {
 type StructReference struct {
 	StructName string `json:"struct-name,omitempty"`
 	IsExternal bool   `json:"is-external,omitempty"`
+	Package    string
 	Item       *Field
 }
 
@@ -173,6 +174,8 @@ func (c *Collection) wireReference2Structs(fields []*Field) error {
 	for _, f := range fields {
 		if f.Typ == AttributeTypeStruct {
 			refs[f.StructName] = f
+		} else if (f.Typ == AttributeTypeMap || f.Typ == AttributeTypeArray) && f.Item.Typ == AttributeTypeStruct {
+			refs[f.Item.StructName] = f.Item
 		}
 	}
 
@@ -357,9 +360,6 @@ func ReadCollectionDefinition(logger log.Logger, reader io.Reader) (*Collection,
 	 */
 	fields := schema.findAttributes()
 	schema.AllAttributes = fields
-	for _, f := range fields {
-		fmt.Println(f)
-	}
 
 	/*
 	 * Now it's time to wire the references to structs in order to calculate all the paths or heirarchies to the leaves.
@@ -478,6 +478,10 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 		}
 		if sn == "" {
 			vErr = &CollectionDefError{ctx: pPath, msg: "struct name required for " + f.Typ}
+		}
+
+		if f.StructRef.IsExternal && f.StructRef.Package == "" {
+			_ = level.Warn(logger).Log("msg", "struct reference declared external but missing package info "+f.StructRef.StructName)
 		}
 	case AttributeTypeStruct:
 		if f.IsKey {

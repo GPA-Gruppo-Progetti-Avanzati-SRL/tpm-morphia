@@ -92,6 +92,16 @@ var example = `{
       "queryable": true
     },
     {
+      "name": "extReference",
+      "type": "ref-struct",
+      "struct-ref": {
+        "struct-name": "ExternalStruct",
+        "is-external": true,
+        "package": "lib/external/extpkg"
+      },
+      "queryable": false
+    },
+    {
       "name": "books",
       "type": "array",
       "item": {

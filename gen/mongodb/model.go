@@ -154,10 +154,16 @@ func NewRefStructTypeAttribute(parentAttribute CodeGenAttribute, attrDefinition 
 
 	switch strings.ToLower(attrDefinition.Typ) {
 	case schema.AttributeTypeRefStruct:
+		if attrDefinition.StructRef.Package != "" {
+			v.PackageImports = make([]string, 0, 1)
+			v.PackageImports = append(v.PackageImports, attrDefinition.StructRef.Package)
+		}
+		/* Introduced the StructReference support info.
 		if slashPos := strings.LastIndex(attrDefinition.StructName, "/"); slashPos > 0 {
 			v.PackageImports = make([]string, 0, 1)
 			v.PackageImports = append(v.PackageImports, attrDefinition.StructName[0:slashPos])
 		}
+		*/
 
 	}
 
@@ -600,6 +606,11 @@ func (v *ValueTypeAttribute) GetGoAttributeType() string {
  * RefStruct Implementation
  */
 func (v *RefStructAttribute) GetGoAttributeType() string {
+	if v.AttrDefinition.StructRef.Package != "" {
+		if pkgNdx := strings.LastIndex(v.AttrDefinition.StructRef.Package, "/"); pkgNdx >= 0 {
+			return strings.Join([]string{v.AttrDefinition.StructRef.Package[pkgNdx+1:], v.AttrDefinition.StructRef.StructName}, ".")
+		}
+	}
 	return v.AttrDefinition.StructRef.StructName
 }
 

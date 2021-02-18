@@ -21,17 +21,17 @@ type GenerationContext struct {
 }
 
 const (
-	TmplCollectionReadme               = "/resources/mongodb-%s/readme.txt"
-	TmplCollectionModel                = "/resources/mongodb-%s/model.txt"
-	TmplCollectionFilter               = "/resources/mongodb-%s/filter-methods.txt"
-	TmplCollectionCriteria             = "/resources/mongodb-%s/filter.txt"
-	TmplCollectionFilterString         = "/resources/mongodb-%s/filter-string.txt"
-	TmplCollectionFilterInt            = "/resources/mongodb-%s/filter-int.txt"
-	TmplCollectionStructFilterString   = "/resources/mongodb-%s/struct-filter-string.txt"
-	TmplCollectionStructFilterInt      = "/resources/mongodb-%s/struct-filter-int.txt"
-	TmplCollectionStructFilterObjectId = "/resources/mongodb-%s/filter-object-id.txt"
-	TmplCollectionUpdate               = "/resources/mongodb-%s/update.txt"
-	TmplCollectionUpdateMethods        = "/resources/mongodb-%s/update-methods.txt"
+	TmplCollectionReadme             = "/resources/mongodb-%s/readme.txt"
+	TmplCollectionModel              = "/resources/mongodb-%s/model.txt"
+	TmplCollectionFilter             = "/resources/mongodb-%s/filter-methods.txt"
+	TmplCollectionCriteria           = "/resources/mongodb-%s/filter.txt"
+	TmplCollectionFilterString       = "/resources/mongodb-%s/filter-string.txt"
+	TmplCollectionFilterInt          = "/resources/mongodb-%s/filter-int.txt"
+	TmplCollectionStructFilterString = "/resources/mongodb-%s/struct-filter-string.txt"
+	TmplCollectionStructFilterInt    = "/resources/mongodb-%s/struct-filter-int.txt"
+	TmplCollectionFilterObjectId     = "/resources/mongodb-%s/filter-object-id.txt"
+	TmplCollectionUpdate             = "/resources/mongodb-%s/update.txt"
+	TmplCollectionUpdateMethods      = "/resources/mongodb-%s/update-methods.txt"
 )
 
 // List of templates for mongoDbGeneration
@@ -40,9 +40,9 @@ func filterTmplList(tmplVersion string) []string {
 	s = append(s, fmt.Sprintf(TmplCollectionFilter, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionFilterString, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionFilterInt, tmplVersion))
-	s = append(s, fmt.Sprintf(TmplCollectionStructFilterString, tmplVersion))
-	s = append(s, fmt.Sprintf(TmplCollectionStructFilterInt, tmplVersion))
-	s = append(s, fmt.Sprintf(TmplCollectionStructFilterObjectId, tmplVersion))
+	//s = append(s, fmt.Sprintf(TmplCollectionStructFilterString, tmplVersion))
+	//s = append(s, fmt.Sprintf(TmplCollectionStructFilterInt, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionFilterObjectId, tmplVersion))
 	return s
 }
 
