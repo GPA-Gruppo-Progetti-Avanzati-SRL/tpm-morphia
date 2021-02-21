@@ -21,6 +21,10 @@ func (uo *UpdateDocument)Set() *Updates {
 	return uo.op(Set)
 }
 
+func (uo *UpdateDocument) Unset() *Updates {
+	return uo.op(Unset)
+}
+
 func (uo *UpdateDocument)op(op UpdateOperator) *Updates {
 
 	if len(uo.Ops) == 0 {
