@@ -35,7 +35,7 @@ func (uo *UpdateDocument)op(op UpdateOperator) *Updates {
 		return u
 	}
 
-	uopi := &Updates{ operator: "$set" }
+	uopi := &Updates{ operator: string(op) }
 	uo.Ops[op] = uopi
 
 	return uopi

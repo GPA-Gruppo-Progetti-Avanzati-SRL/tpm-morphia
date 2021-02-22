@@ -169,6 +169,7 @@ func emit(logger log.Logger, genCtx GenerationContext, resDir string, outFolder 
 		_ = level.Info(logger).Log("msg", "generating text from template", "dest", destinationFile)
 
 		if err := parseTemplateWithFuncMapsProcessWrite2File(t, getTemplateUtilityFunctions(), genCtx, destinationFile, formatCode); err != nil {
+			_ = level.Info(logger).Log("msg", "parse template failed", "err", err.Error())
 			return err
 		}
 	} else {

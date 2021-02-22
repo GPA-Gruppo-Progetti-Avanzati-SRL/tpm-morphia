@@ -200,6 +200,18 @@ func (c *Collection) wireReference2Structs(fields []*Field) error {
 /*
  * Field Methods
  */
+func (f Field) IsStructType() bool {
+	return f.Typ == AttributeTypeStruct || f.Typ == AttributeTypeRefStruct
+}
+
+func (f Field) IsCollectionType() bool {
+	return f.Typ == AttributeTypeMap || f.Typ == AttributeTypeArray
+}
+
+func (f Field) IsValueType() bool {
+	return !f.IsStructType() && !f.IsCollectionType()
+}
+
 func (f *Field) GetTagsAsListOfTag(forceFieldNameIfMissing bool, forceOmitIfEmpty bool, tagsOfInterest []string) []Tag {
 	var tags []Tag
 	if len(f.Tags) > 0 {

@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"unicode"
@@ -155,7 +154,7 @@ func FormatIdentifier(aName string, aSeparator string, aCasingMode FormatMode, i
 	}
 
 	s := stb.String()
-	fmt.Printf("%-30s %s %-10s %-10s %-10s = %s\n", aName, aSeparator, aCasingMode, indexHandling, indexFormat, stb.String())
+	// fmt.Printf("%-30s %s %-10s %-10s %-10s = %s\n", aName, aSeparator, aCasingMode, indexHandling, indexFormat, stb.String())
 	return s
 }
 
