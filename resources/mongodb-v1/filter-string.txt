@@ -5,6 +5,11 @@
 {{- range $i, $p := $f.Paths}}
 {{- if not (isIdentifierIndexed $p) }}
 func (ca *Criteria) And{{ criteriaMethodSignature $p }}EqTo ({{ criteriaMethodVarParams $p true "after" }} p string) *Criteria {
+
+    if p == "" {
+        return ca
+    }
+
 	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "suppress" "indexIjk"}} {{ criteriaMethodVarParams $p false "before" }})
 	c := func() bson.E { return bson.E { Key: mName, Value: p } }
 	*ca = append(*ca, c)
@@ -12,6 +17,11 @@ func (ca *Criteria) And{{ criteriaMethodSignature $p }}EqTo ({{ criteriaMethodVa
 }
 
 func (ca *Criteria) And{{ criteriaMethodSignature $p }}In ({{ criteriaMethodVarParams $p true "after" }} p []string) *Criteria {
+
+    if len(p) == 0 {
+        return ca
+    }
+
 	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "suppress" "indexIjk"}} {{ criteriaMethodVarParams $p false "before" }})
 	c := func() bson.E { return bson.E { Key: mName, Value: bson.D { {"$in", p} } } }
 	*ca = append(*ca, c)

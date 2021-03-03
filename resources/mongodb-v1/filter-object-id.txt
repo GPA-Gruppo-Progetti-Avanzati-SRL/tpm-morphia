@@ -6,6 +6,11 @@
 {{- range $i, $p := $f.Paths}}
 {{- if not (isIdentifierIndexed $p) }}
 func (ca *Criteria) And{{ criteriaMethodSignature $p }}EqTo ({{ criteriaMethodVarParams $p true "after" }} oId primitive.ObjectID) *Criteria {
+
+	if oId == primitive.NilObjectID {
+   		return ca
+   	}
+
 	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "suppress" "indexIjk"}} {{ criteriaMethodVarParams $p false "before" }})
 	c := func() bson.E { return bson.E { Key: mName, Value: oId } }
 	*ca = append(*ca, c)
