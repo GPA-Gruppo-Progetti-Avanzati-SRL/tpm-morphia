@@ -21,17 +21,20 @@ type GenerationContext struct {
 }
 
 const (
-	TmplCollectionReadme             = "/resources/mongodb-%s/readme.txt"
-	TmplCollectionModel              = "/resources/mongodb-%s/model.txt"
-	TmplCollectionFilter             = "/resources/mongodb-%s/filter-methods.txt"
-	TmplCollectionCriteria           = "/resources/mongodb-%s/filter.txt"
-	TmplCollectionFilterString       = "/resources/mongodb-%s/filter-string.txt"
-	TmplCollectionFilterInt          = "/resources/mongodb-%s/filter-int.txt"
-	TmplCollectionStructFilterString = "/resources/mongodb-%s/struct-filter-string.txt"
-	TmplCollectionStructFilterInt    = "/resources/mongodb-%s/struct-filter-int.txt"
-	TmplCollectionFilterObjectId     = "/resources/mongodb-%s/filter-object-id.txt"
-	TmplCollectionUpdate             = "/resources/mongodb-%s/update.txt"
-	TmplCollectionUpdateMethods      = "/resources/mongodb-%s/update-methods.txt"
+	TmplCollectionReadme          = "/resources/mongodb-%s/readme.txt"
+	TmplCollectionModel           = "/resources/mongodb-%s/model.txt"
+	TmplCollectionFilter          = "/resources/mongodb-%s/filter-methods.txt"
+	TmplCollectionCriteria        = "/resources/mongodb-%s/filter.txt"
+	TmplCollectionFilterString    = "/resources/mongodb-%s/filter-string.txt"
+	TmplCollectionFilterInt       = "/resources/mongodb-%s/filter-int.txt"
+	TmplCollectionFilterDate      = "/resources/mongodb-%s/filter-date.txt"
+	TmplCollectionStructFilterInt = "/resources/mongodb-%s/struct-filter-int.txt"
+	TmplCollectionFilterObjectId  = "/resources/mongodb-%s/filter-object-id.txt"
+	TmplCollectionUpdate          = "/resources/mongodb-%s/update.txt"
+	TmplCollectionUpdateMethods   = "/resources/mongodb-%s/update-methods.txt"
+	TmplCollectionUpdateString    = "/resources/mongodb-%s/update-string.txt"
+	TmplCollectionUpdateInt       = "/resources/mongodb-%s/update-int.txt"
+	TmplCollectionUpdateDate      = "/resources/mongodb-%s/update-date.txt"
 )
 
 // List of templates for mongoDbGeneration
@@ -40,7 +43,7 @@ func filterTmplList(tmplVersion string) []string {
 	s = append(s, fmt.Sprintf(TmplCollectionFilter, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionFilterString, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionFilterInt, tmplVersion))
-	//s = append(s, fmt.Sprintf(TmplCollectionStructFilterString, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionFilterDate, tmplVersion))
 	//s = append(s, fmt.Sprintf(TmplCollectionStructFilterInt, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionFilterObjectId, tmplVersion))
 	return s
@@ -73,6 +76,9 @@ func updateTmplList(tmplVersion string) []string {
 func updateMethodsTmplList(tmplVersion string) []string {
 	s := make([]string, 0, 1)
 	s = append(s, fmt.Sprintf(TmplCollectionUpdateMethods, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionUpdateString, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionUpdateInt, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionUpdateDate, tmplVersion))
 	return s
 }
 

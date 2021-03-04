@@ -18,6 +18,7 @@ var example = `{
        { "name": "firstName", "type": "string", "tags": [ "json", "fn", "bson", "fn" ], "queryable": true }
       ,{ "name": "lastName", "type": "string", "tags": [ "json", "ln", "bson", "ln" ], "queryable": true }
       ,{ "name": "age", "type": "int" }
+      ,{ "name": "lastUpdate", "type": "date" }
       ,{ "name": "address",  "type": "struct", "tags": [ "json", "addr", "bson", "addr" ]
          ,"struct-name": "Address"
          ,"attributes": [

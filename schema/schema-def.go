@@ -17,6 +17,7 @@ const (
 	AttributeTypeStruct    = "struct"
 	AttributeTypeString    = "string"
 	AttributeTypeInt       = "int"
+	AttributeTypeDate      = "date"
 	AttributeTypeObjectId  = "object-id"
 	AttributeTypeRefStruct = "ref-struct"
 )
@@ -482,6 +483,7 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 	case AttributeTypeObjectId:
 	case AttributeTypeString:
 	case AttributeTypeInt:
+	case AttributeTypeDate:
 	case AttributeTypeRefStruct:
 		sn := f.StructRef.StructName
 		if sn == "" {

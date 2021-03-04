@@ -14,6 +14,7 @@ const (
 	AttributeTypeStringGoType   = "string"
 	AttributeTypeIntGoType      = "int32"
 	AttributeTypeObjectIdGoType = "primitive.ObjectID"
+	AttributeTypeDateGoType     = "primitive.DateTime"
 )
 
 type InfoCollectorVisitor struct {
@@ -429,6 +430,8 @@ func (b *CodeGenAttributeImpl) GetGoAttributeIsZeroCondition() string {
 		s = fmt.Sprintf("s.%s != primitive.NilObjectID", b.GetGoAttributeName())
 	case schema.AttributeTypeInt:
 		s = fmt.Sprintf("s.%s != 0", b.GetGoAttributeName())
+	case schema.AttributeTypeDate:
+		s = fmt.Sprintf("s.%s != 0", b.GetGoAttributeName())
 	case schema.AttributeTypeArray:
 		s = fmt.Sprintf("len(s.%s) != 0", b.GetGoAttributeName())
 	case schema.AttributeTypeStruct:
@@ -594,6 +597,8 @@ func (v *ValueTypeAttribute) GetGoAttributeType() string {
 		t = AttributeTypeStringGoType
 	case schema.AttributeTypeInt:
 		t = AttributeTypeIntGoType
+	case schema.AttributeTypeDate:
+		t = AttributeTypeDateGoType
 	case schema.AttributeTypeObjectId:
 		t = AttributeTypeObjectIdGoType
 	default:

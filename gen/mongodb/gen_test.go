@@ -9,6 +9,18 @@ import (
 	"testing"
 )
 
+/*
+   {
+     "name": "extReference",
+     "type": "ref-struct",
+     "struct-ref": {
+       "struct-name": "ExternalStruct",
+       "is-external": true,
+       "package": "lib/external/extpkg"
+     },
+     "queryable": false
+   },
+*/
 var example = `{
   "name": "author",
   "properties": {
@@ -35,6 +47,17 @@ var example = `{
         "fn",
         "bson",
         "fn"
+      ],
+      "queryable": true
+    },
+    {
+      "name": "lastUpdate",
+      "type": "date",
+      "tags": [
+        "json",
+        "dt",
+        "bson",
+        "dt"
       ],
       "queryable": true
     },
@@ -91,16 +114,7 @@ var example = `{
       },
       "queryable": true
     },
-    {
-      "name": "extReference",
-      "type": "ref-struct",
-      "struct-ref": {
-        "struct-name": "ExternalStruct",
-        "is-external": true,
-        "package": "lib/external/extpkg"
-      },
-      "queryable": false
-    },
+
     {
       "name": "books",
       "type": "array",

@@ -21,6 +21,9 @@ func {{.Collection.GetPrefix "capital"}}FilterGoInfo() string {
 {{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "int") }}
 {{ template "filter-int" filterSubTemplateContext $a "*" }}
 {{- end -}}
+{{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "date") }}
+{{ template "filter-date" filterSubTemplateContext $a "*" }}
+{{- end -}}
 {{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "object-id") }}
 {{ template "filter-object-id" filterSubTemplateContext $a "*" }}
 {{- end -}}

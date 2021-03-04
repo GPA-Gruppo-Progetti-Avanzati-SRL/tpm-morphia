@@ -8,6 +8,8 @@ type UpdateOperator string
 const (
 	Set   UpdateOperator = "$set"
 	Unset UpdateOperator = "$unset"
+	Inc   UpdateOperator = "$inc"
+	CurrentDate UpdateOperator = "currentDate"
 )
 
 
@@ -23,6 +25,14 @@ func (uo *UpdateDocument)Set() *Updates {
 
 func (uo *UpdateDocument) Unset() *Updates {
 	return uo.op(Unset)
+}
+
+func (uo *UpdateDocument) CurrentDate() *Updates {
+	return uo.op(CurrentDate)
+}
+
+func (uo *UpdateDocument) Inc() *Updates {
+	return uo.op(Inc)
 }
 
 func (uo *UpdateDocument)op(op UpdateOperator) *Updates {
@@ -70,4 +80,8 @@ type Updates struct {
 
 func (ui *Updates)Add(fu Update) {
 	ui.updates = append(ui.updates, fu)
+}
+
+func (ud *UpdateDocument)Add(op UpdateOperator, fu Update) {
+	ud.op(op).Add(fu)
 }
