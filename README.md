@@ -47,14 +47,14 @@ type Address struct {
 The obvious operation is to create a few records and add to a collection. In our case the code could be something like (from example0):
 
 ```go
-    a := example0.Author{
-		FirstName: fn,
-		LastName:  ln,
-		Age:       30,
-		Address:   example0.Address{City: city, Street: strt},
-	}
-	
-	r, err := aCollection.InsertOne(ctx, a)
+a := example0.Author{
+  FirstName: fn,
+  LastName:  ln,
+  Age:       30,
+  Address:   example0.Address{City: city, Street: strt},
+}
+
+r, err := aCollection.InsertOne(ctx, a)
 ```
 
 The resulting object in the collection is pretty much what we expect to be, with just one caveat: if we provide an empty city and street the 
@@ -65,32 +65,33 @@ the marshaller in that case esily understands what to do with it. May be you dec
 
 ```go
 func (s Author) IsZero() bool {
-	if s.OId != primitive.NilObjectID {
-		return false
-	}
-	if s.FirstName != "" {
-		return false
-	}
-	if s.LastName != "" {
-		return false
-	}
-	if s.Age != 0 {
-		return false
-	}
-	if !s.Address.IsZero() {
-		return false
-	}
-	return true
+   if s.OId != primitive.NilObjectID {
+      return false
+   }
+   if s.FirstName != "" {
+   	  return false
+   }
+   if s.LastName != "" {
+   	  return false
+   }
+   if s.Age != 0 {
+   	  return false
+   }
+   if !s.Address.IsZero() {
+   	  return false
+   }
+   return true
 }
 
 func (s Address) IsZero() bool {
-	if s.City != "" {
-		return false
-	}
-	if s.Street != "" {
-		return false
-	}
-	return true
+   if s.City != "" {
+      return false
+   }
+   
+   if s.Street != "" {
+      return false
+   }
+   return true
 }
 ```
 
