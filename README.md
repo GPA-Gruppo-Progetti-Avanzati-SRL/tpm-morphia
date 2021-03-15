@@ -100,7 +100,7 @@ snippet is reported below.
 
 ```go
 filter := bson.D{
-	{"$or", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}, {"addr.city", cy}}}},
+   {"$or", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}, {"addr.city", cy}}}},
 }
 
 cur, err := aCollection.Find(ctx, filter)
@@ -123,14 +123,14 @@ What if we want to do an update? That requires two documents: one to filter the 
 opts := options.Update().SetUpsert(true)
 
 filter := bson.D{
-	{"$and", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}}}},
+   {"$and", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}}}},
 }
 
 updateDoc := bson.D{{"$set", bson.D{{"addr.city", cy}}}}
 if ur, err := aCollection.UpdateOne(ctx, filter, updateDoc, opts); err != nil {
-	return err
+   return err
 } else {
-	_ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
+   _ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
 }
 ```
 
@@ -164,9 +164,9 @@ updateDoc := example1.UpdateDocument{}
 updateDoc.SetAddressCity(cy)
 
 if ur, err := aCollection.UpdateOne(ctx, f.Build(), updateDoc.Build(), opts); err != nil {
-	return err
+   return err
 } else {
-	_ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
+   _ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
 }
 ```
 
