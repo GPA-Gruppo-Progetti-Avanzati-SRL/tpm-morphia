@@ -1,4 +1,4 @@
-### Readme
+## TPM-Morphia
 
 tpm-morphia is simple stuff. It is simple in the name and in substance. 
 It's a generation tool to support easier coding in golang with mongo.
@@ -6,7 +6,7 @@ The following notes try to clarify the way it works and the rationale. May be ou
 I didn't stumble across anything like that. May be because there is no need for doing that or simply because that is not the golang way of
 doing it.
 
-#### Toy example
+### Toy example
 Let's use a fictitious example to introduce the stuff.
 Suppose you have a collection with the following profile: you have few fields and and address sub-structure.
 
@@ -43,7 +43,7 @@ type Address struct {
 }
 ```
 
-The obvious operation is to create a few records and add to a collection. In our case the code could be somethink like (from example0):
+The obvious operation is to create a few records and add to a collection. In our case the code could be something like (from example0):
 
 ```go
     a := example0.Author{
@@ -59,8 +59,8 @@ The obvious operation is to create a few records and add to a collection. In our
 The resulting object in the collection is pretty much what we expect to be, with just one caveat: if we provide an empty city and street the 
 addr property is set to an empty structure. This migh be counter intuitive considering that we explicitly specified the omitempty
 option in struct bson tag. Actually the omitempty to be honored in this context requires that the structure implements the Zeroable interface.
-In that case the empty struct gets not peprsisted and the property is unset. This is not required in the Address was a pointer to structure since 
-the marshaller in that case esily understand what to do. May be you decide to implement that interface in a way similar to what is reported below.
+In that case the empty struct gets not persisted and the property is unset. This is not required in the Address was a pointer to structure since 
+the marshaller in that case esily understands what to do with it. May be you decide to implement that interface in a way similar to what is reported below.
 
 ```go
 func (s Author) IsZero() bool {
@@ -136,7 +136,7 @@ On top of previous problems, a different one gets uin the way. There is the need
 to repeat an array of bson documents each with the required operator. In this case, at least in a different form 
 it pop-up the issue of the empty structures in case you specifically do a $set with an empty one. 
 
-#### Toy example reloaded
+### Toy example reloaded
 In this simple case would be good if we could express the find and update operations in a more expressive way.
 
 ```go
@@ -167,3 +167,62 @@ In a similar way, it could be good to rephrase the update statement
 		_ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
 	}
 ```
+
+### TPM-Morphia
+The idea of tpm-morphia is to generate some code to allow the writing of stuff like that. Basically the tool starts with the definition of the collection of interest
+and tries to generate the types and the methods to support this coding. 
+
+Collection definition is a simple Json file where properties of the collection have to be specificed together with a few metadata to taylor the generation process.
+In the case of our toy example the collection definition (see example1-tpmm.json in the examples directory) it would look like something like that.
+
+```go
+{
+  "name": "author",
+  "properties": {
+    "folder-path": "./example1",
+    "struct-name": "Author"
+  },
+  "attributes": [
+    { "name": "oId", "type": "object-id", "tags": [ "json", "-",  "bson", "_id" ], "queryable": true },
+    { "name": "firstName", "type": "string", "tags": [ "json", "fn", "bson", "fn" ], "queryable": true },
+    { "name": "lastName", "type": "string", "tags": [ "json", "ln", "bson", "ln" ], "queryable": true },
+    { "name": "age", "type": "int", "queryable": true },
+    {
+      "name": "address", "type": "struct",
+      "tags": [ "json", "addr", "bson", "addr"  ],
+      "struct-name": "Address",
+      "attributes": [
+        { "name": "city", "type": "string", "queryable": true },
+        { "name": "street", "type": "string", "queryable": true }
+      ]
+    }
+  ]
+}
+```
+
+Out of this definition the generator creates (or use if it exists) a folder named example1 (relative to the file definition path) with a number of files in there:
+
+- model.go: contains the types and the implementation of the Zeroable interface, it also defines constants for each of the fields in the collection
+- filter.go: contains boilerplate code and types to support filter methods
+- filter-methods.go: methods specific for the collection for filtering
+- update.go: contains boilerplate code and types to support update methods
+- update-methods.go: methods specific for the collection for updating
+
+Below, just to give the feeling of what gets generated in the filter-methods of the example discussed so far:
+
+func (ca *Criteria) AndFirstNameEqTo(p string) *Criteria {
+
+```go
+func (ca *Criteria) AndFirstNameEqTo(p string) *Criteria {  
+  if p == "" {
+    return ca  
+  }
+
+  mName := fmt.Sprintf(FIRSTNAME)
+  c := func () bson.E { return bson.E{Key: mName, Value: p} }
+  *ca = append(*ca, c)
+  return ca
+}	
+```
+
+# To Be Continued....
