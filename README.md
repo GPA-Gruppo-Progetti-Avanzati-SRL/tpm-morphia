@@ -97,11 +97,11 @@ Ok, so far so good. Now it's time to query this collection and update a record j
 snippet is reported below. 
 
 ```go
-	filter := bson.D{
-		{"$or", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}, {"addr.city", cy}}}},
-	}
-	
-	cur, err := aCollection.Find(ctx, filter)
+filter := bson.D{
+	{"$or", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}, {"addr.city", cy}}}},
+}
+
+cur, err := aCollection.Find(ctx, filter)
 ```
 
 In here we look for records verifyng this condition in pseudocode:
@@ -118,18 +118,18 @@ This snippet, at least to me, has a few problems:
 What if we want to do an update? That requires two documents: one to filter the records, one to do the update.
 
 ```go
-	opts := options.Update().SetUpsert(true)
+opts := options.Update().SetUpsert(true)
 
-	filter := bson.D{
-		{"$and", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}}}},
-	}
+filter := bson.D{
+	{"$and", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}}}},
+}
 
-	updateDoc := bson.D{{"$set", bson.D{{"addr.city", cy}}}}
-	if ur, err := aCollection.UpdateOne(ctx, filter, updateDoc, opts); err != nil {
-		return err
-	} else {
-		_ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
-	}
+updateDoc := bson.D{{"$set", bson.D{{"addr.city", cy}}}}
+if ur, err := aCollection.UpdateOne(ctx, filter, updateDoc, opts); err != nil {
+	return err
+} else {
+	_ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
+}
 ```
 
 On top of previous problems, a different one gets uin the way. There is the need to aggregate the operations by operator or 
@@ -140,11 +140,11 @@ it pop-up the issue of the empty structures in case you specifically do a $set w
 In this simple case would be good if we could express the find and update operations in a more expressive way.
 
 ```go
-	f := example1.Filter{}
-	f.Or().AndFirstNameEqTo(fn)
-	f.Or().AndLastNameEqTo(ln).AndAddressCityEqTo(cy)
-	
-	cur, err := aCollection.Find(ctx, f.Build())
+f := example1.Filter{}
+f.Or().AndFirstNameEqTo(fn)
+f.Or().AndLastNameEqTo(ln).AndAddressCityEqTo(cy)
+
+cur, err := aCollection.Find(ctx, f.Build())
 ```
 
 If we could do that we could get rid of the strings, have support from the IDE with auto-completion and express the conditions in terms of the 
@@ -153,19 +153,19 @@ struct properties and not in terms of the actual bson names.
 In a similar way, it could be good to rephrase the update statement
 
 ```go
-	opts := options.Update().SetUpsert(true)
+opts := options.Update().SetUpsert(true)
 
-	f := example1.Filter{}
-	f.Or().AndFirstNameEqTo(fn).AndLastNameEqTo(ln)
-	
-	updateDoc := example1.UpdateDocument{}
-	updateDoc.SetAddressCity(cy)
+f := example1.Filter{}
+f.Or().AndFirstNameEqTo(fn).AndLastNameEqTo(ln)
 
-	if ur, err := aCollection.UpdateOne(ctx, f.Build(), updateDoc.Build(), opts); err != nil {
-		return err
-	} else {
-		_ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
-	}
+updateDoc := example1.UpdateDocument{}
+updateDoc.SetAddressCity(cy)
+
+if ur, err := aCollection.UpdateOne(ctx, f.Build(), updateDoc.Build(), opts); err != nil {
+	return err
+} else {
+	_ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
+}
 ```
 
 ### TPM-Morphia
