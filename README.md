@@ -262,3 +262,4 @@ For examples look into examples directory [examples](./examples)
 - examples: contains a number of schema definitions and a test function to generate the artifacts. The git already contains a run of generation ready to be inspected.
 - example0: sample code of querying and updating mongodb with vanilla API.
 - example1: identical functionality of example0 but using the generated methods to carry out the required ops.
+- example2: the schema is larger and consists of the different types supported by the current implementation
