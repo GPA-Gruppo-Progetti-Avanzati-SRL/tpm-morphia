@@ -250,6 +250,10 @@ tpm-morphia -collection-def-scan-path ./model -out-dir ./model
 ### Schema definition
 For the syntax of the schema files please refer to [collection schema](./schema)
 
+### Generation details
+For some details about the generated stuff please see [generation details](./gen/mongodb)
+
+
 ---
 ### Examples
 For examples look into examples directory [examples](./examples)

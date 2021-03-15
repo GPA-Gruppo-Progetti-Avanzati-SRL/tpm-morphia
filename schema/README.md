@@ -132,6 +132,32 @@ type Contract struct {
 }
 ```
 
+---
+### IMHO
+Below a couple of considerations about the structuring of your schema files.
+
+#### The use of ref-struct
+The reason of ref-struct type is to share the same type of object in different positions in your collection: think of an address where you want to have two different 
+properties, one for billing and one for shipping but with the exact the same shape.
+
+By extending this concept the use of external references might allow to reuse the same type of struct in different collections. Of course the situation can easily get complex
+because of the limit imposed by go in terms of circular dependencies: one collection declares a struct that is referenced by a different collection and so does the other collection.
+This type of crossing might not be unusual in rich documents with some degree of denormalization. To cope with this, one can adopt two different approaches:
+
+- use the same package for both the coupled collections and use the prefix property to have different named files for each collection
+- create a definition for a common collection (one that is not persisted on the DB) and reference the common objects by the actual real collections.
+
+I tend to prefer the latter, since the generation in the same collection can lead to clashes at the level of defined constants and structs defined with the same name but different 
+shape. 
+
+Of course the use of objects external to the collections limit the generation of the filter methods because the referenced struct is not known at the time of generating the
+single collection. The generation process strictly consider the collection at hand and doesn't consider any collections that might be part of a broader perspective (as to speak). 
+
+Anyway, this limit might be overcome by some manual cut&pasting of methods in extension files. Extension files are files manually created in the same package of the generated ones
+with some extension methods and constants to augment the ability to filter or update by fields that are referenced outside the current collection.
+
+#### Using the prefix or not
+In principle the use of the prefix as a workaround to create artifacts for two or more collections in the same directory should be avoided.
 
 
 
