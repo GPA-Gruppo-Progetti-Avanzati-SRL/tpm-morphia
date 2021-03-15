@@ -6,6 +6,7 @@ The following notes try to clarify the way it works and the rationale. May be ou
 I didn't stumble across anything like that. May be because there is no need for doing that or simply because that is not the golang way of
 doing it.
 
+---
 ### Toy example
 Let's use a fictitious example to introduce the stuff.
 Suppose you have a collection with the following profile: you have few fields and and address sub-structure.
@@ -168,6 +169,7 @@ if ur, err := aCollection.UpdateOne(ctx, f.Build(), updateDoc.Build(), opts); er
 }
 ```
 
+---
 ### TPM-Morphia
 The idea of tpm-morphia is to generate some code to allow the writing of stuff like that. Basically the tool starts with the definition of the collection of interest
 and tries to generate the types and the methods to support this coding. 
@@ -175,7 +177,7 @@ and tries to generate the types and the methods to support this coding.
 Collection definition is a simple Json file where properties of the collection have to be specificed together with a few metadata to taylor the generation process.
 In the case of our toy example the collection definition (see example1-tpmm.json in the examples directory) it would look like something like that.
 
-```go
+```json
 {
   "name": "author",
   "properties": {
@@ -225,4 +227,32 @@ func (ca *Criteria) AndFirstNameEqTo(p string) *Criteria {
 }	
 ```
 
-# To Be Continued....
+---
+### Usage
+Next the option that can be specified to trigger the generation.
+
+| Option                       | Note                                                                     | Default  |
+| ---------------------------- | ------------------------------------------------------------------------ | -------- |
+| -out-dir                     | Mount point of generated content (see. folder-path property)             |          |
+| -collection-def-file         | Collection definition file                                               |          |
+| -collection-def-scan-path    | Collection scan path (it scans for names like *-tpmm.json)               |          |
+| -format-code                 | Boolean value to format the generated code                               | true     |
+| -tmpl-ver                    | Version of templates (v2)                                                | v2       |
+
+The following command invokes the main and searches the schema files in ./model and create artifacts in folders under ./model
+
+```go
+tpm-morphia -collection-def-scan-path ./model -out-dir ./model
+```
+
+---
+### Schema definition
+For the syntax of the schema files please refer to [collection schema](./schema)
+
+---
+### Examples
+For examples look into examples directory [examples](./examples)
+
+- examples: contains a number of schema definitions and a test function to generate the artifacts. The git already contains a run of generation ready to be inspected.
+- example0: sample code of querying and updating mongodb with vanilla API.
+- example1: identical functionality of example0 but using the generated methods to carry out the required ops.
