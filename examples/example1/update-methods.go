@@ -13,248 +13,160 @@ func UpdateMethodsGoInfo() string {
 	return i
 }
 
+/*
+ * Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
+ * the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
+ * the issue and delete an existing value without creating an empty struct..
+ */
+func GetUpdateDocument(obj *Author) UpdateDocument {
+	ud := UpdateDocument{}
+	if obj.FirstName != "" {
+		ud.SetFirstName(obj.FirstName)
+	} else {
+		ud.UnsetFirstName()
+	}
+	if obj.LastName != "" {
+		ud.SetLastName(obj.LastName)
+	} else {
+		ud.UnsetLastName()
+	}
+	if obj.Age != 0 {
+		ud.SetAge(obj.Age)
+	} else {
+		ud.UnsetAge()
+	}
+	if !obj.Address.IsZero() {
+		ud.SetAddress(obj.Address)
+	} else {
+		ud.UnsetAddress()
+	}
+
+	return ud
+}
+
 // oId - object-id -  [oId]
-func (upds *Updates) SetOId(p primitive.ObjectID) *Updates {
+func (ud *UpdateDocument) SetOId(p primitive.ObjectID) *UpdateDocument {
 	mName := fmt.Sprintf(OID)
-	upds.Add(func() bson.E {
+	ud.Set().Add(func() bson.E {
 		return bson.E{Key: mName, Value: p}
 	})
-	return upds
+	return ud
+}
+
+func (ud *UpdateDocument) UnsetOId() *UpdateDocument {
+	mName := fmt.Sprintf(OID)
+	ud.Unset().Add(func() bson.E {
+		return bson.E{Key: mName, Value: ""}
+	})
+	return ud
 }
 
 // firstName - string -  [firstName]
-func (upds *Updates) SetFirstName(p string) *Updates {
+func (ud *UpdateDocument) SetFirstName(p string) *UpdateDocument {
 	mName := fmt.Sprintf(FIRSTNAME)
-	upds.Add(func() bson.E {
+	ud.Set().Add(func() bson.E {
 		return bson.E{Key: mName, Value: p}
 	})
-	return upds
+	return ud
+}
+
+func (ud *UpdateDocument) UnsetFirstName() *UpdateDocument {
+	mName := fmt.Sprintf(FIRSTNAME)
+	ud.Unset().Add(func() bson.E {
+		return bson.E{Key: mName, Value: ""}
+	})
+	return ud
 }
 
 // lastName - string -  [lastName]
-func (upds *Updates) SetLastName(p string) *Updates {
+func (ud *UpdateDocument) SetLastName(p string) *UpdateDocument {
 	mName := fmt.Sprintf(LASTNAME)
-	upds.Add(func() bson.E {
+	ud.Set().Add(func() bson.E {
 		return bson.E{Key: mName, Value: p}
 	})
-	return upds
+	return ud
+}
+
+func (ud *UpdateDocument) UnsetLastName() *UpdateDocument {
+	mName := fmt.Sprintf(LASTNAME)
+	ud.Unset().Add(func() bson.E {
+		return bson.E{Key: mName, Value: ""}
+	})
+	return ud
 }
 
 // age - int -  [age]
-func (upds *Updates) SetAge(p int32) *Updates {
+func (ud *UpdateDocument) SetAge(p int32) *UpdateDocument {
 	mName := fmt.Sprintf(AGE)
-	upds.Add(func() bson.E {
+	ud.Set().Add(func() bson.E {
 		return bson.E{Key: mName, Value: p}
 	})
-	return upds
+	return ud
+}
+
+func (ud *UpdateDocument) UnsetAge() *UpdateDocument {
+	mName := fmt.Sprintf(AGE)
+	ud.Unset().Add(func() bson.E {
+		return bson.E{Key: mName, Value: ""}
+	})
+	return ud
+}
+
+func (ud *UpdateDocument) IncAge(p int32) *UpdateDocument {
+	mName := fmt.Sprintf(AGE)
+	ud.Inc().Add(func() bson.E {
+		return bson.E{Key: mName, Value: p}
+	})
+	return ud
 }
 
 // address - struct - Address [address]
-func (upds *Updates) SetAddress(p Address) *Updates {
+func (ud *UpdateDocument) SetAddress(p Address) *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS)
-	upds.Add(func() bson.E {
+	ud.Set().Add(func() bson.E {
 		return bson.E{Key: mName, Value: p}
 	})
-	return upds
+	return ud
 }
 
-// city - string -  [address.city shipAddress.city]
-func (upds *Updates) SetAddressCity(p string) *Updates {
+func (ud *UpdateDocument) UnsetAddress() *UpdateDocument {
+	mName := fmt.Sprintf(ADDRESS)
+	ud.Unset().Add(func() bson.E {
+		return bson.E{Key: mName, Value: ""}
+	})
+	return ud
+}
+
+// city - string -  [address.city]
+func (ud *UpdateDocument) SetAddressCity(p string) *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS_CITY)
-	upds.Add(func() bson.E {
+	ud.Set().Add(func() bson.E {
 		return bson.E{Key: mName, Value: p}
 	})
-	return upds
+	return ud
 }
-func (upds *Updates) SetShipAddressCity(p string) *Updates {
-	mName := fmt.Sprintf(SHIPADDRESS_CITY)
-	upds.Add(func() bson.E {
+
+func (ud *UpdateDocument) UnsetAddressCity() *UpdateDocument {
+	mName := fmt.Sprintf(ADDRESS_CITY)
+	ud.Unset().Add(func() bson.E {
+		return bson.E{Key: mName, Value: ""}
+	})
+	return ud
+}
+
+// street - string -  [address.street]
+func (ud *UpdateDocument) SetAddressStreet(p string) *UpdateDocument {
+	mName := fmt.Sprintf(ADDRESS_STREET)
+	ud.Set().Add(func() bson.E {
 		return bson.E{Key: mName, Value: p}
 	})
-	return upds
+	return ud
 }
 
-// strt - string -  [address.strt shipAddress.strt]
-func (upds *Updates) SetAddressStrt(p string) *Updates {
-	mName := fmt.Sprintf(ADDRESS_STRT)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
+func (ud *UpdateDocument) UnsetAddressStreet() *UpdateDocument {
+	mName := fmt.Sprintf(ADDRESS_STREET)
+	ud.Unset().Add(func() bson.E {
+		return bson.E{Key: mName, Value: ""}
 	})
-	return upds
+	return ud
 }
-func (upds *Updates) SetShipAddressStrt(p string) *Updates {
-	mName := fmt.Sprintf(SHIPADDRESS_STRT)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// shipAddress - ref-struct -  [shipAddress]
-func (upds *Updates) SetShipAddress(p Address) *Updates {
-	mName := fmt.Sprintf(SHIPADDRESS)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// books - array -  [books]
-func (upds *Updates) SetBooks(p []Book) *Updates {
-	mName := fmt.Sprintf(BOOKS)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// [] - struct - Book [books.[]]
-func (upds *Updates) SetBooksI(ndxI int, p Book) *Updates {
-	mName := fmt.Sprintf(BOOKS_I, ndxI)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// title - string -  [books.[].title books.title]
-func (upds *Updates) SetBooksITitle(ndxI int, p string) *Updates {
-	mName := fmt.Sprintf(BOOKS_I_TITLE, ndxI)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// isbn - string -  [books.[].isbn books.isbn]
-func (upds *Updates) SetBooksIIsbn(ndxI int, p string) *Updates {
-	mName := fmt.Sprintf(BOOKS_I_ISBN, ndxI)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// coAuthors - array -  [books.[].coAuthors books.coAuthors]
-func (upds *Updates) SetBooksICoAuthors(ndxI int, p []string) *Updates {
-	mName := fmt.Sprintf(BOOKS_I_COAUTHORS, ndxI)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// [] - string -  [books.[].coAuthors.[]]
-func (upds *Updates) SetBooksICoAuthorsJ(ndxI int, ndxJ int, p string) *Updates {
-	mName := fmt.Sprintf(BOOKS_I_COAUTHORS_J, ndxI, ndxJ)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// businessRels - map -  [businessRels]
-func (upds *Updates) SetBusinessRels(p map[string]BusinessRel) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// %s - struct - BusinessRel [businessRels.%s]
-func (upds *Updates) SetBusinessRelsS(keyS string, p BusinessRel) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS_S, keyS)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// publisherId - string -  [businessRels.%s.publisherId]
-func (upds *Updates) SetBusinessRelsSPublisherId(keyS string, p string) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS_S_PUBLISHERID, keyS)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// publisherName - string -  [businessRels.%s.publisherName]
-func (upds *Updates) SetBusinessRelsSPublisherName(keyS string, p string) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS_S_PUBLISHERNAME, keyS)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// contracts - map -  [businessRels.%s.contracts]
-func (upds *Updates) SetBusinessRelsSContracts(keyS string, p map[string]Contract) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS, keyS)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// %s - struct - Contract [businessRels.%s.contracts.%s]
-func (upds *Updates) SetBusinessRelsSContractsT(keyS string, keyT string, p Contract) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T, keyS, keyT)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// contractId - string -  [businessRels.%s.contracts.%s.contractId]
-func (upds *Updates) SetBusinessRelsSContractsTContractId(keyS string, keyT string, p string) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T_CONTRACTID, keyS, keyT)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-// contractDescr - string -  [businessRels.%s.contracts.%s.contractDescr]
-func (upds *Updates) SetBusinessRelsSContractsTContractDescr(keyS string, keyT string, p string) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T_CONTRACTDESCR, keyS, keyT)
-	upds.Add(func() bson.E {
-		return bson.E{Key: mName, Value: p}
-	})
-	return upds
-}
-
-/*
-func (upds *Updates) SetAddress(a Address) *Updates {
-
-	upds.Add(func() bson.E {
-		return bson.E{ Key: ADDRESS, Value: a}
-	})
-
-    return upds
-}
-
-func (upds *Updates) SetShippingAddress(a Address) *Updates {
-
-	upds.Add(func() bson.E {
-		return bson.E{ Key: SHIPADDRESS, Value: a}
-	})
-
-	return upds
-}
-
-func (ca *Updates) SetBusinessRelsS(keyS string, p BusinessRel) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS_S, keyS)
-	c := func() bson.E { return bson.E{Key: mName, Value: p} }
-	ca.Add(c)
-	return ca
-}
-
-func (ca *Updates) SetBusinessRelsSContractsT(keyS string, keyT string, p Contract) *Updates {
-	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T, keyS, keyT)
-	c := func() bson.E { return bson.E{Key: mName, Value: p} }
-	ca.Add(c)
-	return ca
-}
-*/

@@ -66,6 +66,7 @@ type Field struct {
 	StructRef  StructReference `json:"struct-ref,omitempty"`
 	Paths      []string        `json:"-"`
 	BsonPaths  []string        `json:"-"`
+	Options    string          `json:"options,omitempty"`
 }
 
 type InfoCollectorVisitor struct {

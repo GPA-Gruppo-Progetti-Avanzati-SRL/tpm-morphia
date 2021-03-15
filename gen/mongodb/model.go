@@ -130,6 +130,10 @@ func NewValueTypeAttribute(parentAttribute CodeGenAttribute, attrDefinition sche
 	v.Tags = attrDefinition.GetTagsAsListOfTag(true, true, []string{"json", "bson"})
 
 	switch strings.ToLower(attrDefinition.Typ) {
+	case schema.AttributeTypeDate:
+		v.PackageImports = make([]string, 0, 1)
+		v.PackageImports = append(v.PackageImports, "go.mongodb.org/mongo-driver/bson/primitive")
+
 	case schema.AttributeTypeObjectId:
 		v.PackageImports = make([]string, 0, 1)
 		v.PackageImports = append(v.PackageImports, "go.mongodb.org/mongo-driver/bson/primitive")
@@ -422,6 +426,10 @@ func (c *CodeGenCollection) GetMorphiaPackage() string {
 /*
  * CodeGenAttributeImpl
  */
+func (b *CodeGenAttributeImpl) HasOption(o string) bool {
+	return b.AttrDefinition.Options != "" && strings.Contains(b.AttrDefinition.Options, o)
+}
+
 func (b *CodeGenAttributeImpl) GetGoAttributeIsZeroCondition() string {
 
 	s := ""

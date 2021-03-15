@@ -1,16 +1,6 @@
-package example1
+package example0
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
-
-const (
-	OID            = "_id"
-	FIRSTNAME      = "fn"
-	LASTNAME       = "ln"
-	AGE            = "age"
-	ADDRESS        = "addr"
-	ADDRESS_CITY   = "addr.city"
-	ADDRESS_STREET = "addr.street"
-)
 
 type Author struct {
 	OId       primitive.ObjectID `json:"-" bson:"_id,omitempty"`
@@ -20,6 +10,15 @@ type Author struct {
 	Address   Address            `json:"addr,omitempty" bson:"addr,omitempty"`
 }
 
+type Address struct {
+	City   string `json:"city,omitempty" bson:"city,omitempty"`
+	Street string `json:"strt,omitempty" bson:"strt,omitempty"`
+}
+
+/*
+ * The implementation of this interface is mandatory for the bson omitempty tag to work in case fields are structs
+ * and not pointers to structs. In the latter case the nil value do the job...
+ */
 func (s Author) IsZero() bool {
 	if s.OId != primitive.NilObjectID {
 		return false
@@ -37,11 +36,6 @@ func (s Author) IsZero() bool {
 		return false
 	}
 	return true
-}
-
-type Address struct {
-	City   string `json:"city,omitempty" bson:"city,omitempty"`
-	Street string `json:"street,omitempty" bson:"street,omitempty"`
 }
 
 func (s Address) IsZero() bool {

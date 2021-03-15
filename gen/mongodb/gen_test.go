@@ -22,6 +22,85 @@ import (
    },
 */
 var example = `{
+	"name": "commons",
+	"properties": {
+		"folder-path": "./common"
+	,"struct-name": "Commons"
+	}
+,"attributes": [
+	{ "name": "indirizzo", "type": "struct", "struct-name": "Indirizzo", "attributes": [
+	{ "name": "tipo"                   , "type": "string"}
+	,{ "name": "sottoTipo"              , "type": "string"}
+	,{ "name": "intestazione"           , "type": "string"}
+	,{ "name": "tipoSpedizione"         , "type": "string"}
+	,{ "name": "tipoSpedizioneLegale"   , "type": "string"}
+	,{ "name": "civico"                 , "type": "string"}
+	,{ "name": "indirizzo"              , "type": "string"}
+	,{ "name": "cap"                    , "type": "string"}
+	,{ "name": "localita"               , "type": "string"}
+	,{ "name": "provincia"              , "type": "string"}
+	,{ "name": "nazione"                , "type": "string"}
+	,{ "name": "loco"                   , "type": "string"}
+	,{ "name": "normalizzato"           , "type": "string"}
+	,{ "name": "manuale"                , "type": "string"}
+	,{ "name": "infoTecniche"           , "type": "ref-struct", "struct-name": "InfoTecniche"}
+	]}
+
+,{ "name": "sysInfo", "type": "struct", "struct-name": "SysInfo", "options": "cust-upd-handling", "attributes": [
+ { "name": "dbLastUpdate"            , "type": "date" }
+,{ "name": "dbUpsertedCount"         , "type": "int"}
+		]}
+
+,{ "name": "infoTecniche", "type": "struct", "struct-name": "InfoTecniche", "attributes": [
+	 { "name": "dataOraAlimentazione", "type": "string"}
+	,{ "name": "dataOra"             , "type": "string", "queryable":  true}
+	,{ "name": "operatore"           , "type": "string"}
+	,{ "name": "terminale"           , "type": "string"}
+	,{ "name": "filiale"             , "type": "string"}
+	,{ "name": "ufficio"             , "type": "string"}
+	,{ "name": "dataAggiornamento"   , "type": "string"}
+	,{ "name": "tipoOperazione"      , "type": "string"}
+	,{ "name": "sistema"             , "type": "string"}
+	,{ "name": "processo"            , "type": "string"}
+	,{ "name": "certificato"         , "type": "string"}
+	,{ "name": "dataOraCertificazione", "type": "string"}
+	,{ "name": "dataValA"             , "type": "string"}
+	,{ "name": "dataValDa"            , "type": "string", "queryable":  true}
+	,{ "name": "ultimaOperazioneBusiness", "type": "string"}
+	,{ "name": "job"                     , "type": "string"}
+	,{ "name": "program"                 , "type": "string"}
+		]}
+
+,{ "name": "cliente", "type": "struct", "struct-name": "RifCliente", "attributes": [
+	{ "name": "ndg"                 , "type": "string", "queryable":  true }
+	,{ "name": "cognome"             , "type": "string" }
+	,{ "name": "nome"                , "type": "string" }
+	,{ "name": "codiceFiscale"         , "type": "string" }
+	,{ "name": "partitaIVA"            , "type": "string" }
+	,{ "name": "natura"                , "type": "string" }
+	,{ "name": "tipo"                  , "type": "string" }
+	,{ "name": "stato"                 , "type": "string" }
+	,{ "name": "intestazioneRidotta"   , "type": "string" }
+	,{ "name": "intestazionePostale"   , "type": "string" }
+	,{ "name": "ragioneSociale"        , "type": "string" }
+	]}
+
+,{ "name": "legame", "type": "struct", "struct-name": "RifLegame", "attributes": [
+ 	{ "name": "legante", "type": "ref-struct", "struct-name": "RifCliente"}
+	,{ "name": "legato", "type": "ref-struct", "struct-name": "RifCliente"}
+	,{ "name": "tipoLegame"             , "type": "string", "queryable":  true }
+	,{ "name": "stato"                  , "type": "string" }
+	]}
+
+,{ "name": "rapporto", "type": "struct", "struct-name": "RifRapporto", "attributes": [
+	{ "name": "servizio"               , "type": "string"}
+	,{ "name": "numero"                 , "type": "string"}
+	,{ "name": "iban"                 , "type": "string"}
+	]}
+]
+}
+`
+var example2 = `{
   "name": "author",
   "properties": {
     "folder-path": "./author",
@@ -97,7 +176,18 @@ var example = `{
           "name": "strt",
           "type": "string",
           "queryable": true
-        }
+        },
+    {
+      "name": "lastUpdate2",
+      "type": "date",
+      "tags": [
+        "json",
+        "dt2",
+        "bson",
+        "dt2"
+      ],
+      "queryable": true
+    }
       ]
     },
     {
@@ -194,7 +284,7 @@ func TestGeneration(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	genCfg := config.Config{TargetDirectory: ".", ResourceDirectory: "../..", FormatCode: false}
+	genCfg := config.Config{Version: "v2", TargetDirectory: ".", ResourceDirectory: "../..", FormatCode: true}
 	genDriver, e := NewCodeGenCollection(schema)
 	if e != nil {
 		t.Error(e)

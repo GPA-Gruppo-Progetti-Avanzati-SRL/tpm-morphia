@@ -1,0 +1,30 @@
+package {{ .Collection.GetPackageName }}
+
+import (
+	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"time"
+{{range $pkg := .Collection.GetPackageImports true}}
+    "{{$pkg}}"
+{{- end}}
+)
+
+func {{.Collection.GetPrefix "capital"}}FilterGoInfo() string {
+	i := fmt.Sprintf("tpm_morphia query filter support generated for %s package on %s", "author", time.Now().String())
+	return i
+}
+
+{{- range $a := .Collection.Attributes}}
+{{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "string") }}
+{{ template "filter-string" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "int") }}
+{{ template "filter-int" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "date") }}
+{{ template "filter-date" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "object-id") }}
+{{ template "filter-object-id" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- end }}

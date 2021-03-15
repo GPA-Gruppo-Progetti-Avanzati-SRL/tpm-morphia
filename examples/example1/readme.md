@@ -1,4 +1,7 @@
-### author
+### Example - 1
+
+This example is the example0 version but with the find and update operations carried out with the generated
+code resulting from the definition of the collection.
 
 #### Collection schema definition.
 
@@ -20,6 +23,7 @@
 	      ],
 	      "queryable": true,
 	      "struct-ref": {
+	        "Package": "",
 	        "Item": null
 	      }
 	    },
@@ -34,6 +38,7 @@
 	      ],
 	      "queryable": true,
 	      "struct-ref": {
+	        "Package": "",
 	        "Item": null
 	      }
 	    },
@@ -48,6 +53,7 @@
 	      ],
 	      "queryable": true,
 	      "struct-ref": {
+	        "Package": "",
 	        "Item": null
 	      }
 	    },
@@ -56,6 +62,7 @@
 	      "type": "int",
 	      "queryable": true,
 	      "struct-ref": {
+	        "Package": "",
 	        "Item": null
 	      }
 	    },
@@ -75,179 +82,22 @@
 	          "type": "string",
 	          "queryable": true,
 	          "struct-ref": {
+	            "Package": "",
 	            "Item": null
 	          }
 	        },
 	        {
-	          "name": "strt",
+	          "name": "street",
 	          "type": "string",
 	          "queryable": true,
 	          "struct-ref": {
+	            "Package": "",
 	            "Item": null
 	          }
 	        }
 	      ],
 	      "struct-ref": {
-	        "Item": null
-	      }
-	    },
-	    {
-	      "name": "shipAddress",
-	      "type": "ref-struct",
-	      "tags": [
-	        "json",
-	        "shipaddr",
-	        "bson",
-	        "shipaddr"
-	      ],
-	      "queryable": true,
-	      "struct-ref": {
-	        "struct-name": "Address",
-	        "Item": {
-	          "name": "address",
-	          "struct-name": "Address",
-	          "type": "struct",
-	          "tags": [
-	            "json",
-	            "addr",
-	            "bson",
-	            "addr"
-	          ],
-	          "attributes": [
-	            {
-	              "name": "city",
-	              "type": "string",
-	              "queryable": true,
-	              "struct-ref": {
-	                "Item": null
-	              }
-	            },
-	            {
-	              "name": "strt",
-	              "type": "string",
-	              "queryable": true,
-	              "struct-ref": {
-	                "Item": null
-	              }
-	            }
-	          ],
-	          "struct-ref": {
-	            "Item": null
-	          }
-	        }
-	      }
-	    },
-	    {
-	      "name": "books",
-	      "type": "array",
-	      "item": {
-	        "name": "[]",
-	        "struct-name": "Book",
-	        "type": "struct",
-	        "attributes": [
-	          {
-	            "name": "title",
-	            "type": "string",
-	            "queryable": true,
-	            "struct-ref": {
-	              "Item": null
-	            }
-	          },
-	          {
-	            "name": "isbn",
-	            "type": "string",
-	            "queryable": true,
-	            "struct-ref": {
-	              "Item": null
-	            }
-	          },
-	          {
-	            "name": "coAuthors",
-	            "type": "array",
-	            "item": {
-	              "name": "[]",
-	              "type": "string",
-	              "struct-ref": {
-	                "Item": null
-	              }
-	            },
-	            "queryable": true,
-	            "struct-ref": {
-	              "Item": null
-	            }
-	          }
-	        ],
-	        "struct-ref": {
-	          "Item": null
-	        }
-	      },
-	      "struct-ref": {
-	        "Item": null
-	      }
-	    },
-	    {
-	      "name": "businessRels",
-	      "type": "map",
-	      "item": {
-	        "name": "%s",
-	        "struct-name": "BusinessRel",
-	        "type": "struct",
-	        "attributes": [
-	          {
-	            "name": "publisherId",
-	            "type": "string",
-	            "queryable": true,
-	            "struct-ref": {
-	              "Item": null
-	            }
-	          },
-	          {
-	            "name": "publisherName",
-	            "type": "string",
-	            "queryable": true,
-	            "struct-ref": {
-	              "Item": null
-	            }
-	          },
-	          {
-	            "name": "contracts",
-	            "type": "map",
-	            "item": {
-	              "name": "%s",
-	              "struct-name": "Contract",
-	              "type": "struct",
-	              "attributes": [
-	                {
-	                  "name": "contractId",
-	                  "type": "string",
-	                  "queryable": true,
-	                  "struct-ref": {
-	                    "Item": null
-	                  }
-	                },
-	                {
-	                  "name": "contractDescr",
-	                  "type": "string",
-	                  "queryable": true,
-	                  "struct-ref": {
-	                    "Item": null
-	                  }
-	                }
-	              ],
-	              "struct-ref": {
-	                "Item": null
-	              }
-	            },
-	            "struct-ref": {
-	              "Item": null
-	            }
-	          }
-	        ],
-	        "struct-ref": {
-	          "Item": null
-	        }
-	      },
-	      "struct-ref": {
+	        "Package": "",
 	        "Item": null
 	      }
 	    }

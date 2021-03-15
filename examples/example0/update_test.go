@@ -1,12 +1,11 @@
-package example1_test
+package example0_test
 
 import (
 	"context"
-	"fmt"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/examples/example1"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"testing"
@@ -17,7 +16,9 @@ func TestUpdate(t *testing.T) {
 
 	logger := system.GetLogger()
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer ctxCancel()
+
 	client, collection, err := Setup(logger, ctx)
 
 	if client != nil {
@@ -25,30 +26,24 @@ func TestUpdate(t *testing.T) {
 	}
 
 	if err != nil {
-		_ = level.Error(logger).Log("msg", err.Error())
-		return
+		_ = level.Info(logger).Log("err", err.Error())
 	}
 
 	if err := update(logger, ctx, collection, "Susan", "Red", "Atlanta"); err != nil {
 		_ = level.Info(logger).Log("err", err.Error())
 	}
-
 }
 
 func update(logger log.Logger, ctx context.Context, aCollection *mongo.Collection, fn string, ln string, cy string) error {
 
 	opts := options.Update().SetUpsert(true)
 
-	f := example1.Filter{}
-	f.Or().AndFirstNameEqTo(fn).AndLastNameEqTo(ln)
+	filter := bson.D{
+		{"$and", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}}}},
+	}
 
-	filterDocument := f.Build()
-	_ = level.Info(logger).Log("resulting_filter: ", fmt.Sprintf("%v", filterDocument))
-
-	updateDoc := example1.UpdateDocument{}
-	updateDoc.SetAddressCity(cy)
-
-	if ur, err := aCollection.UpdateOne(ctx, filterDocument, updateDoc.Build(), opts); err != nil {
+	updateDoc := bson.D{{"$set", bson.D{{"addr.city", cy}}}}
+	if ur, err := aCollection.UpdateOne(ctx, filter, updateDoc, opts); err != nil {
 		return err
 	} else {
 		_ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)

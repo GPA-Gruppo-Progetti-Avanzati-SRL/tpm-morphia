@@ -35,7 +35,7 @@ type Config struct {
 var DefaultConfig = Config{
 	flagSet:    nil,
 	ConfigFile: DefaultConfigFile,
-	Version:    "v1",
+	Version:    "v2",
 	FormatCode: true,
 }
 
@@ -122,7 +122,7 @@ func (cfg *Config) initializeFlagSet() {
 	 */
 	cfg.flagSet.BoolVar(&cfg.FormatCode, "format-code", cfg.FormatCode, "Boolean: format code?")
 	cfg.flagSet.StringVar(&cfg.TargetDirectory, "out-dir", cfg.TargetDirectory, "mount point of generated files.")
-	cfg.flagSet.StringVar(&cfg.Version, "tmpl-ver", cfg.Version, "Version of templates (v1)")
+	cfg.flagSet.StringVar(&cfg.Version, "tmpl-ver", cfg.Version, "Version of templates (v2)")
 	cfg.flagSet.StringVar(&cfg.CollectionDefFile, "collection-def-file", cfg.CollectionDefFile, "collection definition filename")
 	cfg.flagSet.StringVar(&cfg.CollectionDefScanPath, "collection-def-scan-path", cfg.CollectionDefScanPath, "scan directory for collection definition")
 }
@@ -218,8 +218,8 @@ func (cfg *Config) checkValid() error {
 		}
 	}
 
-	if cfg.Version != "v1" {
-		return errors.New("just have v1 version of templates sorry")
+	if cfg.Version != "v1" && cfg.Version != "v2" {
+		return errors.New("just have v1 and v2 versions of templates sorry")
 	}
 	return nil
 }

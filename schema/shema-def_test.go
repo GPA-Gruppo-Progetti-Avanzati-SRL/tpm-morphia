@@ -22,7 +22,7 @@ var example = `{
       ,{ "name": "address",  "type": "struct", "tags": [ "json", "addr", "bson", "addr" ]
          ,"struct-name": "Address"
          ,"attributes": [
-            { "name": "city", "type": "string" }
+            { "name": "city", "type": "string", "options": "o1,o2" }
            ,{ "name": "strt", "type": "string" }
          ]
       }
