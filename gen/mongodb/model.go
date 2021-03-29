@@ -13,6 +13,8 @@ import (
 const (
 	AttributeTypeStringGoType   = "string"
 	AttributeTypeIntGoType      = "int32"
+	AttributeTypeLongGoType     = "int64"
+	AttributeTypeBoolGoType     = "bool"
 	AttributeTypeObjectIdGoType = "primitive.ObjectID"
 	AttributeTypeDateGoType     = "primitive.DateTime"
 )
@@ -438,6 +440,10 @@ func (b *CodeGenAttributeImpl) GetGoAttributeIsZeroCondition() string {
 		s = fmt.Sprintf("s.%s != primitive.NilObjectID", b.GetGoAttributeName())
 	case schema.AttributeTypeInt:
 		s = fmt.Sprintf("s.%s != 0", b.GetGoAttributeName())
+	case schema.AttributeTypeLong:
+		s = fmt.Sprintf("s.%s != 0", b.GetGoAttributeName())
+	case schema.AttributeTypeBool:
+		s = fmt.Sprintf("s.%s", b.GetGoAttributeName())
 	case schema.AttributeTypeDate:
 		s = fmt.Sprintf("s.%s != 0", b.GetGoAttributeName())
 	case schema.AttributeTypeArray:
@@ -605,6 +611,10 @@ func (v *ValueTypeAttribute) GetGoAttributeType() string {
 		t = AttributeTypeStringGoType
 	case schema.AttributeTypeInt:
 		t = AttributeTypeIntGoType
+	case schema.AttributeTypeLong:
+		t = AttributeTypeLongGoType
+	case schema.AttributeTypeBool:
+		t = AttributeTypeBoolGoType
 	case schema.AttributeTypeDate:
 		t = AttributeTypeDateGoType
 	case schema.AttributeTypeObjectId:

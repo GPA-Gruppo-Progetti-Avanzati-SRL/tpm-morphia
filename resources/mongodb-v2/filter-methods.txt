@@ -27,4 +27,10 @@ func {{.Collection.GetPrefix "capital"}}FilterGoInfo() string {
 {{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "object-id") }}
 {{ template "filter-object-id" filterSubTemplateContext $a "*" }}
 {{- end -}}
+{{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "long") }}
+{{ template "filter-long" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- if and $a.GetDefinition.Queryable (eq $a.GetDefinition.Typ "bool") }}
+{{ template "filter-bool" filterSubTemplateContext $a "*" }}
+{{- end -}}
 {{- end }}

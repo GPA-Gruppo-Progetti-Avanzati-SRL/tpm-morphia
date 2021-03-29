@@ -5,16 +5,17 @@
   ,"struct-name": "DataTypes"
   },
   "attributes": [
-    { "name": "f1"             , "type": "struct", "struct-name": "F1Struct", "attributes": [
-      { "name": "f1_1"        , "type": "string", "queryable":  true}
-    ,{ "name": "f1_2"        , "type": "int"}
-    ,{ "name": "f1_3"        , "type": "date"}
-
-    ,{ "name": "f1_4"        , "type": "struct", "struct-name": "F1_4_NestedStruct", "attributes": [
-        { "name": "f1_4_1"  , "type": "string" }
-      ,{ "name": "f1_4_2"  , "type": "int" }
+    { "name": "f1Struct"             , "type": "struct", "struct-name": "Struct1", "attributes": [
+     { "name": "fString"        , "type": "string", "queryable":  true}
+    ,{ "name": "fInt"        , "type": "int", "queryable":  true}
+    ,{ "name": "fDate"        , "type": "date", "queryable":  true}
+    ,{ "name": "f2Struct"        , "type": "struct", "struct-name": "StructNested", "attributes": [
+        { "name": "fString"  , "type": "string", "queryable":  true }
+      ,{ "name": "fInt"  , "type": "int", "queryable":  true }
       ]}
+    ,{ "name": "fLong"        , "type": "long", "queryable":  true}
+    ,{ "name": "fBool"        , "type": "bool", "queryable":  true}
     ]}
-  ,{ "name": "f2"  , "type": "ref-struct", "struct-name": "F1_4_NestedStruct",  "options": "cust-upd-handling"}
-  ,{ "name": "f3"  , "type": "ref-struct", "struct-ref" : { "struct-name": "ExtStruct", "is-external": true, "package": "github.com/external-package" },  "options": "cust-upd-handling"}
+  ,{ "name": "fRef1"  , "type": "ref-struct", "struct-name": "StructNested",  "options": "cust-upd-handling"}
+  ,{ "name": "fRef2"  , "type": "ref-struct", "struct-ref" : { "struct-name": "StructExt", "is-external": true, "package": "github.com/external-package" },  "options": "cust-upd-handling"}
 ]}

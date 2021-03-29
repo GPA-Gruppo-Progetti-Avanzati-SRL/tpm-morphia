@@ -57,6 +57,20 @@ if obj.{{$a.GetGoAttributeName}} != 0 {
    ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
 }
 {{- end }}
+{{- if eq $f.Typ "long" }}
+if obj.{{$a.GetGoAttributeName}} != 0 {
+   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
+} else {
+   ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
+}
+{{- end }}
+{{- if eq $f.Typ "bool" }}
+if obj.{{$a.GetGoAttributeName}} {
+   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
+} else {
+   ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
+}
+{{- end }}
 {{- if eq $f.Typ "date" }}
 if obj.{{$a.GetGoAttributeName}} != 0 {
    ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
@@ -80,6 +94,10 @@ if obj.{{$a.GetGoAttributeName}} != 0 {
 {{ template "update-string" filterSubTemplateContext $a "*" }}
 {{- else if eq $a.GetDefinition.Typ "int" }}
 {{ template "update-int" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.GetDefinition.Typ "long" }}
+{{ template "update-long" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.GetDefinition.Typ "bool" }}
+{{ template "update-bool" filterSubTemplateContext $a "*" }}
 {{- else if eq $a.GetDefinition.Typ "date" }}
 {{ template "update-date" filterSubTemplateContext $a "*" }}
 {{- else }}

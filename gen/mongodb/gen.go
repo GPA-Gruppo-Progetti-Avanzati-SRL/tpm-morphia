@@ -21,20 +21,23 @@ type GenerationContext struct {
 }
 
 const (
-	TmplCollectionReadme          = "/resources/mongodb-%s/readme.txt"
-	TmplCollectionModel           = "/resources/mongodb-%s/model.txt"
-	TmplCollectionFilter          = "/resources/mongodb-%s/filter-methods.txt"
-	TmplCollectionCriteria        = "/resources/mongodb-%s/filter.txt"
-	TmplCollectionFilterString    = "/resources/mongodb-%s/filter-string.txt"
-	TmplCollectionFilterInt       = "/resources/mongodb-%s/filter-int.txt"
-	TmplCollectionFilterDate      = "/resources/mongodb-%s/filter-date.txt"
-	TmplCollectionStructFilterInt = "/resources/mongodb-%s/struct-filter-int.txt"
-	TmplCollectionFilterObjectId  = "/resources/mongodb-%s/filter-object-id.txt"
-	TmplCollectionUpdate          = "/resources/mongodb-%s/update.txt"
-	TmplCollectionUpdateMethods   = "/resources/mongodb-%s/update-methods.txt"
-	TmplCollectionUpdateString    = "/resources/mongodb-%s/update-string.txt"
-	TmplCollectionUpdateInt       = "/resources/mongodb-%s/update-int.txt"
-	TmplCollectionUpdateDate      = "/resources/mongodb-%s/update-date.txt"
+	TmplCollectionReadme         = "/resources/mongodb-%s/readme.txt"
+	TmplCollectionModel          = "/resources/mongodb-%s/model.txt"
+	TmplCollectionFilter         = "/resources/mongodb-%s/filter-methods.txt"
+	TmplCollectionCriteria       = "/resources/mongodb-%s/filter.txt"
+	TmplCollectionFilterString   = "/resources/mongodb-%s/filter-string.txt"
+	TmplCollectionFilterInt      = "/resources/mongodb-%s/filter-int.txt"
+	TmplCollectionFilterLong     = "/resources/mongodb-%s/filter-long.txt"
+	TmplCollectionFilterBool     = "/resources/mongodb-%s/filter-bool.txt"
+	TmplCollectionFilterDate     = "/resources/mongodb-%s/filter-date.txt"
+	TmplCollectionFilterObjectId = "/resources/mongodb-%s/filter-object-id.txt"
+	TmplCollectionUpdate         = "/resources/mongodb-%s/update.txt"
+	TmplCollectionUpdateMethods  = "/resources/mongodb-%s/update-methods.txt"
+	TmplCollectionUpdateString   = "/resources/mongodb-%s/update-string.txt"
+	TmplCollectionUpdateInt      = "/resources/mongodb-%s/update-int.txt"
+	TmplCollectionUpdateLong     = "/resources/mongodb-%s/update-long.txt"
+	TmplCollectionUpdateBool     = "/resources/mongodb-%s/update-bool.txt"
+	TmplCollectionUpdateDate     = "/resources/mongodb-%s/update-date.txt"
 )
 
 // List of templates for mongoDbGeneration
@@ -44,7 +47,8 @@ func filterTmplList(tmplVersion string) []string {
 	s = append(s, fmt.Sprintf(TmplCollectionFilterString, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionFilterInt, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionFilterDate, tmplVersion))
-	//s = append(s, fmt.Sprintf(TmplCollectionStructFilterInt, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionFilterLong, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionFilterBool, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionFilterObjectId, tmplVersion))
 	return s
 }
@@ -78,6 +82,8 @@ func updateMethodsTmplList(tmplVersion string) []string {
 	s = append(s, fmt.Sprintf(TmplCollectionUpdateMethods, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionUpdateString, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionUpdateInt, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionUpdateLong, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionUpdateBool, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionUpdateDate, tmplVersion))
 	return s
 }
