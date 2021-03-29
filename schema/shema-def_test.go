@@ -1,8 +1,8 @@
 package schema
 
 import (
-	"bytes"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
+	"os"
 	"testing"
 )
 
@@ -53,10 +53,18 @@ var example = `{
    ] 
 }`
 
+var tests_datatypes = "../tests/datatypes-tpmm.json"
+var tests_cliente = "../tests/cliente-tpmm.json"
+
 func TestParse(t *testing.T) {
 
-	r := bytes.NewReader([]byte(example))
-	_, e := ReadCollectionDefinition(system.GetLogger(), r)
+	f, err := os.Open(tests_cliente)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	_, e := ReadCollectionDefinition(system.GetLogger(), f)
 	if e != nil {
 		t.Error(e)
 	}

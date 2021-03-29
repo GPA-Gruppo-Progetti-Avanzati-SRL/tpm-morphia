@@ -72,7 +72,7 @@ func newConfig(_ context.Context, cfgFileName string) (*Config, error) {
 	cfg := DefaultConfig
 	cfg.ConfigFile = cfgFileName
 
-	_ = level.Debug(logger).Log(system.DefaultLogMessageField, "Embedded Configuration Loaded", "Config", cfg)
+	_ = level.Debug(logger).Log(system.DefaultLogMessageField, "Embedded Configuration Loaded", "Config", fmt.Sprintf("%+v", cfg))
 
 	if _, err := cfg.readConfigFromFile(logger, cfg.ConfigFile, false); err != nil {
 		return &cfg, err
@@ -92,7 +92,7 @@ func newConfig(_ context.Context, cfgFileName string) (*Config, error) {
 		_ = level.Warn(logger).Log(system.DefaultLogMessageField, "Invalid Command Line flag", "Flag", cfg.flagSet.Arg(0))
 	}
 
-	_ = level.Debug(logger).Log(system.DefaultLogMessageField, "Command Line Parsed", "Config", cfg)
+	_ = level.Debug(logger).Log(system.DefaultLogMessageField, "Command Line Parsed", "Config", fmt.Sprintf("%+v", cfg))
 
 	if cfg.ConfigFile != currentConfigFile {
 		/*
@@ -104,7 +104,7 @@ func newConfig(_ context.Context, cfgFileName string) (*Config, error) {
 		}
 	}
 
-	_ = level.Info(logger).Log(system.DefaultLogMessageField, "Configuration Loaded", "Config", cfg)
+	_ = level.Info(logger).Log(system.DefaultLogMessageField, "Configuration Loaded", "Config", fmt.Sprintf("%+v", cfg))
 
 	if err := cfg.checkValid(); err != nil {
 		return nil, err
