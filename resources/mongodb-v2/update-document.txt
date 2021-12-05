@@ -1,4 +1,4 @@
-{{ define "update-bool" }}
+{{ define "update-document" }}
 //----- {{.Attr.GetDefinition}} {{.Attr.GetDefinition.Paths}}
 {{ $a := .Attr }}
 {{ $f := $a.GetDefinition }}
@@ -12,7 +12,7 @@ func (ud *UpdateDocument) Set{{ updateMethodSignature $p }} ({{ updateMethodVarP
 	return ud
 }
 
-// Unset{{ updateMethodSignature $p }}
+// Unset{{ updateMethodSignature $p }} No Remarks
 func (ud *UpdateDocument) Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "none" }}) *UpdateDocument {
 	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "index" "indexIjk"}} {{ updateMethodVarParams $p false "before" }})
 	ud.Unset().Add(func() bson.E {

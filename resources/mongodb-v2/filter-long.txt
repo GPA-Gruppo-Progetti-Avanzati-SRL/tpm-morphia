@@ -1,10 +1,11 @@
 {{ define "filter-long" }}
 //----- {{.Attr.GetDefinition.Name}} of type {{.Attr.GetDefinition.Typ}}
+//----- {{.Attr.GetDefinition}} {{.Attr.GetDefinition.Paths}}
 {{ $a := .Attr }}
 {{ $f := $a.GetDefinition }}
-// {{$f}} {{$f.Paths}}
 {{- range $i, $p := $f.Paths}}
 {{- if not (isIdentifierIndexed $p) }}
+// And{{ criteriaMethodSignature $p }}EqTo No Remarks
 func (ca *Criteria) And{{ criteriaMethodSignature $p }}EqTo ({{ criteriaMethodVarParams $p true "after" }} p int64, nullValue ...int64) *Criteria {
 
 	if len(nullValue) > 0 && p == nullValue[0] {

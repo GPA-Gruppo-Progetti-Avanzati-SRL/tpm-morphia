@@ -19,45 +19,45 @@ type UpdateDocument struct {
 	Ops map[UpdateOperator]*Updates
 }
 
-func (uo *UpdateDocument)Set() *Updates {
-	return uo.op(Set)
+func (ud *UpdateDocument)Set() *Updates {
+	return ud.op(Set)
 }
 
-func (uo *UpdateDocument) Unset() *Updates {
-	return uo.op(Unset)
+func (ud *UpdateDocument) Unset() *Updates {
+	return ud.op(Unset)
 }
 
-func (uo *UpdateDocument) CurrentDate() *Updates {
-	return uo.op(CurrentDate)
+func (ud *UpdateDocument) CurrentDate() *Updates {
+	return ud.op(CurrentDate)
 }
 
-func (uo *UpdateDocument) Inc() *Updates {
-	return uo.op(Inc)
+func (ud *UpdateDocument) Inc() *Updates {
+	return ud.op(Inc)
 }
 
-func (uo *UpdateDocument)op(op UpdateOperator) *Updates {
+func (ud *UpdateDocument)op(op UpdateOperator) *Updates {
 
-	if len(uo.Ops) == 0 {
-		uo.Ops = make(map[UpdateOperator]*Updates)
+	if len(ud.Ops) == 0 {
+		ud.Ops = make(map[UpdateOperator]*Updates)
 	}
 
-	if u, ok := uo.Ops[op]; ok {
+	if u, ok := ud.Ops[op]; ok {
 		return u
 	}
 
 	uopi := &Updates{ operator: string(op) }
-	uo.Ops[op] = uopi
+	ud.Ops[op] = uopi
 
 	return uopi
 }
 
-func (uo *UpdateDocument)Build() bson.D {
-	if len(uo.Ops) == 0 {
+func (ud *UpdateDocument)Build() bson.D {
+	if len(ud.Ops) == 0 {
 		return emptyFilter
 	}
 
 	docAll := bson.D{}
-	for _, cas := range uo.Ops {
+	for _, cas := range ud.Ops {
 		doc := bson.D{}
 		for _, c := range cas.updates {
 			if u := c(); u.Key != "" {

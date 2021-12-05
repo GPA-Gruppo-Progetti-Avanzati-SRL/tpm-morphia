@@ -14,8 +14,9 @@ func FilterGoInfo() string {
 }
 
 //----- oId of type object-id
+//----- oId - object-id -  [oId]
 
-// oId - object-id -  [oId]
+// AndOIdEqTo No Remarks
 func (ca *Criteria) AndOIdEqTo(oId primitive.ObjectID) *Criteria {
 
 	if oId == primitive.NilObjectID {
@@ -28,7 +29,10 @@ func (ca *Criteria) AndOIdEqTo(oId primitive.ObjectID) *Criteria {
 	return ca
 }
 
-// firstName - string -  [firstName]
+//----- firstName of type string
+//----- firstName - string -  [firstName]
+
+// AndFirstNameEqTo No Remarks
 func (ca *Criteria) AndFirstNameEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -53,7 +57,10 @@ func (ca *Criteria) AndFirstNameIn(p []string) *Criteria {
 	return ca
 }
 
-// lastName - string -  [lastName]
+//----- lastName of type string
+//----- lastName - string -  [lastName]
+
+// AndLastNameEqTo No Remarks
 func (ca *Criteria) AndLastNameEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -79,8 +86,9 @@ func (ca *Criteria) AndLastNameIn(p []string) *Criteria {
 }
 
 //----- age of type int
+//----- age - int -  [age]
 
-// age - int -  [age]
+// AndAgeEqTo No Remarks
 func (ca *Criteria) AndAgeEqTo(p int, nullValue ...int) *Criteria {
 
 	if len(nullValue) > 0 && p == nullValue[0] {
@@ -105,7 +113,10 @@ func (ca *Criteria) AndAgeGt(p int, nullValue ...int) *Criteria {
 	return ca
 }
 
-// city - string -  [address.city shipAddress.city]
+//----- city of type string
+//----- city - string -  [address.city shipAddress.city]
+
+// AndAddressCityEqTo No Remarks
 func (ca *Criteria) AndAddressCityEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -129,6 +140,8 @@ func (ca *Criteria) AndAddressCityIn(p []string) *Criteria {
 	*ca = append(*ca, c)
 	return ca
 }
+
+// AndShipAddressCityEqTo No Remarks
 func (ca *Criteria) AndShipAddressCityEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -153,7 +166,10 @@ func (ca *Criteria) AndShipAddressCityIn(p []string) *Criteria {
 	return ca
 }
 
-// strt - string -  [address.strt shipAddress.strt]
+//----- strt of type string
+//----- strt - string -  [address.strt shipAddress.strt]
+
+// AndAddressStrtEqTo No Remarks
 func (ca *Criteria) AndAddressStrtEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -177,6 +193,8 @@ func (ca *Criteria) AndAddressStrtIn(p []string) *Criteria {
 	*ca = append(*ca, c)
 	return ca
 }
+
+// AndShipAddressStrtEqTo No Remarks
 func (ca *Criteria) AndShipAddressStrtEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -201,7 +219,10 @@ func (ca *Criteria) AndShipAddressStrtIn(p []string) *Criteria {
 	return ca
 }
 
-// title - string -  [books.[].title books.title]
+//----- title of type string
+//----- title - string -  [books.[].title books.title]
+
+// AndBooksTitleEqTo No Remarks
 func (ca *Criteria) AndBooksTitleEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -226,7 +247,10 @@ func (ca *Criteria) AndBooksTitleIn(p []string) *Criteria {
 	return ca
 }
 
-// isbn - string -  [books.[].isbn books.isbn]
+//----- isbn of type string
+//----- isbn - string -  [books.[].isbn books.isbn]
+
+// AndBooksIsbnEqTo No Remarks
 func (ca *Criteria) AndBooksIsbnEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -251,7 +275,10 @@ func (ca *Criteria) AndBooksIsbnIn(p []string) *Criteria {
 	return ca
 }
 
-// publisherId - string -  [businessRels.%s.publisherId]
+//----- publisherId of type string
+//----- publisherId - string -  [businessRels.%s.publisherId]
+
+// AndBusinessRelsSPublisherIdEqTo No Remarks
 func (ca *Criteria) AndBusinessRelsSPublisherIdEqTo(keyS string, p string) *Criteria {
 
 	if p == "" {
@@ -276,7 +303,10 @@ func (ca *Criteria) AndBusinessRelsSPublisherIdIn(keyS string, p []string) *Crit
 	return ca
 }
 
-// publisherName - string -  [businessRels.%s.publisherName]
+//----- publisherName of type string
+//----- publisherName - string -  [businessRels.%s.publisherName]
+
+// AndBusinessRelsSPublisherNameEqTo No Remarks
 func (ca *Criteria) AndBusinessRelsSPublisherNameEqTo(keyS string, p string) *Criteria {
 
 	if p == "" {
@@ -301,7 +331,10 @@ func (ca *Criteria) AndBusinessRelsSPublisherNameIn(keyS string, p []string) *Cr
 	return ca
 }
 
-// contractId - string -  [businessRels.%s.contracts.%s.contractId]
+//----- contractId of type string
+//----- contractId - string -  [businessRels.%s.contracts.%s.contractId]
+
+// AndBusinessRelsSContractsTContractIdEqTo No Remarks
 func (ca *Criteria) AndBusinessRelsSContractsTContractIdEqTo(keyS string, keyT string, p string) *Criteria {
 
 	if p == "" {
@@ -326,7 +359,10 @@ func (ca *Criteria) AndBusinessRelsSContractsTContractIdIn(keyS string, keyT str
 	return ca
 }
 
-// contractDescr - string -  [businessRels.%s.contracts.%s.contractDescr]
+//----- contractDescr of type string
+//----- contractDescr - string -  [businessRels.%s.contracts.%s.contractDescr]
+
+// AndBusinessRelsSContractsTContractDescrEqTo No Remarks
 func (ca *Criteria) AndBusinessRelsSContractsTContractDescrEqTo(keyS string, keyT string, p string) *Criteria {
 
 	if p == "" {

@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func CritriaGoInfo() string {
+func CriteriaGoInfo() string {
 	i := fmt.Sprintf("tpm_morphia query filter support generated for %s package on %s", "author", time.Now().String())
 	return i
 }

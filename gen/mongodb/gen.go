@@ -38,6 +38,8 @@ const (
 	TmplCollectionUpdateLong     = "/resources/mongodb-%s/update-long.txt"
 	TmplCollectionUpdateBool     = "/resources/mongodb-%s/update-bool.txt"
 	TmplCollectionUpdateDate     = "/resources/mongodb-%s/update-date.txt"
+	TmplCollectionUpdateDocument = "/resources/mongodb-%s/update-document.txt"
+	TmplCollectionUpdateObjectId = "/resources/mongodb-%s/update-object-id.txt"
 )
 
 // List of templates for mongoDbGeneration
@@ -85,6 +87,8 @@ func updateMethodsTmplList(tmplVersion string) []string {
 	s = append(s, fmt.Sprintf(TmplCollectionUpdateLong, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionUpdateBool, tmplVersion))
 	s = append(s, fmt.Sprintf(TmplCollectionUpdateDate, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionUpdateDocument, tmplVersion))
+	s = append(s, fmt.Sprintf(TmplCollectionUpdateObjectId, tmplVersion))
 	return s
 }
 

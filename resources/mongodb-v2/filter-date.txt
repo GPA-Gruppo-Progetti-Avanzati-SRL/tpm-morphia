@@ -1,10 +1,11 @@
 {{ define "filter-date" }}
 //----- {{.Attr.GetDefinition.Name}} of type {{.Attr.GetDefinition.Typ}}
+//----- {{.Attr.GetDefinition}} {{.Attr.GetDefinition.Paths}}
 {{ $a := .Attr }}
 {{ $f := $a.GetDefinition }}
-// {{$f}} {{$f.Paths}}
 {{- range $i, $p := $f.Paths}}
 {{- if not (isIdentifierIndexed $p) }}
+// And{{ criteriaMethodSignature $p }}EqTo No Remarks
 func (ca *Criteria) And{{ criteriaMethodSignature $p }}EqTo ({{ criteriaMethodVarParams $p true "after" }} dt primitive.DateTime) *Criteria {
 
 	if dt == 0 {

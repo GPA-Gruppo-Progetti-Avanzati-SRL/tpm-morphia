@@ -1,10 +1,11 @@
 {{ define "filter-bool" }}
 //----- {{.Attr.GetDefinition.Name}} of type {{.Attr.GetDefinition.Typ}}
+//----- {{.Attr.GetDefinition}} {{.Attr.GetDefinition.Paths}}
 {{ $a := .Attr }}
 {{ $f := $a.GetDefinition }}
-// {{$f}} {{$f.Paths}}
 {{- range $i, $p := $f.Paths}}
 {{- if not (isIdentifierIndexed $p) }}
+// And{{ criteriaMethodSignature $p }}Is No Remarks
 func (ca *Criteria) And{{ criteriaMethodSignature $p }}Is ({{ criteriaMethodVarParams $p true "after" }} p bool) *Criteria {
 
 	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "suppress" "indexIjk"}} {{ criteriaMethodVarParams $p false "before" }})
@@ -12,7 +13,6 @@ func (ca *Criteria) And{{ criteriaMethodSignature $p }}Is ({{ criteriaMethodVarP
 	*ca = append(*ca, c)
     return ca
 }
-
 {{- end }}
 {{- end }}
 {{ end }}

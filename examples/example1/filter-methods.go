@@ -14,8 +14,9 @@ func FilterGoInfo() string {
 }
 
 //----- oId of type object-id
+//----- oId - object-id -  [oId]
 
-// oId - object-id -  [oId]
+// AndOIdEqTo No Remarks
 func (ca *Criteria) AndOIdEqTo(oId primitive.ObjectID) *Criteria {
 
 	if oId == primitive.NilObjectID {
@@ -28,7 +29,10 @@ func (ca *Criteria) AndOIdEqTo(oId primitive.ObjectID) *Criteria {
 	return ca
 }
 
-// firstName - string -  [firstName]
+//----- firstName of type string
+//----- firstName - string -  [firstName]
+
+// AndFirstNameEqTo No Remarks
 func (ca *Criteria) AndFirstNameEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -53,7 +57,10 @@ func (ca *Criteria) AndFirstNameIn(p []string) *Criteria {
 	return ca
 }
 
-// lastName - string -  [lastName]
+//----- lastName of type string
+//----- lastName - string -  [lastName]
+
+// AndLastNameEqTo No Remarks
 func (ca *Criteria) AndLastNameEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -79,8 +86,9 @@ func (ca *Criteria) AndLastNameIn(p []string) *Criteria {
 }
 
 //----- age of type int
+//----- age - int -  [age]
 
-// age - int -  [age]
+// AndAgeEqTo No Remarks
 func (ca *Criteria) AndAgeEqTo(p int, nullValue ...int) *Criteria {
 
 	if len(nullValue) > 0 && p == nullValue[0] {
@@ -105,7 +113,10 @@ func (ca *Criteria) AndAgeGt(p int, nullValue ...int) *Criteria {
 	return ca
 }
 
-// city - string -  [address.city]
+//----- city of type string
+//----- city - string -  [address.city]
+
+// AndAddressCityEqTo No Remarks
 func (ca *Criteria) AndAddressCityEqTo(p string) *Criteria {
 
 	if p == "" {
@@ -130,7 +141,10 @@ func (ca *Criteria) AndAddressCityIn(p []string) *Criteria {
 	return ca
 }
 
-// street - string -  [address.street]
+//----- street of type string
+//----- street - string -  [address.street]
+
+// AndAddressStreetEqTo No Remarks
 func (ca *Criteria) AndAddressStreetEqTo(p string) *Criteria {
 
 	if p == "" {

@@ -1,12 +1,14 @@
 package example1
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
+import "go.mongodb.org/mongo-driver/bson"
 
 const (
 	OID            = "_id"
 	FIRSTNAME      = "fn"
 	LASTNAME       = "ln"
 	AGE            = "age"
+	DOC            = "doc"
 	ADDRESS        = "addr"
 	ADDRESS_CITY   = "addr.city"
 	ADDRESS_STREET = "addr.street"
@@ -17,6 +19,7 @@ type Author struct {
 	FirstName string             `json:"fn,omitempty" bson:"fn,omitempty"`
 	LastName  string             `json:"ln,omitempty" bson:"ln,omitempty"`
 	Age       int32              `json:"age,omitempty" bson:"age,omitempty"`
+	Doc       bson.M             `json:"doc,omitempty" bson:"doc,omitempty"`
 	Address   Address            `json:"addr,omitempty" bson:"addr,omitempty"`
 }
 
@@ -31,6 +34,9 @@ func (s Author) IsZero() bool {
 		return false
 	}
 	if s.Age != 0 {
+		return false
+	}
+	if len(s.Doc) != 0 {
 		return false
 	}
 	if !s.Address.IsZero() {

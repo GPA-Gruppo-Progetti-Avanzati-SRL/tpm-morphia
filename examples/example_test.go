@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestExamplesSetup(t *testing.T) {
+func TestExamples(t *testing.T) {
 
 	genCfg := config.DefaultConfig
 	genCfg.TargetDirectory = "."

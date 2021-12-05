@@ -22,6 +22,7 @@ const (
 	AttributeTypeDate      = "date"
 	AttributeTypeObjectId  = "object-id"
 	AttributeTypeRefStruct = "ref-struct"
+	AttributeTypeDocument  = "document"
 )
 
 type CollectionDefError struct {
@@ -190,6 +191,7 @@ func (c *Collection) wireReference2Structs(fields []*Field) error {
 				// Another approach could be to process two schemas as a bundle but is way to elaborate.
 				// Should probably add a dependency in terms of a package import
 				if !f.StructRef.IsExternal {
+					// TODO: the f.StructName in the message should be replaced with f.StructRef.StructName
 					return errors.New(fmt.Sprintf("the field %s refers to undefined struct %s", f.Name, f.StructName))
 				}
 			} else {
@@ -489,6 +491,7 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 	case AttributeTypeLong:
 	case AttributeTypeBool:
 	case AttributeTypeDate:
+	case AttributeTypeDocument:
 	case AttributeTypeRefStruct:
 		sn := f.StructRef.StructName
 		if sn == "" {

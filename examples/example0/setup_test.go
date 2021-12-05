@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/examples/example0"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -65,6 +65,7 @@ func insertARecord(logger log.Logger, ctx context.Context, aCollection *mongo.Co
 		LastName:  ln,
 		Age:       30,
 		Address:   example0.Address{City: city, Street: strt},
+		Document:  bson.M{"f1": fn, "f2": ln},
 	}
 
 	_ = level.Info(logger).Log("inserting_record", fmt.Sprintf("%v", a))

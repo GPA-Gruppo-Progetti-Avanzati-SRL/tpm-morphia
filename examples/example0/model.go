@@ -1,6 +1,9 @@
 package example0
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Author struct {
 	OId       primitive.ObjectID `json:"-" bson:"_id,omitempty"`
@@ -8,6 +11,7 @@ type Author struct {
 	LastName  string             `json:"ln,omitempty" bson:"ln,omitempty"`
 	Age       int32              `json:"age,omitempty" bson:"age,omitempty"`
 	Address   Address            `json:"addr,omitempty" bson:"addr,omitempty"`
+	Document  bson.M             `json:"doc,omitempty" bson:"doc,omitempty"`
 }
 
 type Address struct {
@@ -33,6 +37,9 @@ func (s Author) IsZero() bool {
 		return false
 	}
 	if !s.Address.IsZero() {
+		return false
+	}
+	if len(s.Document) != 0 {
 		return false
 	}
 	return true

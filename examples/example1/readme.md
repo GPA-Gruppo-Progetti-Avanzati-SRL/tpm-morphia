@@ -1,8 +1,5 @@
 ### author
 
-This example is the example0 version but with the find and update operations carried out with the generated
-code resulting from the definition of the collection.
-
 #### Collection schema definition.
 
     {
@@ -61,6 +58,14 @@ code resulting from the definition of the collection.
 	      "name": "age",
 	      "type": "int",
 	      "queryable": true,
+	      "struct-ref": {
+	        "Package": "",
+	        "Item": null
+	      }
+	    },
+	    {
+	      "name": "doc",
+	      "type": "document",
 	      "struct-ref": {
 	        "Package": "",
 	        "Item": null

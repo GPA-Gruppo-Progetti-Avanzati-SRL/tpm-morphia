@@ -32,6 +32,7 @@ func TestUpdate(t *testing.T) {
 	if err := update(logger, ctx, collection, "Susan", "Red", "Atlanta"); err != nil {
 		_ = level.Info(logger).Log("err", err.Error())
 	}
+
 }
 
 func update(logger log.Logger, ctx context.Context, aCollection *mongo.Collection, fn string, ln string, cy string) error {

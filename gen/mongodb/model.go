@@ -17,6 +17,7 @@ const (
 	AttributeTypeBoolGoType     = "bool"
 	AttributeTypeObjectIdGoType = "primitive.ObjectID"
 	AttributeTypeDateGoType     = "primitive.DateTime"
+	AttributeTypeDocumentGoType = "bson.M"
 )
 
 type InfoCollectorVisitor struct {
@@ -139,6 +140,10 @@ func NewValueTypeAttribute(parentAttribute CodeGenAttribute, attrDefinition sche
 	case schema.AttributeTypeObjectId:
 		v.PackageImports = make([]string, 0, 1)
 		v.PackageImports = append(v.PackageImports, "go.mongodb.org/mongo-driver/bson/primitive")
+
+	case schema.AttributeTypeDocument:
+		v.PackageImports = make([]string, 0, 1)
+		v.PackageImports = append(v.PackageImports, "go.mongodb.org/mongo-driver/bson")
 	}
 
 	// v.BSONNamespace = visitor.BSONNamespace
@@ -456,6 +461,8 @@ func (b *CodeGenAttributeImpl) GetGoAttributeIsZeroCondition() string {
 		s = fmt.Sprintf("s.%s != \"\"", b.GetGoAttributeName())
 	case schema.AttributeTypeMap:
 		s = fmt.Sprintf("len(s.%s) != 0", b.GetGoAttributeName())
+	case schema.AttributeTypeDocument:
+		s = fmt.Sprintf("len(s.%s) != 0", b.GetGoAttributeName())
 	}
 
 	return s
@@ -619,6 +626,8 @@ func (v *ValueTypeAttribute) GetGoAttributeType() string {
 		t = AttributeTypeDateGoType
 	case schema.AttributeTypeObjectId:
 		t = AttributeTypeObjectIdGoType
+	case schema.AttributeTypeDocument:
+		t = AttributeTypeDocumentGoType
 	default:
 		t = "-- NotYetImplemented --"
 	}

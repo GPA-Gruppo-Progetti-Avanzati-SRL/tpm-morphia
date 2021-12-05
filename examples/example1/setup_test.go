@@ -64,6 +64,7 @@ func insertARecord(logger log.Logger, ctx context.Context, aCollection *mongo.Co
 		FirstName: fn,
 		LastName:  ln,
 		Age:       30,
+		Doc:       bson.M{"field_name": fn, "field_lastname": ln},
 		Address:   example1.Address{City: city, Street: strt},
 	}
 

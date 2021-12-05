@@ -13,11 +13,10 @@ func UpdateMethodsGoInfo() string {
 	return i
 }
 
-/*
- * Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
- * the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
- * the issue and delete an existing value without creating an empty struct..
- */
+// GetUpdateDocument
+// Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
+// the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
+// the issue and delete an existing value without creating an empty struct..
 func GetUpdateDocument(obj *Author) UpdateDocument {
 	ud := UpdateDocument{}
 	if obj.FirstName != "" {
@@ -59,7 +58,9 @@ func GetUpdateDocument(obj *Author) UpdateDocument {
 	return ud
 }
 
-// oId - object-id -  [oId]
+//----- oId - object-id -  [oId]
+
+// SetOId No Remarks
 func (ud *UpdateDocument) SetOId(p primitive.ObjectID) *UpdateDocument {
 	mName := fmt.Sprintf(OID)
 	ud.Set().Add(func() bson.E {
@@ -68,6 +69,7 @@ func (ud *UpdateDocument) SetOId(p primitive.ObjectID) *UpdateDocument {
 	return ud
 }
 
+// UnsetOId No Remarks
 func (ud *UpdateDocument) UnsetOId() *UpdateDocument {
 	mName := fmt.Sprintf(OID)
 	ud.Unset().Add(func() bson.E {
@@ -76,7 +78,9 @@ func (ud *UpdateDocument) UnsetOId() *UpdateDocument {
 	return ud
 }
 
-// firstName - string -  [firstName]
+//----- firstName - string -  [firstName]
+
+// SetFirstName No Remarks
 func (ud *UpdateDocument) SetFirstName(p string) *UpdateDocument {
 	mName := fmt.Sprintf(FIRSTNAME)
 	ud.Set().Add(func() bson.E {
@@ -85,6 +89,7 @@ func (ud *UpdateDocument) SetFirstName(p string) *UpdateDocument {
 	return ud
 }
 
+// UnsetFirstName No Remarks
 func (ud *UpdateDocument) UnsetFirstName() *UpdateDocument {
 	mName := fmt.Sprintf(FIRSTNAME)
 	ud.Unset().Add(func() bson.E {
@@ -93,7 +98,9 @@ func (ud *UpdateDocument) UnsetFirstName() *UpdateDocument {
 	return ud
 }
 
-// lastName - string -  [lastName]
+//----- lastName - string -  [lastName]
+
+// SetLastName No Remarks
 func (ud *UpdateDocument) SetLastName(p string) *UpdateDocument {
 	mName := fmt.Sprintf(LASTNAME)
 	ud.Set().Add(func() bson.E {
@@ -102,6 +109,7 @@ func (ud *UpdateDocument) SetLastName(p string) *UpdateDocument {
 	return ud
 }
 
+// UnsetLastName No Remarks
 func (ud *UpdateDocument) UnsetLastName() *UpdateDocument {
 	mName := fmt.Sprintf(LASTNAME)
 	ud.Unset().Add(func() bson.E {
@@ -110,7 +118,9 @@ func (ud *UpdateDocument) UnsetLastName() *UpdateDocument {
 	return ud
 }
 
-// age - int -  [age]
+//----- age - int -  [age]
+
+// SetAge No Remarks
 func (ud *UpdateDocument) SetAge(p int32) *UpdateDocument {
 	mName := fmt.Sprintf(AGE)
 	ud.Set().Add(func() bson.E {
@@ -119,6 +129,7 @@ func (ud *UpdateDocument) SetAge(p int32) *UpdateDocument {
 	return ud
 }
 
+// UnsetAge No Remarks
 func (ud *UpdateDocument) UnsetAge() *UpdateDocument {
 	mName := fmt.Sprintf(AGE)
 	ud.Unset().Add(func() bson.E {
@@ -127,6 +138,7 @@ func (ud *UpdateDocument) UnsetAge() *UpdateDocument {
 	return ud
 }
 
+// IncAge No Remarks
 func (ud *UpdateDocument) IncAge(p int32) *UpdateDocument {
 	mName := fmt.Sprintf(AGE)
 	ud.Inc().Add(func() bson.E {
@@ -135,7 +147,8 @@ func (ud *UpdateDocument) IncAge(p int32) *UpdateDocument {
 	return ud
 }
 
-// address - struct - Address [address]
+//----- address - struct - Address [address]
+// SetAddress No Remarks
 func (ud *UpdateDocument) SetAddress(p Address) *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS)
 	ud.Set().Add(func() bson.E {
@@ -144,6 +157,7 @@ func (ud *UpdateDocument) SetAddress(p Address) *UpdateDocument {
 	return ud
 }
 
+// UnsetAddress No Remarks
 func (ud *UpdateDocument) UnsetAddress() *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS)
 	ud.Unset().Add(func() bson.E {
@@ -152,7 +166,9 @@ func (ud *UpdateDocument) UnsetAddress() *UpdateDocument {
 	return ud
 }
 
-// city - string -  [address.city shipAddress.city]
+//----- city - string -  [address.city shipAddress.city]
+
+// SetAddressCity No Remarks
 func (ud *UpdateDocument) SetAddressCity(p string) *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS_CITY)
 	ud.Set().Add(func() bson.E {
@@ -161,6 +177,7 @@ func (ud *UpdateDocument) SetAddressCity(p string) *UpdateDocument {
 	return ud
 }
 
+// UnsetAddressCity No Remarks
 func (ud *UpdateDocument) UnsetAddressCity() *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS_CITY)
 	ud.Unset().Add(func() bson.E {
@@ -168,6 +185,8 @@ func (ud *UpdateDocument) UnsetAddressCity() *UpdateDocument {
 	})
 	return ud
 }
+
+// SetShipAddressCity No Remarks
 func (ud *UpdateDocument) SetShipAddressCity(p string) *UpdateDocument {
 	mName := fmt.Sprintf(SHIPADDRESS_CITY)
 	ud.Set().Add(func() bson.E {
@@ -176,6 +195,7 @@ func (ud *UpdateDocument) SetShipAddressCity(p string) *UpdateDocument {
 	return ud
 }
 
+// UnsetShipAddressCity No Remarks
 func (ud *UpdateDocument) UnsetShipAddressCity() *UpdateDocument {
 	mName := fmt.Sprintf(SHIPADDRESS_CITY)
 	ud.Unset().Add(func() bson.E {
@@ -184,7 +204,9 @@ func (ud *UpdateDocument) UnsetShipAddressCity() *UpdateDocument {
 	return ud
 }
 
-// strt - string -  [address.strt shipAddress.strt]
+//----- strt - string -  [address.strt shipAddress.strt]
+
+// SetAddressStrt No Remarks
 func (ud *UpdateDocument) SetAddressStrt(p string) *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS_STRT)
 	ud.Set().Add(func() bson.E {
@@ -193,6 +215,7 @@ func (ud *UpdateDocument) SetAddressStrt(p string) *UpdateDocument {
 	return ud
 }
 
+// UnsetAddressStrt No Remarks
 func (ud *UpdateDocument) UnsetAddressStrt() *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS_STRT)
 	ud.Unset().Add(func() bson.E {
@@ -200,6 +223,8 @@ func (ud *UpdateDocument) UnsetAddressStrt() *UpdateDocument {
 	})
 	return ud
 }
+
+// SetShipAddressStrt No Remarks
 func (ud *UpdateDocument) SetShipAddressStrt(p string) *UpdateDocument {
 	mName := fmt.Sprintf(SHIPADDRESS_STRT)
 	ud.Set().Add(func() bson.E {
@@ -208,6 +233,7 @@ func (ud *UpdateDocument) SetShipAddressStrt(p string) *UpdateDocument {
 	return ud
 }
 
+// UnsetShipAddressStrt No Remarks
 func (ud *UpdateDocument) UnsetShipAddressStrt() *UpdateDocument {
 	mName := fmt.Sprintf(SHIPADDRESS_STRT)
 	ud.Unset().Add(func() bson.E {
@@ -216,7 +242,8 @@ func (ud *UpdateDocument) UnsetShipAddressStrt() *UpdateDocument {
 	return ud
 }
 
-// shipAddress - ref-struct -  [shipAddress]
+//----- shipAddress - ref-struct -  [shipAddress]
+// SetShipAddress No Remarks
 func (ud *UpdateDocument) SetShipAddress(p Address) *UpdateDocument {
 	mName := fmt.Sprintf(SHIPADDRESS)
 	ud.Set().Add(func() bson.E {
@@ -225,6 +252,7 @@ func (ud *UpdateDocument) SetShipAddress(p Address) *UpdateDocument {
 	return ud
 }
 
+// UnsetShipAddress No Remarks
 func (ud *UpdateDocument) UnsetShipAddress() *UpdateDocument {
 	mName := fmt.Sprintf(SHIPADDRESS)
 	ud.Unset().Add(func() bson.E {
@@ -233,7 +261,8 @@ func (ud *UpdateDocument) UnsetShipAddress() *UpdateDocument {
 	return ud
 }
 
-// books - array -  [books]
+//----- books - array -  [books]
+// SetBooks No Remarks
 func (ud *UpdateDocument) SetBooks(p []Book) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS)
 	ud.Set().Add(func() bson.E {
@@ -242,6 +271,7 @@ func (ud *UpdateDocument) SetBooks(p []Book) *UpdateDocument {
 	return ud
 }
 
+// UnsetBooks No Remarks
 func (ud *UpdateDocument) UnsetBooks() *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS)
 	ud.Unset().Add(func() bson.E {
@@ -250,7 +280,8 @@ func (ud *UpdateDocument) UnsetBooks() *UpdateDocument {
 	return ud
 }
 
-// [] - struct - Book [books.[]]
+//----- [] - struct - Book [books.[]]
+// SetBooksI No Remarks
 func (ud *UpdateDocument) SetBooksI(ndxI int, p Book) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I, ndxI)
 	ud.Set().Add(func() bson.E {
@@ -259,6 +290,7 @@ func (ud *UpdateDocument) SetBooksI(ndxI int, p Book) *UpdateDocument {
 	return ud
 }
 
+// UnsetBooksI No Remarks
 func (ud *UpdateDocument) UnsetBooksI(ndxI int) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I, ndxI)
 	ud.Unset().Add(func() bson.E {
@@ -267,7 +299,9 @@ func (ud *UpdateDocument) UnsetBooksI(ndxI int) *UpdateDocument {
 	return ud
 }
 
-// title - string -  [books.[].title books.title]
+//----- title - string -  [books.[].title books.title]
+
+// SetBooksITitle No Remarks
 func (ud *UpdateDocument) SetBooksITitle(ndxI int, p string) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_TITLE, ndxI)
 	ud.Set().Add(func() bson.E {
@@ -276,6 +310,7 @@ func (ud *UpdateDocument) SetBooksITitle(ndxI int, p string) *UpdateDocument {
 	return ud
 }
 
+// UnsetBooksITitle No Remarks
 func (ud *UpdateDocument) UnsetBooksITitle(ndxI int) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_TITLE, ndxI)
 	ud.Unset().Add(func() bson.E {
@@ -284,7 +319,9 @@ func (ud *UpdateDocument) UnsetBooksITitle(ndxI int) *UpdateDocument {
 	return ud
 }
 
-// isbn - string -  [books.[].isbn books.isbn]
+//----- isbn - string -  [books.[].isbn books.isbn]
+
+// SetBooksIIsbn No Remarks
 func (ud *UpdateDocument) SetBooksIIsbn(ndxI int, p string) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_ISBN, ndxI)
 	ud.Set().Add(func() bson.E {
@@ -293,6 +330,7 @@ func (ud *UpdateDocument) SetBooksIIsbn(ndxI int, p string) *UpdateDocument {
 	return ud
 }
 
+// UnsetBooksIIsbn No Remarks
 func (ud *UpdateDocument) UnsetBooksIIsbn(ndxI int) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_ISBN, ndxI)
 	ud.Unset().Add(func() bson.E {
@@ -301,7 +339,8 @@ func (ud *UpdateDocument) UnsetBooksIIsbn(ndxI int) *UpdateDocument {
 	return ud
 }
 
-// coAuthors - array -  [books.[].coAuthors books.coAuthors]
+//----- coAuthors - array -  [books.[].coAuthors books.coAuthors]
+// SetBooksICoAuthors No Remarks
 func (ud *UpdateDocument) SetBooksICoAuthors(ndxI int, p []string) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_COAUTHORS, ndxI)
 	ud.Set().Add(func() bson.E {
@@ -310,6 +349,7 @@ func (ud *UpdateDocument) SetBooksICoAuthors(ndxI int, p []string) *UpdateDocume
 	return ud
 }
 
+// UnsetBooksICoAuthors No Remarks
 func (ud *UpdateDocument) UnsetBooksICoAuthors(ndxI int) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_COAUTHORS, ndxI)
 	ud.Unset().Add(func() bson.E {
@@ -318,7 +358,8 @@ func (ud *UpdateDocument) UnsetBooksICoAuthors(ndxI int) *UpdateDocument {
 	return ud
 }
 
-// [] - string -  [books.[].coAuthors.[]]
+//----- [] - string -  [books.[].coAuthors.[]]
+// SetBooksICoAuthorsJ No Remarks
 func (ud *UpdateDocument) SetBooksICoAuthorsJ(ndxI int, ndxJ int, p string) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_COAUTHORS_J, ndxI, ndxJ)
 	ud.Set().Add(func() bson.E {
@@ -327,6 +368,7 @@ func (ud *UpdateDocument) SetBooksICoAuthorsJ(ndxI int, ndxJ int, p string) *Upd
 	return ud
 }
 
+// UnsetBooksICoAuthorsJ No Remarks
 func (ud *UpdateDocument) UnsetBooksICoAuthorsJ(ndxI int, ndxJ int) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_COAUTHORS_J, ndxI, ndxJ)
 	ud.Unset().Add(func() bson.E {
@@ -335,7 +377,8 @@ func (ud *UpdateDocument) UnsetBooksICoAuthorsJ(ndxI int, ndxJ int) *UpdateDocum
 	return ud
 }
 
-// businessRels - map -  [businessRels]
+//----- businessRels - map -  [businessRels]
+// SetBusinessRels No Remarks
 func (ud *UpdateDocument) SetBusinessRels(p map[string]BusinessRel) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS)
 	ud.Set().Add(func() bson.E {
@@ -344,6 +387,7 @@ func (ud *UpdateDocument) SetBusinessRels(p map[string]BusinessRel) *UpdateDocum
 	return ud
 }
 
+// UnsetBusinessRels No Remarks
 func (ud *UpdateDocument) UnsetBusinessRels() *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS)
 	ud.Unset().Add(func() bson.E {
@@ -352,7 +396,8 @@ func (ud *UpdateDocument) UnsetBusinessRels() *UpdateDocument {
 	return ud
 }
 
-// %s - struct - BusinessRel [businessRels.%s]
+//----- %s - struct - BusinessRel [businessRels.%s]
+// SetBusinessRelsS No Remarks
 func (ud *UpdateDocument) SetBusinessRelsS(keyS string, p BusinessRel) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S, keyS)
 	ud.Set().Add(func() bson.E {
@@ -361,6 +406,7 @@ func (ud *UpdateDocument) SetBusinessRelsS(keyS string, p BusinessRel) *UpdateDo
 	return ud
 }
 
+// UnsetBusinessRelsS No Remarks
 func (ud *UpdateDocument) UnsetBusinessRelsS(keyS string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S, keyS)
 	ud.Unset().Add(func() bson.E {
@@ -369,7 +415,9 @@ func (ud *UpdateDocument) UnsetBusinessRelsS(keyS string) *UpdateDocument {
 	return ud
 }
 
-// publisherId - string -  [businessRels.%s.publisherId]
+//----- publisherId - string -  [businessRels.%s.publisherId]
+
+// SetBusinessRelsSPublisherId No Remarks
 func (ud *UpdateDocument) SetBusinessRelsSPublisherId(keyS string, p string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_PUBLISHERID, keyS)
 	ud.Set().Add(func() bson.E {
@@ -378,6 +426,7 @@ func (ud *UpdateDocument) SetBusinessRelsSPublisherId(keyS string, p string) *Up
 	return ud
 }
 
+// UnsetBusinessRelsSPublisherId No Remarks
 func (ud *UpdateDocument) UnsetBusinessRelsSPublisherId(keyS string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_PUBLISHERID, keyS)
 	ud.Unset().Add(func() bson.E {
@@ -386,7 +435,9 @@ func (ud *UpdateDocument) UnsetBusinessRelsSPublisherId(keyS string) *UpdateDocu
 	return ud
 }
 
-// publisherName - string -  [businessRels.%s.publisherName]
+//----- publisherName - string -  [businessRels.%s.publisherName]
+
+// SetBusinessRelsSPublisherName No Remarks
 func (ud *UpdateDocument) SetBusinessRelsSPublisherName(keyS string, p string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_PUBLISHERNAME, keyS)
 	ud.Set().Add(func() bson.E {
@@ -395,6 +446,7 @@ func (ud *UpdateDocument) SetBusinessRelsSPublisherName(keyS string, p string) *
 	return ud
 }
 
+// UnsetBusinessRelsSPublisherName No Remarks
 func (ud *UpdateDocument) UnsetBusinessRelsSPublisherName(keyS string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_PUBLISHERNAME, keyS)
 	ud.Unset().Add(func() bson.E {
@@ -403,7 +455,8 @@ func (ud *UpdateDocument) UnsetBusinessRelsSPublisherName(keyS string) *UpdateDo
 	return ud
 }
 
-// contracts - map -  [businessRels.%s.contracts]
+//----- contracts - map -  [businessRels.%s.contracts]
+// SetBusinessRelsSContracts No Remarks
 func (ud *UpdateDocument) SetBusinessRelsSContracts(keyS string, p map[string]Contract) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS, keyS)
 	ud.Set().Add(func() bson.E {
@@ -412,6 +465,7 @@ func (ud *UpdateDocument) SetBusinessRelsSContracts(keyS string, p map[string]Co
 	return ud
 }
 
+// UnsetBusinessRelsSContracts No Remarks
 func (ud *UpdateDocument) UnsetBusinessRelsSContracts(keyS string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS, keyS)
 	ud.Unset().Add(func() bson.E {
@@ -420,7 +474,8 @@ func (ud *UpdateDocument) UnsetBusinessRelsSContracts(keyS string) *UpdateDocume
 	return ud
 }
 
-// %s - struct - Contract [businessRels.%s.contracts.%s]
+//----- %s - struct - Contract [businessRels.%s.contracts.%s]
+// SetBusinessRelsSContractsT No Remarks
 func (ud *UpdateDocument) SetBusinessRelsSContractsT(keyS string, keyT string, p Contract) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T, keyS, keyT)
 	ud.Set().Add(func() bson.E {
@@ -429,6 +484,7 @@ func (ud *UpdateDocument) SetBusinessRelsSContractsT(keyS string, keyT string, p
 	return ud
 }
 
+// UnsetBusinessRelsSContractsT No Remarks
 func (ud *UpdateDocument) UnsetBusinessRelsSContractsT(keyS string, keyT string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T, keyS, keyT)
 	ud.Unset().Add(func() bson.E {
@@ -437,7 +493,9 @@ func (ud *UpdateDocument) UnsetBusinessRelsSContractsT(keyS string, keyT string)
 	return ud
 }
 
-// contractId - string -  [businessRels.%s.contracts.%s.contractId]
+//----- contractId - string -  [businessRels.%s.contracts.%s.contractId]
+
+// SetBusinessRelsSContractsTContractId No Remarks
 func (ud *UpdateDocument) SetBusinessRelsSContractsTContractId(keyS string, keyT string, p string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T_CONTRACTID, keyS, keyT)
 	ud.Set().Add(func() bson.E {
@@ -446,6 +504,7 @@ func (ud *UpdateDocument) SetBusinessRelsSContractsTContractId(keyS string, keyT
 	return ud
 }
 
+// UnsetBusinessRelsSContractsTContractId No Remarks
 func (ud *UpdateDocument) UnsetBusinessRelsSContractsTContractId(keyS string, keyT string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T_CONTRACTID, keyS, keyT)
 	ud.Unset().Add(func() bson.E {
@@ -454,7 +513,9 @@ func (ud *UpdateDocument) UnsetBusinessRelsSContractsTContractId(keyS string, ke
 	return ud
 }
 
-// contractDescr - string -  [businessRels.%s.contracts.%s.contractDescr]
+//----- contractDescr - string -  [businessRels.%s.contracts.%s.contractDescr]
+
+// SetBusinessRelsSContractsTContractDescr No Remarks
 func (ud *UpdateDocument) SetBusinessRelsSContractsTContractDescr(keyS string, keyT string, p string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T_CONTRACTDESCR, keyS, keyT)
 	ud.Set().Add(func() bson.E {
@@ -463,6 +524,7 @@ func (ud *UpdateDocument) SetBusinessRelsSContractsTContractDescr(keyS string, k
 	return ud
 }
 
+// UnsetBusinessRelsSContractsTContractDescr No Remarks
 func (ud *UpdateDocument) UnsetBusinessRelsSContractsTContractDescr(keyS string, keyT string) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T_CONTRACTDESCR, keyS, keyT)
 	ud.Unset().Add(func() bson.E {

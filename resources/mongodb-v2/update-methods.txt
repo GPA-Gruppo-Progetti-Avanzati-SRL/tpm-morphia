@@ -14,11 +14,10 @@ func {{.Collection.GetPrefix "capital"}}UpdateMethodsGoInfo() string {
 	return i
 }
 
-/*
- * Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
- * the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
- * the issue and delete an existing value without creating an empty struct..
- */
+// GetUpdateDocument
+// Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
+// the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
+// the issue and delete an existing value without creating an empty struct.
 func GetUpdateDocument(obj *{{.Collection.Schema.Properties.StructName}}) UpdateDocument {
   ud := UpdateDocument{}
 
@@ -78,6 +77,13 @@ if obj.{{$a.GetGoAttributeName}} != 0 {
    ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
 }
 {{- end }}
+{{- if eq $f.Typ "document" }}
+if len(obj.{{$a.GetGoAttributeName}}) > 0 {
+  ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
+} else {
+  ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
+}
+{{- end }}
 {{- end }}
 {{- if $a.HasOption "cust-upd-handling" }}
  */
@@ -100,10 +106,16 @@ if obj.{{$a.GetGoAttributeName}} != 0 {
 {{ template "update-bool" filterSubTemplateContext $a "*" }}
 {{- else if eq $a.GetDefinition.Typ "date" }}
 {{ template "update-date" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.GetDefinition.Typ "document" }}
+{{ template "update-document" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.GetDefinition.Typ "object-id" }}
+{{ template "update-object-id" filterSubTemplateContext $a "*" }}
 {{- else }}
 {{ $f := $a.GetDefinition }}
-// {{$f}} {{$f.Paths}}
+//----- {{$f}} {{$f.Paths}}
+
 {{- range $i, $p := $a.GetPaths "preferIndexed" }}
+// Set{{ updateMethodSignature $p }} No Remarks
 func (ud *UpdateDocument) Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} p {{$a.GetGoAttributeType}}) *UpdateDocument {
 	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "index" "indexIjk"}} {{ updateMethodVarParams $p false "before" }})
 	ud.Set().Add(func() bson.E {
@@ -112,6 +124,7 @@ func (ud *UpdateDocument) Set{{ updateMethodSignature $p }} ({{ updateMethodVarP
 	return ud
 }
 
+// Unset{{ updateMethodSignature $p }} No Remarks
 func (ud *UpdateDocument) Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "none" }}) *UpdateDocument {
 	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "index" "indexIjk"}} {{ updateMethodVarParams $p false "before" }})
 	ud.Unset().Add(func() bson.E {
@@ -124,8 +137,10 @@ func (ud *UpdateDocument) Unset{{ updateMethodSignature $p }} ({{ updateMethodVa
 
 {{- if or (eq $a.GetDefinition.Typ "array") (eq $a.GetDefinition.Typ "map") -}}
 {{ $f := $a.Item.GetDefinition }}
-// {{$f}} {{$f.Paths}}
+//----- {{$f}} {{$f.Paths}}
+
 {{- range $i, $p := $a.Item.GetPaths "preferIndexed"}}
+// Set{{ updateMethodSignature $p }} No Remarks
 func (ud *UpdateDocument) Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} p {{$a.Item.GetGoAttributeType}}) *UpdateDocument {
 	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "index" "indexIjk"}} {{ updateMethodVarParams $p false "before" }})
 	ud.Set().Add(func() bson.E {
@@ -134,6 +149,7 @@ func (ud *UpdateDocument) Set{{ updateMethodSignature $p }} ({{ updateMethodVarP
 	return ud
 }
 
+// Unset{{ updateMethodSignature $p }} No Remarks
 func (ud *UpdateDocument) Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "none" }}) *UpdateDocument {
 	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "index" "indexIjk"}} {{ updateMethodVarParams $p false "before" }})
 	ud.Unset().Add(func() bson.E {

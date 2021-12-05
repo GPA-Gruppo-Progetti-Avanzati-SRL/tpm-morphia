@@ -9,6 +9,7 @@
     { "name": "firstName", "type": "string", "tags": [ "json", "fn", "bson", "fn" ], "queryable": true },
     { "name": "lastName", "type": "string", "tags": [ "json", "ln", "bson", "ln" ], "queryable": true },
     { "name": "age", "type": "int", "queryable": true },
+    { "name": "doc", "type": "document" },
     {
       "name": "address", "type": "struct",
       "tags": [ "json", "addr", "bson", "addr"  ],
