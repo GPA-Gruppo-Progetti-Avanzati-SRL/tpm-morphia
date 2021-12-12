@@ -45,6 +45,15 @@ func (ca *Criteria) AndFirstNameEqTo(p string) *Criteria {
 	return ca
 }
 
+// AndFirstNameIsNullOrUnset No Remarks
+func (ca *Criteria) AndFirstNameIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(FIRSTNAME)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
+	*ca = append(*ca, c)
+	return ca
+}
+
 func (ca *Criteria) AndFirstNameIn(p []string) *Criteria {
 
 	if len(p) == 0 {
@@ -69,6 +78,15 @@ func (ca *Criteria) AndLastNameEqTo(p string) *Criteria {
 
 	mName := fmt.Sprintf(LASTNAME)
 	c := func() bson.E { return bson.E{Key: mName, Value: p} }
+	*ca = append(*ca, c)
+	return ca
+}
+
+// AndLastNameIsNullOrUnset No Remarks
+func (ca *Criteria) AndLastNameIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(LASTNAME)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
 	*ca = append(*ca, c)
 	return ca
 }
@@ -129,6 +147,15 @@ func (ca *Criteria) AndAddressCityEqTo(p string) *Criteria {
 	return ca
 }
 
+// AndAddressCityIsNullOrUnset No Remarks
+func (ca *Criteria) AndAddressCityIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(ADDRESS_CITY)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
+	*ca = append(*ca, c)
+	return ca
+}
+
 func (ca *Criteria) AndAddressCityIn(p []string) *Criteria {
 
 	if len(p) == 0 {
@@ -153,6 +180,15 @@ func (ca *Criteria) AndAddressStreetEqTo(p string) *Criteria {
 
 	mName := fmt.Sprintf(ADDRESS_STREET)
 	c := func() bson.E { return bson.E{Key: mName, Value: p} }
+	*ca = append(*ca, c)
+	return ca
+}
+
+// AndAddressStreetIsNullOrUnset No Remarks
+func (ca *Criteria) AndAddressStreetIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(ADDRESS_STREET)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
 	*ca = append(*ca, c)
 	return ca
 }

@@ -17,32 +17,145 @@ func UpdateMethodsGoInfo() string {
 // Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
 // the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
 // the issue and delete an existing value without creating an empty struct.
-func GetUpdateDocument(obj *Author) UpdateDocument {
+type UnsetMode int64
+
+const (
+	UnSpecified     UnsetMode = 0
+	KeepCurrent               = 1
+	UnsetData                 = 2
+	SetData2Default           = 3
+)
+
+type UnsetOption func(uopt *UnsetOptions)
+
+type UnsetOptions struct {
+	DefaultMode UnsetMode
+	OId         UnsetMode
+	FirstName   UnsetMode
+	LastName    UnsetMode
+	Age         UnsetMode
+	Doc         UnsetMode
+	Address     UnsetMode
+}
+
+func WithDefaultUnsetMode(m UnsetMode) UnsetOption {
+	return func(uopt *UnsetOptions) {
+		uopt.DefaultMode = m
+	}
+}
+func WithOIdUnsetMode(m UnsetMode) UnsetOption {
+	return func(uopt *UnsetOptions) {
+		uopt.OId = m
+	}
+}
+func WithFirstNameUnsetMode(m UnsetMode) UnsetOption {
+	return func(uopt *UnsetOptions) {
+		uopt.FirstName = m
+	}
+}
+func WithLastNameUnsetMode(m UnsetMode) UnsetOption {
+	return func(uopt *UnsetOptions) {
+		uopt.LastName = m
+	}
+}
+func WithAgeUnsetMode(m UnsetMode) UnsetOption {
+	return func(uopt *UnsetOptions) {
+		uopt.Age = m
+	}
+}
+func WithDocUnsetMode(m UnsetMode) UnsetOption {
+	return func(uopt *UnsetOptions) {
+		uopt.Doc = m
+	}
+}
+func WithAddressUnsetMode(m UnsetMode) UnsetOption {
+	return func(uopt *UnsetOptions) {
+		uopt.Address = m
+	}
+}
+
+func GetUpdateDocument(obj *Author, opts ...UnsetOption) UpdateDocument {
+
+	uo := &UnsetOptions{DefaultMode: KeepCurrent}
+	for _, o := range opts {
+		o(uo)
+	}
+
 	ud := UpdateDocument{}
 	if obj.FirstName != "" {
 		ud.SetFirstName(obj.FirstName)
 	} else {
-		ud.UnsetFirstName()
+		um := uo.FirstName
+		if um == UnSpecified {
+			um = uo.DefaultMode
+		}
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetFirstName()
+		case SetData2Default:
+			ud.UnsetFirstName()
+		}
 	}
 	if obj.LastName != "" {
 		ud.SetLastName(obj.LastName)
 	} else {
-		ud.UnsetLastName()
+		um := uo.LastName
+		if um == UnSpecified {
+			um = uo.DefaultMode
+		}
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetLastName()
+		case SetData2Default:
+			ud.UnsetLastName()
+		}
 	}
 	if obj.Age != 0 {
 		ud.SetAge(obj.Age)
 	} else {
-		ud.UnsetAge()
+		um := uo.Age
+		if um == UnSpecified {
+			um = uo.DefaultMode
+		}
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAge()
+		case SetData2Default:
+			ud.SetAge(0)
+		}
 	}
 	if len(obj.Doc) > 0 {
 		ud.SetDoc(obj.Doc)
 	} else {
-		ud.UnsetDoc()
+		um := uo.Doc
+		if um == UnSpecified {
+			um = uo.DefaultMode
+		}
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetDoc()
+		case SetData2Default:
+			ud.UnsetDoc()
+		}
 	}
 	if !obj.Address.IsZero() {
 		ud.SetAddress(obj.Address)
 	} else {
-		ud.UnsetAddress()
+		um := uo.Address
+		if um == UnSpecified {
+			um = uo.DefaultMode
+		}
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAddress()
+		case SetData2Default:
+			ud.UnsetAddress()
+		}
 	}
 
 	return ud

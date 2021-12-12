@@ -37,7 +37,7 @@ func (ce *CollectionDefError) Error() string {
 type CollectionProps struct {
 	FolderPath     string `json:"folder-path,omitempty"`
 	Prefix         string `json:"prefix,omitempty"`
-	PackageName    string `json:"packageName,omitempty"`
+	PackageName    string `json:"package-name,omitempty"`
 	StructName     string `json:"struct-name,omitempty"`
 	MorphiaPackage string `json:"morphia-pkg,omitempty"`
 }

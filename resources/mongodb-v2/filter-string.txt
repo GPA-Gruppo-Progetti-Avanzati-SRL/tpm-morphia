@@ -18,6 +18,15 @@ func (ca *Criteria) And{{ criteriaMethodSignature $p }}EqTo ({{ criteriaMethodVa
     return ca
 }
 
+// And{{ criteriaMethodSignature $p }}IsNullOrUnset No Remarks
+func (ca *Criteria) And{{ criteriaMethodSignature $p }}IsNullOrUnset ({{ criteriaMethodVarParams $p true "" }}) *Criteria {
+
+	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "suppress" "indexIjk"}} {{ criteriaMethodVarParams $p false "before" }})
+	c := func() bson.E { return bson.E { Key: mName, Value: nil } }
+	*ca = append(*ca, c)
+    return ca
+}
+
 func (ca *Criteria) And{{ criteriaMethodSignature $p }}In ({{ criteriaMethodVarParams $p true "after" }} p []string) *Criteria {
 
     if len(p) == 0 {

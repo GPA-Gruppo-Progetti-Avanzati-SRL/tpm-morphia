@@ -7,8 +7,8 @@ import (
 	"unicode/utf8"
 )
 
-var PackageNamePathForm = regexp.MustCompile("^(./)?[a-zA-Z_0-9]+(/[a-zA-Z_0-9]+)*$")
-var PackageNameDotForm = regexp.MustCompile("^[a-zA-Z_0-9]+(\\.[a-zA-Z_0-9]+)*$")
+var PackageNamePathForm = regexp.MustCompile("^(./)?[a-z\\-A-Z_0-9]+(/[a-z\\-A-Z_0-9]+)*$")
+var PackageNameDotForm = regexp.MustCompile("^[a-z\\-A-Z_0-9]+(\\.[a-z\\-A-Z_0-9]+)*$")
 
 func IsPathForm(s string) bool {
 	return PackageNamePathForm.Match([]byte(s))

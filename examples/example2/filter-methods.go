@@ -45,6 +45,15 @@ func (ca *Criteria) AndFirstNameEqTo(p string) *Criteria {
 	return ca
 }
 
+// AndFirstNameIsNullOrUnset No Remarks
+func (ca *Criteria) AndFirstNameIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(FIRSTNAME)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
+	*ca = append(*ca, c)
+	return ca
+}
+
 func (ca *Criteria) AndFirstNameIn(p []string) *Criteria {
 
 	if len(p) == 0 {
@@ -69,6 +78,15 @@ func (ca *Criteria) AndLastNameEqTo(p string) *Criteria {
 
 	mName := fmt.Sprintf(LASTNAME)
 	c := func() bson.E { return bson.E{Key: mName, Value: p} }
+	*ca = append(*ca, c)
+	return ca
+}
+
+// AndLastNameIsNullOrUnset No Remarks
+func (ca *Criteria) AndLastNameIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(LASTNAME)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
 	*ca = append(*ca, c)
 	return ca
 }
@@ -129,6 +147,15 @@ func (ca *Criteria) AndAddressCityEqTo(p string) *Criteria {
 	return ca
 }
 
+// AndAddressCityIsNullOrUnset No Remarks
+func (ca *Criteria) AndAddressCityIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(ADDRESS_CITY)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
+	*ca = append(*ca, c)
+	return ca
+}
+
 func (ca *Criteria) AndAddressCityIn(p []string) *Criteria {
 
 	if len(p) == 0 {
@@ -150,6 +177,15 @@ func (ca *Criteria) AndShipAddressCityEqTo(p string) *Criteria {
 
 	mName := fmt.Sprintf(SHIPADDRESS_CITY)
 	c := func() bson.E { return bson.E{Key: mName, Value: p} }
+	*ca = append(*ca, c)
+	return ca
+}
+
+// AndShipAddressCityIsNullOrUnset No Remarks
+func (ca *Criteria) AndShipAddressCityIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(SHIPADDRESS_CITY)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
 	*ca = append(*ca, c)
 	return ca
 }
@@ -182,6 +218,15 @@ func (ca *Criteria) AndAddressStrtEqTo(p string) *Criteria {
 	return ca
 }
 
+// AndAddressStrtIsNullOrUnset No Remarks
+func (ca *Criteria) AndAddressStrtIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(ADDRESS_STRT)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
+	*ca = append(*ca, c)
+	return ca
+}
+
 func (ca *Criteria) AndAddressStrtIn(p []string) *Criteria {
 
 	if len(p) == 0 {
@@ -203,6 +248,15 @@ func (ca *Criteria) AndShipAddressStrtEqTo(p string) *Criteria {
 
 	mName := fmt.Sprintf(SHIPADDRESS_STRT)
 	c := func() bson.E { return bson.E{Key: mName, Value: p} }
+	*ca = append(*ca, c)
+	return ca
+}
+
+// AndShipAddressStrtIsNullOrUnset No Remarks
+func (ca *Criteria) AndShipAddressStrtIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(SHIPADDRESS_STRT)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
 	*ca = append(*ca, c)
 	return ca
 }
@@ -235,6 +289,15 @@ func (ca *Criteria) AndBooksTitleEqTo(p string) *Criteria {
 	return ca
 }
 
+// AndBooksTitleIsNullOrUnset No Remarks
+func (ca *Criteria) AndBooksTitleIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(BOOKS_TITLE)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
+	*ca = append(*ca, c)
+	return ca
+}
+
 func (ca *Criteria) AndBooksTitleIn(p []string) *Criteria {
 
 	if len(p) == 0 {
@@ -259,6 +322,15 @@ func (ca *Criteria) AndBooksIsbnEqTo(p string) *Criteria {
 
 	mName := fmt.Sprintf(BOOKS_ISBN)
 	c := func() bson.E { return bson.E{Key: mName, Value: p} }
+	*ca = append(*ca, c)
+	return ca
+}
+
+// AndBooksIsbnIsNullOrUnset No Remarks
+func (ca *Criteria) AndBooksIsbnIsNullOrUnset() *Criteria {
+
+	mName := fmt.Sprintf(BOOKS_ISBN)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
 	*ca = append(*ca, c)
 	return ca
 }
@@ -291,6 +363,15 @@ func (ca *Criteria) AndBusinessRelsSPublisherIdEqTo(keyS string, p string) *Crit
 	return ca
 }
 
+// AndBusinessRelsSPublisherIdIsNullOrUnset No Remarks
+func (ca *Criteria) AndBusinessRelsSPublisherIdIsNullOrUnset(keyS string) *Criteria {
+
+	mName := fmt.Sprintf(BUSINESSRELS_S_PUBLISHERID, keyS)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
+	*ca = append(*ca, c)
+	return ca
+}
+
 func (ca *Criteria) AndBusinessRelsSPublisherIdIn(keyS string, p []string) *Criteria {
 
 	if len(p) == 0 {
@@ -315,6 +396,15 @@ func (ca *Criteria) AndBusinessRelsSPublisherNameEqTo(keyS string, p string) *Cr
 
 	mName := fmt.Sprintf(BUSINESSRELS_S_PUBLISHERNAME, keyS)
 	c := func() bson.E { return bson.E{Key: mName, Value: p} }
+	*ca = append(*ca, c)
+	return ca
+}
+
+// AndBusinessRelsSPublisherNameIsNullOrUnset No Remarks
+func (ca *Criteria) AndBusinessRelsSPublisherNameIsNullOrUnset(keyS string) *Criteria {
+
+	mName := fmt.Sprintf(BUSINESSRELS_S_PUBLISHERNAME, keyS)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
 	*ca = append(*ca, c)
 	return ca
 }
@@ -347,6 +437,15 @@ func (ca *Criteria) AndBusinessRelsSContractsTContractIdEqTo(keyS string, keyT s
 	return ca
 }
 
+// AndBusinessRelsSContractsTContractIdIsNullOrUnset No Remarks
+func (ca *Criteria) AndBusinessRelsSContractsTContractIdIsNullOrUnset(keyS string, keyT string) *Criteria {
+
+	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T_CONTRACTID, keyS, keyT)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
+	*ca = append(*ca, c)
+	return ca
+}
+
 func (ca *Criteria) AndBusinessRelsSContractsTContractIdIn(keyS string, keyT string, p []string) *Criteria {
 
 	if len(p) == 0 {
@@ -371,6 +470,15 @@ func (ca *Criteria) AndBusinessRelsSContractsTContractDescrEqTo(keyS string, key
 
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T_CONTRACTDESCR, keyS, keyT)
 	c := func() bson.E { return bson.E{Key: mName, Value: p} }
+	*ca = append(*ca, c)
+	return ca
+}
+
+// AndBusinessRelsSContractsTContractDescrIsNullOrUnset No Remarks
+func (ca *Criteria) AndBusinessRelsSContractsTContractDescrIsNullOrUnset(keyS string, keyT string) *Criteria {
+
+	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T_CONTRACTDESCR, keyS, keyT)
+	c := func() bson.E { return bson.E{Key: mName, Value: nil} }
 	*ca = append(*ca, c)
 	return ca
 }
