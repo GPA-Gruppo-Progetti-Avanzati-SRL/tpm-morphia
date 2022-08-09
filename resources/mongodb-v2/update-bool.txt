@@ -20,5 +20,20 @@ func (ud *UpdateDocument) Unset{{ updateMethodSignature $p }} ({{ updateMethodVa
     })
 	return ud
 }
+
+// setOrUnset{{ updateMethodSignature $p }} No Remarks
+func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} p {{$a.GetGoAttributeType}}, um UnsetMode) {
+	if p {
+		ud.Set{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "after" }} p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+		case SetData2Default:
+			ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+		}
+	}
+}
 {{- end }}
 {{- end }}

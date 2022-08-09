@@ -16,7 +16,7 @@ var tests_cliente = "../../tests/cliente-tpmm.json"
 
 func TestGeneration(t *testing.T) {
 
-	f, err := os.Open(tests_datatypes)
+	f, err := os.Open(tests_cliente)
 	// b, err := ioutil.ReadFile(tests_datatypes)
 	if err != nil {
 		t.Fatal(err)

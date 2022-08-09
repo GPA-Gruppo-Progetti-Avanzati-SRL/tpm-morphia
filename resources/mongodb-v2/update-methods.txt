@@ -16,10 +16,6 @@ func {{.Collection.GetPrefix "capital"}}UpdateMethodsGoInfo() string {
 	return i
 }
 
-// GetUpdateDocument
-// Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
-// the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
-// the issue and delete an existing value without creating an empty struct.
 type UnsetMode int64
 
 const (
@@ -38,6 +34,14 @@ type UnsetOptions struct {
 	{{- end}}
 }
 
+func (uo *UnsetOptions) ResolveUnsetMode(um UnsetMode) UnsetMode {
+	if um == UnSpecified {
+		um = uo.DefaultMode
+	}
+
+	return um
+}
+
 func WithDefaultUnsetMode(m UnsetMode) UnsetOption {
 	return func(uopt *UnsetOptions) {
 		uopt.DefaultMode = m
@@ -52,7 +56,10 @@ func With{{$a.GetGoAttributeName}}UnsetMode(m UnsetMode) UnsetOption {
   }
 {{- end}}
 
-
+// GetUpdateDocument
+// Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
+// the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
+// the issue and delete an existing value without creating an empty struct.
 func GetUpdateDocument(obj *{{.Collection.Schema.Properties.StructName}}, opts ...UnsetOption) UpdateDocument {
 
 	uo := &UnsetOptions{ DefaultMode: KeepCurrent }
@@ -69,141 +76,41 @@ func GetUpdateDocument(obj *{{.Collection.Schema.Properties.StructName}}, opts .
 /* Custom Update Handling Option: cust-upd-handling
 {{- end}}
 {{- if $f.IsCollectionType }}
-if len(obj.{{$a.GetGoAttributeName}}) > 0 {
-  ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
-} else {
-	um := uo.{{$a.GetGoAttributeName}}
-	if um == UnSpecified {
-		um = uo.DefaultMode
-	}
-	switch um {
-	case KeepCurrent:
-	case UnsetData:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	case SetData2Default:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	}
-}
+// if len(obj.{{$a.GetGoAttributeName}}) > 0 {
+//   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
+// } else {
+	ud.setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}}, uo.ResolveUnsetMode(uo.{{$a.GetGoAttributeName}}))
+// }
 {{- end }}
 {{- if $f.IsStructType }}
-if !obj.{{$a.GetGoAttributeName}}.IsZero() {
-  ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
-} else {
-	um := uo.{{$a.GetGoAttributeName}}
-	if um == UnSpecified {
-		um = uo.DefaultMode
-	}
-	switch um {
-	case KeepCurrent:
-	case UnsetData:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} )
-	case SetData2Default:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} )
-	}
-}
+// if !obj.{{$a.GetGoAttributeName}}.IsZero() {
+//   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
+// } else {
+    ud.setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}}, uo.ResolveUnsetMode(uo.{{$a.GetGoAttributeName}}))
+// }
 {{- end }}
 {{- if $f.IsValueType }}
 {{- if eq $f.Typ "string" }}
-if obj.{{$a.GetGoAttributeName}} != "" {
-   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
-} else {
-	um := uo.{{$a.GetGoAttributeName}}
-	if um == UnSpecified {
-		um = uo.DefaultMode
-	}
-	switch um {
-	case KeepCurrent:
-	case UnsetData:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	case SetData2Default:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	}
-}
+   ud.setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}}, uo.ResolveUnsetMode(uo.{{$a.GetGoAttributeName}}))
 {{- end }}
 {{- if eq $f.Typ "int" }}
-if obj.{{$a.GetGoAttributeName}} != 0 {
-   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
-} else {
-	um := uo.{{$a.GetGoAttributeName}}
-	if um == UnSpecified {
-		um = uo.DefaultMode
-	}
-	switch um {
-	case KeepCurrent:
-	case UnsetData:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	case SetData2Default:
-		ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} 0)
-	}
-}
+   ud.setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}}, uo.ResolveUnsetMode(uo.{{$a.GetGoAttributeName}}))
 {{- end }}
 {{- if eq $f.Typ "long" }}
-if obj.{{$a.GetGoAttributeName}} != 0 {
-   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
-} else {
-	um := uo.{{$a.GetGoAttributeName}}
-	if um == UnSpecified {
-		um = uo.DefaultMode
-	}
-	switch um {
-	case KeepCurrent:
-	case UnsetData:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	case SetData2Default:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	}
-}
+   ud.setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}}, uo.ResolveUnsetMode(uo.{{$a.GetGoAttributeName}}))
 {{- end }}
 {{- if eq $f.Typ "bool" }}
-if obj.{{$a.GetGoAttributeName}} {
-   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
-} else {
-	um := uo.{{$a.GetGoAttributeName}}
-	if um == UnSpecified {
-		um = uo.DefaultMode
-	}
-	switch um {
-	case KeepCurrent:
-	case UnsetData:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	case SetData2Default:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	}
-}
+   ud.setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}}, uo.ResolveUnsetMode(uo.{{$a.GetGoAttributeName}}))
 {{- end }}
 {{- if eq $f.Typ "date" }}
-if obj.{{$a.GetGoAttributeName}} != 0 {
-   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
-} else {
-	um := uo.{{$a.GetGoAttributeName}}
-	if um == UnSpecified {
-		um = uo.DefaultMode
-	}
-	switch um {
-	case KeepCurrent:
-	case UnsetData:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	case SetData2Default:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	}
-}
+   ud.setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}}, uo.ResolveUnsetMode(uo.{{$a.GetGoAttributeName}}))
 {{- end }}
 {{- if eq $f.Typ "document" }}
-if len(obj.{{$a.GetGoAttributeName}}) > 0 {
-  ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
-} else {
-	um := uo.{{$a.GetGoAttributeName}}
-	if um == UnSpecified {
-		um = uo.DefaultMode
-	}
-	switch um {
-	case KeepCurrent:
-	case UnsetData:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	case SetData2Default:
-		ud.Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }})
-	}
-}
+// if len(obj.{{$a.GetGoAttributeName}}) > 0 {
+//   ud.Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}})
+// } else {
+    ud.setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} obj.{{$a.GetGoAttributeName}}, uo.ResolveUnsetMode(uo.{{$a.GetGoAttributeName}}))
+// }
 {{- end }}
 {{- end }}
 {{- if $a.HasOption "cust-upd-handling" }}
@@ -253,6 +160,31 @@ func (ud *UpdateDocument) Unset{{ updateMethodSignature $p }} ({{ updateMethodVa
     })
 	return ud
 }
+
+// setOrUnset{{ updateMethodSignature $p }} No Remarks - here2
+func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} p {{$a.GetGoAttributeType}}, um UnsetMode) {
+
+//----- {{$a.GetDefinition.Typ}}\n
+
+{{ if or (eq $a.GetDefinition.Typ "array") (eq $a.GetDefinition.Typ "map") -}}
+	if len(p) > 0 {
+{{- else if $a.GetDefinition.IsStructType  }}
+	if !p.IsZero() {
+{{- else }}
+    // Warining.... should not get here
+    if p != "" {
+{{- end }}
+		ud.Set{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "after" }} p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+		case SetData2Default:
+			ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+		}
+	}
+}
 {{- end }}
 {{- end -}}
 
@@ -277,6 +209,26 @@ func (ud *UpdateDocument) Unset{{ updateMethodSignature $p }} ({{ updateMethodVa
     		return bson.E{ Key: mName, Value: ""}
     })
 	return ud
+}
+
+// setOrUnset{{ updateMethodSignature $p }} No Remarks
+func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} p {{$a.Item.GetGoAttributeType}}, um UnsetMode) {
+{{- if $a.Item.GetDefinition.IsStructType  }}
+	if !p.IsZero() {
+{{- else }}
+    // Warining.... should not get here
+    if p != "" {
+{{- end }}
+		ud.Set{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "after" }} p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }} )
+		case SetData2Default:
+			ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+		}
+	}
 }
 {{- end }}
 {{- end }}
