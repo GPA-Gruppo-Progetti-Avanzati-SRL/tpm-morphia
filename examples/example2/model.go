@@ -44,31 +44,35 @@ type Author struct {
 }
 
 func (s Author) IsZero() bool {
-	if s.OId != primitive.NilObjectID {
-		return false
-	}
-	if s.FirstName != "" {
-		return false
-	}
-	if s.LastName != "" {
-		return false
-	}
-	if s.Age != 0 {
-		return false
-	}
-	if !s.Address.IsZero() {
-		return false
-	}
-	if !s.ShipAddress.IsZero() {
-		return false
-	}
-	if len(s.Books) != 0 {
-		return false
-	}
-	if len(s.BusinessRels) != 0 {
-		return false
-	}
-	return true
+	/*
+	   if s.OId == primitive.NilObjectID {
+	       return false
+	   }
+	   if s.FirstName == "" {
+	       return false
+	   }
+	   if s.LastName == "" {
+	       return false
+	   }
+	   if s.Age == 0 {
+	       return false
+	   }
+	   if s.Address.IsZero() {
+	       return false
+	   }
+	   if s.ShipAddress.IsZero() {
+	       return false
+	   }
+	   if len(s.Books) == 0 {
+	       return false
+	   }
+	   if len(s.BusinessRels) == 0 {
+	       return false
+	   }
+	       return true
+	*/
+
+	return s.OId == primitive.NilObjectID && s.FirstName == "" && s.LastName == "" && s.Age == 0 && s.Address.IsZero() && s.ShipAddress.IsZero() && len(s.Books) == 0 && len(s.BusinessRels) == 0
 }
 
 type Address struct {
@@ -77,13 +81,16 @@ type Address struct {
 }
 
 func (s Address) IsZero() bool {
-	if s.City != "" {
-		return false
-	}
-	if s.Strt != "" {
-		return false
-	}
-	return true
+	/*
+	   if s.City == "" {
+	       return false
+	   }
+	   if s.Strt == "" {
+	       return false
+	   }
+	       return true
+	*/
+	return s.City == "" && s.Strt == ""
 }
 
 type Book struct {
@@ -93,16 +100,19 @@ type Book struct {
 }
 
 func (s Book) IsZero() bool {
-	if s.Title != "" {
-		return false
-	}
-	if s.Isbn != "" {
-		return false
-	}
-	if len(s.CoAuthors) != 0 {
-		return false
-	}
-	return true
+	/*
+	   if s.Title == "" {
+	       return false
+	   }
+	   if s.Isbn == "" {
+	       return false
+	   }
+	   if len(s.CoAuthors) == 0 {
+	       return false
+	   }
+	       return true
+	*/
+	return s.Title == "" && s.Isbn == "" && len(s.CoAuthors) == 0
 }
 
 type BusinessRel struct {
@@ -112,16 +122,19 @@ type BusinessRel struct {
 }
 
 func (s BusinessRel) IsZero() bool {
-	if s.PublisherId != "" {
-		return false
-	}
-	if s.PublisherName != "" {
-		return false
-	}
-	if len(s.Contracts) != 0 {
-		return false
-	}
-	return true
+	/*
+	   if s.PublisherId == "" {
+	       return false
+	   }
+	   if s.PublisherName == "" {
+	       return false
+	   }
+	   if len(s.Contracts) == 0 {
+	       return false
+	   }
+	       return true
+	*/
+	return s.PublisherId == "" && s.PublisherName == "" && len(s.Contracts) == 0
 }
 
 type Contract struct {
@@ -130,11 +143,14 @@ type Contract struct {
 }
 
 func (s Contract) IsZero() bool {
-	if s.ContractId != "" {
-		return false
-	}
-	if s.ContractDescr != "" {
-		return false
-	}
-	return true
+	/*
+	   if s.ContractId == "" {
+	       return false
+	   }
+	   if s.ContractDescr == "" {
+	       return false
+	   }
+	       return true
+	*/
+	return s.ContractId == "" && s.ContractDescr == ""
 }

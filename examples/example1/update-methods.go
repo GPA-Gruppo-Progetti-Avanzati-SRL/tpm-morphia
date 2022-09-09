@@ -13,10 +13,6 @@ func UpdateMethodsGoInfo() string {
 	return i
 }
 
-// GetUpdateDocument
-// Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
-// the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
-// the issue and delete an existing value without creating an empty struct.
 type UnsetMode int64
 
 const (
@@ -36,6 +32,14 @@ type UnsetOptions struct {
 	Age         UnsetMode
 	Doc         UnsetMode
 	Address     UnsetMode
+}
+
+func (uo *UnsetOptions) ResolveUnsetMode(um UnsetMode) UnsetMode {
+	if um == UnSpecified {
+		um = uo.DefaultMode
+	}
+
+	return um
 }
 
 func WithDefaultUnsetMode(m UnsetMode) UnsetOption {
@@ -74,6 +78,10 @@ func WithAddressUnsetMode(m UnsetMode) UnsetOption {
 	}
 }
 
+// GetUpdateDocument
+// Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
+// the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
+// the issue and delete an existing value without creating an empty struct.
 func GetUpdateDocument(obj *Author, opts ...UnsetOption) UpdateDocument {
 
 	uo := &UnsetOptions{DefaultMode: KeepCurrent}
@@ -82,81 +90,19 @@ func GetUpdateDocument(obj *Author, opts ...UnsetOption) UpdateDocument {
 	}
 
 	ud := UpdateDocument{}
-	if obj.FirstName != "" {
-		ud.SetFirstName(obj.FirstName)
-	} else {
-		um := uo.FirstName
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetFirstName()
-		case SetData2Default:
-			ud.UnsetFirstName()
-		}
-	}
-	if obj.LastName != "" {
-		ud.SetLastName(obj.LastName)
-	} else {
-		um := uo.LastName
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetLastName()
-		case SetData2Default:
-			ud.UnsetLastName()
-		}
-	}
-	if obj.Age != 0 {
-		ud.SetAge(obj.Age)
-	} else {
-		um := uo.Age
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetAge()
-		case SetData2Default:
-			ud.SetAge(0)
-		}
-	}
-	if len(obj.Doc) > 0 {
-		ud.SetDoc(obj.Doc)
-	} else {
-		um := uo.Doc
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetDoc()
-		case SetData2Default:
-			ud.UnsetDoc()
-		}
-	}
-	if !obj.Address.IsZero() {
-		ud.SetAddress(obj.Address)
-	} else {
-		um := uo.Address
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetAddress()
-		case SetData2Default:
-			ud.UnsetAddress()
-		}
-	}
+	ud.setOrUnsetFirstName(obj.FirstName, uo.ResolveUnsetMode(uo.FirstName))
+	ud.setOrUnsetLastName(obj.LastName, uo.ResolveUnsetMode(uo.LastName))
+	ud.setOrUnsetAge(obj.Age, uo.ResolveUnsetMode(uo.Age))
+	// if len(obj.Doc) > 0 {
+	//   ud.SetDoc ( obj.Doc)
+	// } else {
+	ud.setOrUnsetDoc(obj.Doc, uo.ResolveUnsetMode(uo.Doc))
+	// }
+	// if !obj.Address.IsZero() {
+	//   ud.SetAddress ( obj.Address)
+	// } else {
+	ud.setOrUnsetAddress(obj.Address, uo.ResolveUnsetMode(uo.Address))
+	// }
 
 	return ud
 }
@@ -181,6 +127,21 @@ func (ud *UpdateDocument) UnsetOId() *UpdateDocument {
 	return ud
 }
 
+// setOrUnsetOId No Remarks
+func (ud *UpdateDocument) setOrUnsetOId(p primitive.ObjectID, um UnsetMode) {
+	if !p.IsZero() {
+		ud.SetOId(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetOId()
+		case SetData2Default:
+			ud.UnsetOId()
+		}
+	}
+}
+
 //----- firstName - string -  [firstName]
 
 // SetFirstName No Remarks
@@ -199,6 +160,21 @@ func (ud *UpdateDocument) UnsetFirstName() *UpdateDocument {
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetFirstName No Remarks
+func (ud *UpdateDocument) setOrUnsetFirstName(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetFirstName(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetFirstName()
+		case SetData2Default:
+			ud.UnsetFirstName()
+		}
+	}
 }
 
 //----- lastName - string -  [lastName]
@@ -221,6 +197,21 @@ func (ud *UpdateDocument) UnsetLastName() *UpdateDocument {
 	return ud
 }
 
+// setOrUnsetLastName No Remarks
+func (ud *UpdateDocument) setOrUnsetLastName(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetLastName(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetLastName()
+		case SetData2Default:
+			ud.UnsetLastName()
+		}
+	}
+}
+
 //----- age - int -  [age]
 
 // SetAge No Remarks
@@ -239,6 +230,21 @@ func (ud *UpdateDocument) UnsetAge() *UpdateDocument {
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetAge No Remarks
+func (ud *UpdateDocument) setOrUnsetAge(p int32, um UnsetMode) {
+	if p != 0 {
+		ud.SetAge(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAge()
+		case SetData2Default:
+			ud.UnsetAge()
+		}
+	}
 }
 
 // IncAge No Remarks
@@ -270,7 +276,22 @@ func (ud *UpdateDocument) UnsetDoc() *UpdateDocument {
 	return ud
 }
 
-//----- address - struct - Address [address]
+// setOrUnsetDoc No Remarks
+func (ud *UpdateDocument) setOrUnsetDoc(p bson.M, um UnsetMode) {
+	if len(p) > 0 {
+		ud.SetDoc(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetDoc()
+		case SetData2Default:
+			ud.UnsetDoc()
+		}
+	}
+}
+
+// ----- address - struct - Address [address]
 // SetAddress No Remarks
 func (ud *UpdateDocument) SetAddress(p Address) *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS)
@@ -287,6 +308,24 @@ func (ud *UpdateDocument) UnsetAddress() *UpdateDocument {
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetAddress No Remarks - here2
+func (ud *UpdateDocument) setOrUnsetAddress(p Address, um UnsetMode) {
+
+	//----- struct\n
+
+	if !p.IsZero() {
+		ud.SetAddress(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAddress()
+		case SetData2Default:
+			ud.UnsetAddress()
+		}
+	}
 }
 
 //----- city - string -  [address.city]
@@ -309,6 +348,21 @@ func (ud *UpdateDocument) UnsetAddressCity() *UpdateDocument {
 	return ud
 }
 
+// setOrUnsetAddressCity No Remarks
+func (ud *UpdateDocument) setOrUnsetAddressCity(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetAddressCity(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAddressCity()
+		case SetData2Default:
+			ud.UnsetAddressCity()
+		}
+	}
+}
+
 //----- street - string -  [address.street]
 
 // SetAddressStreet No Remarks
@@ -327,4 +381,19 @@ func (ud *UpdateDocument) UnsetAddressStreet() *UpdateDocument {
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetAddressStreet No Remarks
+func (ud *UpdateDocument) setOrUnsetAddressStreet(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetAddressStreet(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAddressStreet()
+		case SetData2Default:
+			ud.UnsetAddressStreet()
+		}
+	}
 }

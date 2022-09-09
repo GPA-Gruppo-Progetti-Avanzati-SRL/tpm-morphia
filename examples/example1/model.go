@@ -24,25 +24,29 @@ type Author struct {
 }
 
 func (s Author) IsZero() bool {
-	if s.OId != primitive.NilObjectID {
-		return false
-	}
-	if s.FirstName != "" {
-		return false
-	}
-	if s.LastName != "" {
-		return false
-	}
-	if s.Age != 0 {
-		return false
-	}
-	if len(s.Doc) != 0 {
-		return false
-	}
-	if !s.Address.IsZero() {
-		return false
-	}
-	return true
+	/*
+	   if s.OId == primitive.NilObjectID {
+	       return false
+	   }
+	   if s.FirstName == "" {
+	       return false
+	   }
+	   if s.LastName == "" {
+	       return false
+	   }
+	   if s.Age == 0 {
+	       return false
+	   }
+	   if len(s.Doc) == 0 {
+	       return false
+	   }
+	   if s.Address.IsZero() {
+	       return false
+	   }
+	       return true
+	*/
+
+	return s.OId == primitive.NilObjectID && s.FirstName == "" && s.LastName == "" && s.Age == 0 && len(s.Doc) == 0 && s.Address.IsZero()
 }
 
 type Address struct {
@@ -51,11 +55,14 @@ type Address struct {
 }
 
 func (s Address) IsZero() bool {
-	if s.City != "" {
-		return false
-	}
-	if s.Street != "" {
-		return false
-	}
-	return true
+	/*
+	   if s.City == "" {
+	       return false
+	   }
+	   if s.Street == "" {
+	       return false
+	   }
+	       return true
+	*/
+	return s.City == "" && s.Street == ""
 }

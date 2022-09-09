@@ -437,7 +437,7 @@ func (b *CodeGenAttributeImpl) HasOption(o string) bool {
 	return b.AttrDefinition.Options != "" && strings.Contains(b.AttrDefinition.Options, o)
 }
 
-func (b *CodeGenAttributeImpl) GetGoAttributeIsZeroCondition() string {
+func (b *CodeGenAttributeImpl) GetGoAttributeIsNOTZeroCondition() string {
 
 	s := ""
 	switch b.AttrDefinition.Typ {
@@ -463,6 +463,37 @@ func (b *CodeGenAttributeImpl) GetGoAttributeIsZeroCondition() string {
 		s = fmt.Sprintf("len(s.%s) != 0", b.GetGoAttributeName())
 	case schema.AttributeTypeDocument:
 		s = fmt.Sprintf("len(s.%s) != 0", b.GetGoAttributeName())
+	}
+
+	return s
+}
+
+func (b *CodeGenAttributeImpl) GetGoAttributeIsZeroCondition() string {
+
+	s := ""
+	switch b.AttrDefinition.Typ {
+	case schema.AttributeTypeObjectId:
+		s = fmt.Sprintf("s.%s == primitive.NilObjectID", b.GetGoAttributeName())
+	case schema.AttributeTypeInt:
+		s = fmt.Sprintf("s.%s == 0", b.GetGoAttributeName())
+	case schema.AttributeTypeLong:
+		s = fmt.Sprintf("s.%s == 0", b.GetGoAttributeName())
+	case schema.AttributeTypeBool:
+		s = fmt.Sprintf("s.%s", b.GetGoAttributeName())
+	case schema.AttributeTypeDate:
+		s = fmt.Sprintf("s.%s == 0", b.GetGoAttributeName())
+	case schema.AttributeTypeArray:
+		s = fmt.Sprintf("len(s.%s) == 0", b.GetGoAttributeName())
+	case schema.AttributeTypeStruct:
+		s = fmt.Sprintf("s.%s.IsZero()", b.GetGoAttributeName())
+	case schema.AttributeTypeRefStruct:
+		s = fmt.Sprintf("s.%s.IsZero()", b.GetGoAttributeName())
+	case schema.AttributeTypeString:
+		s = fmt.Sprintf("s.%s == \"\"", b.GetGoAttributeName())
+	case schema.AttributeTypeMap:
+		s = fmt.Sprintf("len(s.%s) == 0", b.GetGoAttributeName())
+	case schema.AttributeTypeDocument:
+		s = fmt.Sprintf("len(s.%s) == 0", b.GetGoAttributeName())
 	}
 
 	return s
@@ -515,10 +546,10 @@ func (b *CodeGenAttributeImpl) GetBsonPropertyName(qualified bool) string {
 }
 
 /*
-func (b *CodeGenAttributeImpl) GetBsonPropertyQualifiedName() string {
-	s := b.AttrDefinition.GetTagNameValue("bson")
-	return util.AppendToNamespace( b.BSONNamespace, s , ".")
-}
+	func (b *CodeGenAttributeImpl) GetBsonPropertyQualifiedName() string {
+		s := b.AttrDefinition.GetTagNameValue("bson")
+		return util.AppendToNamespace( b.BSONNamespace, s , ".")
+	}
 */
 func (b *CodeGenAttributeImpl) GetPaths(pathType string) []string {
 

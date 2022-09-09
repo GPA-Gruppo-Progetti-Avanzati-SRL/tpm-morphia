@@ -24,12 +24,16 @@ type {{.Collection.Schema.Properties.StructName}} struct {
 }
 
 func (s {{.Collection.Schema.Properties.StructName}}) IsZero() bool {
+/*
 {{- range $a := .Collection.DirectAttributes}}
 if {{ $a.GetGoAttributeIsZeroCondition }} {
     return false
 }
 {{- end}}
     return true
+*/
+
+    return {{- range $i, $a := .Collection.DirectAttributes}} {{ if $i }} && {{- end}} {{ $a.GetGoAttributeIsZeroCondition }} {{- end}}
 }
 
 {{range $s := .Collection.GetStructAttributes}}
@@ -40,11 +44,14 @@ type {{$s.GetDefinition.StructName}} struct {
 }
 
 func (s {{$s.GetDefinition.StructName}}) IsZero() bool {
+/*
 {{- range $a := $s.Attributes}}
 if {{ $a.GetGoAttributeIsZeroCondition }} {
     return false
 }
 {{- end}}
     return true
+*/
+    return {{- range $i, $a := $s.Attributes}} {{ if $i }} && {{- end}} {{ $a.GetGoAttributeIsZeroCondition }} {{- end}}
 }
 {{end }}

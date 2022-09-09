@@ -13,10 +13,6 @@ func UpdateMethodsGoInfo() string {
 	return i
 }
 
-// GetUpdateDocument
-// Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
-// the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
-// the issue and delete an existing value without creating an empty struct.
 type UnsetMode int64
 
 const (
@@ -38,6 +34,14 @@ type UnsetOptions struct {
 	ShipAddress  UnsetMode
 	Books        UnsetMode
 	BusinessRels UnsetMode
+}
+
+func (uo *UnsetOptions) ResolveUnsetMode(um UnsetMode) UnsetMode {
+	if um == UnSpecified {
+		um = uo.DefaultMode
+	}
+
+	return um
 }
 
 func WithDefaultUnsetMode(m UnsetMode) UnsetOption {
@@ -86,6 +90,10 @@ func WithBusinessRelsUnsetMode(m UnsetMode) UnsetOption {
 	}
 }
 
+// GetUpdateDocument
+// Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
+// the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
+// the issue and delete an existing value without creating an empty struct.
 func GetUpdateDocument(obj *Author, opts ...UnsetOption) UpdateDocument {
 
 	uo := &UnsetOptions{DefaultMode: KeepCurrent}
@@ -94,111 +102,29 @@ func GetUpdateDocument(obj *Author, opts ...UnsetOption) UpdateDocument {
 	}
 
 	ud := UpdateDocument{}
-	if obj.FirstName != "" {
-		ud.SetFirstName(obj.FirstName)
-	} else {
-		um := uo.FirstName
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetFirstName()
-		case SetData2Default:
-			ud.UnsetFirstName()
-		}
-	}
-	if obj.LastName != "" {
-		ud.SetLastName(obj.LastName)
-	} else {
-		um := uo.LastName
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetLastName()
-		case SetData2Default:
-			ud.UnsetLastName()
-		}
-	}
-	if obj.Age != 0 {
-		ud.SetAge(obj.Age)
-	} else {
-		um := uo.Age
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetAge()
-		case SetData2Default:
-			ud.SetAge(0)
-		}
-	}
-	if !obj.Address.IsZero() {
-		ud.SetAddress(obj.Address)
-	} else {
-		um := uo.Address
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetAddress()
-		case SetData2Default:
-			ud.UnsetAddress()
-		}
-	}
-	if !obj.ShipAddress.IsZero() {
-		ud.SetShipAddress(obj.ShipAddress)
-	} else {
-		um := uo.ShipAddress
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetShipAddress()
-		case SetData2Default:
-			ud.UnsetShipAddress()
-		}
-	}
-	if len(obj.Books) > 0 {
-		ud.SetBooks(obj.Books)
-	} else {
-		um := uo.Books
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetBooks()
-		case SetData2Default:
-			ud.UnsetBooks()
-		}
-	}
-	if len(obj.BusinessRels) > 0 {
-		ud.SetBusinessRels(obj.BusinessRels)
-	} else {
-		um := uo.BusinessRels
-		if um == UnSpecified {
-			um = uo.DefaultMode
-		}
-		switch um {
-		case KeepCurrent:
-		case UnsetData:
-			ud.UnsetBusinessRels()
-		case SetData2Default:
-			ud.UnsetBusinessRels()
-		}
-	}
+	ud.setOrUnsetFirstName(obj.FirstName, uo.ResolveUnsetMode(uo.FirstName))
+	ud.setOrUnsetLastName(obj.LastName, uo.ResolveUnsetMode(uo.LastName))
+	ud.setOrUnsetAge(obj.Age, uo.ResolveUnsetMode(uo.Age))
+	// if !obj.Address.IsZero() {
+	//   ud.SetAddress ( obj.Address)
+	// } else {
+	ud.setOrUnsetAddress(obj.Address, uo.ResolveUnsetMode(uo.Address))
+	// }
+	// if !obj.ShipAddress.IsZero() {
+	//   ud.SetShipAddress ( obj.ShipAddress)
+	// } else {
+	ud.setOrUnsetShipAddress(obj.ShipAddress, uo.ResolveUnsetMode(uo.ShipAddress))
+	// }
+	// if len(obj.Books) > 0 {
+	//   ud.SetBooks ( obj.Books)
+	// } else {
+	ud.setOrUnsetBooks(obj.Books, uo.ResolveUnsetMode(uo.Books))
+	// }
+	// if len(obj.BusinessRels) > 0 {
+	//   ud.SetBusinessRels ( obj.BusinessRels)
+	// } else {
+	ud.setOrUnsetBusinessRels(obj.BusinessRels, uo.ResolveUnsetMode(uo.BusinessRels))
+	// }
 
 	return ud
 }
@@ -223,6 +149,21 @@ func (ud *UpdateDocument) UnsetOId() *UpdateDocument {
 	return ud
 }
 
+// setOrUnsetOId No Remarks
+func (ud *UpdateDocument) setOrUnsetOId(p primitive.ObjectID, um UnsetMode) {
+	if !p.IsZero() {
+		ud.SetOId(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetOId()
+		case SetData2Default:
+			ud.UnsetOId()
+		}
+	}
+}
+
 //----- firstName - string -  [firstName]
 
 // SetFirstName No Remarks
@@ -241,6 +182,21 @@ func (ud *UpdateDocument) UnsetFirstName() *UpdateDocument {
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetFirstName No Remarks
+func (ud *UpdateDocument) setOrUnsetFirstName(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetFirstName(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetFirstName()
+		case SetData2Default:
+			ud.UnsetFirstName()
+		}
+	}
 }
 
 //----- lastName - string -  [lastName]
@@ -263,6 +219,21 @@ func (ud *UpdateDocument) UnsetLastName() *UpdateDocument {
 	return ud
 }
 
+// setOrUnsetLastName No Remarks
+func (ud *UpdateDocument) setOrUnsetLastName(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetLastName(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetLastName()
+		case SetData2Default:
+			ud.UnsetLastName()
+		}
+	}
+}
+
 //----- age - int -  [age]
 
 // SetAge No Remarks
@@ -283,6 +254,21 @@ func (ud *UpdateDocument) UnsetAge() *UpdateDocument {
 	return ud
 }
 
+// setOrUnsetAge No Remarks
+func (ud *UpdateDocument) setOrUnsetAge(p int32, um UnsetMode) {
+	if p != 0 {
+		ud.SetAge(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAge()
+		case SetData2Default:
+			ud.UnsetAge()
+		}
+	}
+}
+
 // IncAge No Remarks
 func (ud *UpdateDocument) IncAge(p int32) *UpdateDocument {
 	mName := fmt.Sprintf(AGE)
@@ -292,7 +278,7 @@ func (ud *UpdateDocument) IncAge(p int32) *UpdateDocument {
 	return ud
 }
 
-//----- address - struct - Address [address]
+// ----- address - struct - Address [address]
 // SetAddress No Remarks
 func (ud *UpdateDocument) SetAddress(p Address) *UpdateDocument {
 	mName := fmt.Sprintf(ADDRESS)
@@ -309,6 +295,24 @@ func (ud *UpdateDocument) UnsetAddress() *UpdateDocument {
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetAddress No Remarks - here2
+func (ud *UpdateDocument) setOrUnsetAddress(p Address, um UnsetMode) {
+
+	//----- struct\n
+
+	if !p.IsZero() {
+		ud.SetAddress(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAddress()
+		case SetData2Default:
+			ud.UnsetAddress()
+		}
+	}
 }
 
 //----- city - string -  [address.city shipAddress.city]
@@ -331,6 +335,21 @@ func (ud *UpdateDocument) UnsetAddressCity() *UpdateDocument {
 	return ud
 }
 
+// setOrUnsetAddressCity No Remarks
+func (ud *UpdateDocument) setOrUnsetAddressCity(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetAddressCity(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAddressCity()
+		case SetData2Default:
+			ud.UnsetAddressCity()
+		}
+	}
+}
+
 // SetShipAddressCity No Remarks
 func (ud *UpdateDocument) SetShipAddressCity(p string) *UpdateDocument {
 	mName := fmt.Sprintf(SHIPADDRESS_CITY)
@@ -347,6 +366,21 @@ func (ud *UpdateDocument) UnsetShipAddressCity() *UpdateDocument {
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetShipAddressCity No Remarks
+func (ud *UpdateDocument) setOrUnsetShipAddressCity(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetShipAddressCity(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetShipAddressCity()
+		case SetData2Default:
+			ud.UnsetShipAddressCity()
+		}
+	}
 }
 
 //----- strt - string -  [address.strt shipAddress.strt]
@@ -369,6 +403,21 @@ func (ud *UpdateDocument) UnsetAddressStrt() *UpdateDocument {
 	return ud
 }
 
+// setOrUnsetAddressStrt No Remarks
+func (ud *UpdateDocument) setOrUnsetAddressStrt(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetAddressStrt(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetAddressStrt()
+		case SetData2Default:
+			ud.UnsetAddressStrt()
+		}
+	}
+}
+
 // SetShipAddressStrt No Remarks
 func (ud *UpdateDocument) SetShipAddressStrt(p string) *UpdateDocument {
 	mName := fmt.Sprintf(SHIPADDRESS_STRT)
@@ -387,7 +436,22 @@ func (ud *UpdateDocument) UnsetShipAddressStrt() *UpdateDocument {
 	return ud
 }
 
-//----- shipAddress - ref-struct -  [shipAddress]
+// setOrUnsetShipAddressStrt No Remarks
+func (ud *UpdateDocument) setOrUnsetShipAddressStrt(p string, um UnsetMode) {
+	if p != "" {
+		ud.SetShipAddressStrt(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetShipAddressStrt()
+		case SetData2Default:
+			ud.UnsetShipAddressStrt()
+		}
+	}
+}
+
+// ----- shipAddress - ref-struct -  [shipAddress]
 // SetShipAddress No Remarks
 func (ud *UpdateDocument) SetShipAddress(p Address) *UpdateDocument {
 	mName := fmt.Sprintf(SHIPADDRESS)
@@ -406,7 +470,25 @@ func (ud *UpdateDocument) UnsetShipAddress() *UpdateDocument {
 	return ud
 }
 
-//----- books - array -  [books]
+// setOrUnsetShipAddress No Remarks - here2
+func (ud *UpdateDocument) setOrUnsetShipAddress(p Address, um UnsetMode) {
+
+	//----- ref-struct\n
+
+	if !p.IsZero() {
+		ud.SetShipAddress(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetShipAddress()
+		case SetData2Default:
+			ud.UnsetShipAddress()
+		}
+	}
+}
+
+// ----- books - array -  [books]
 // SetBooks No Remarks
 func (ud *UpdateDocument) SetBooks(p []Book) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS)
@@ -425,7 +507,25 @@ func (ud *UpdateDocument) UnsetBooks() *UpdateDocument {
 	return ud
 }
 
-//----- [] - struct - Book [books.[]]
+// setOrUnsetBooks No Remarks - here2
+func (ud *UpdateDocument) setOrUnsetBooks(p []Book, um UnsetMode) {
+
+	//----- array\n
+
+	if len(p) > 0 {
+		ud.SetBooks(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBooks()
+		case SetData2Default:
+			ud.UnsetBooks()
+		}
+	}
+}
+
+// ----- [] - struct - Book [books.[]]
 // SetBooksI No Remarks
 func (ud *UpdateDocument) SetBooksI(ndxI int, p Book) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I, ndxI)
@@ -442,6 +542,21 @@ func (ud *UpdateDocument) UnsetBooksI(ndxI int) *UpdateDocument {
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetBooksI No Remarks
+func (ud *UpdateDocument) setOrUnsetBooksI(ndxI int, p Book, um UnsetMode) {
+	if !p.IsZero() {
+		ud.SetBooksI(ndxI, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBooksI(ndxI)
+		case SetData2Default:
+			ud.UnsetBooksI(ndxI)
+		}
+	}
 }
 
 //----- title - string -  [books.[].title books.title]
@@ -464,6 +579,21 @@ func (ud *UpdateDocument) UnsetBooksITitle(ndxI int) *UpdateDocument {
 	return ud
 }
 
+// setOrUnsetBooksITitle No Remarks
+func (ud *UpdateDocument) setOrUnsetBooksITitle(ndxI int, p string, um UnsetMode) {
+	if p != "" {
+		ud.SetBooksITitle(ndxI, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBooksITitle(ndxI)
+		case SetData2Default:
+			ud.UnsetBooksITitle(ndxI)
+		}
+	}
+}
+
 //----- isbn - string -  [books.[].isbn books.isbn]
 
 // SetBooksIIsbn No Remarks
@@ -484,7 +614,22 @@ func (ud *UpdateDocument) UnsetBooksIIsbn(ndxI int) *UpdateDocument {
 	return ud
 }
 
-//----- coAuthors - array -  [books.[].coAuthors books.coAuthors]
+// setOrUnsetBooksIIsbn No Remarks
+func (ud *UpdateDocument) setOrUnsetBooksIIsbn(ndxI int, p string, um UnsetMode) {
+	if p != "" {
+		ud.SetBooksIIsbn(ndxI, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBooksIIsbn(ndxI)
+		case SetData2Default:
+			ud.UnsetBooksIIsbn(ndxI)
+		}
+	}
+}
+
+// ----- coAuthors - array -  [books.[].coAuthors books.coAuthors]
 // SetBooksICoAuthors No Remarks
 func (ud *UpdateDocument) SetBooksICoAuthors(ndxI int, p []string) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_COAUTHORS, ndxI)
@@ -503,7 +648,25 @@ func (ud *UpdateDocument) UnsetBooksICoAuthors(ndxI int) *UpdateDocument {
 	return ud
 }
 
-//----- [] - string -  [books.[].coAuthors.[]]
+// setOrUnsetBooksICoAuthors No Remarks - here2
+func (ud *UpdateDocument) setOrUnsetBooksICoAuthors(ndxI int, p []string, um UnsetMode) {
+
+	//----- array\n
+
+	if len(p) > 0 {
+		ud.SetBooksICoAuthors(ndxI, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBooksICoAuthors(ndxI)
+		case SetData2Default:
+			ud.UnsetBooksICoAuthors(ndxI)
+		}
+	}
+}
+
+// ----- [] - string -  [books.[].coAuthors.[]]
 // SetBooksICoAuthorsJ No Remarks
 func (ud *UpdateDocument) SetBooksICoAuthorsJ(ndxI int, ndxJ int, p string) *UpdateDocument {
 	mName := fmt.Sprintf(BOOKS_I_COAUTHORS_J, ndxI, ndxJ)
@@ -522,7 +685,23 @@ func (ud *UpdateDocument) UnsetBooksICoAuthorsJ(ndxI int, ndxJ int) *UpdateDocum
 	return ud
 }
 
-//----- businessRels - map -  [businessRels]
+// setOrUnsetBooksICoAuthorsJ No Remarks
+func (ud *UpdateDocument) setOrUnsetBooksICoAuthorsJ(ndxI int, ndxJ int, p string, um UnsetMode) {
+	// Warining.... should not get here
+	if p != "" {
+		ud.SetBooksICoAuthorsJ(ndxI, ndxJ, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBooksICoAuthorsJ(ndxI, ndxJ)
+		case SetData2Default:
+			ud.UnsetBooksICoAuthorsJ(ndxI, ndxJ)
+		}
+	}
+}
+
+// ----- businessRels - map -  [businessRels]
 // SetBusinessRels No Remarks
 func (ud *UpdateDocument) SetBusinessRels(p map[string]BusinessRel) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS)
@@ -541,7 +720,25 @@ func (ud *UpdateDocument) UnsetBusinessRels() *UpdateDocument {
 	return ud
 }
 
-//----- %s - struct - BusinessRel [businessRels.%s]
+// setOrUnsetBusinessRels No Remarks - here2
+func (ud *UpdateDocument) setOrUnsetBusinessRels(p map[string]BusinessRel, um UnsetMode) {
+
+	//----- map\n
+
+	if len(p) > 0 {
+		ud.SetBusinessRels(p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBusinessRels()
+		case SetData2Default:
+			ud.UnsetBusinessRels()
+		}
+	}
+}
+
+// ----- %s - struct - BusinessRel [businessRels.%s]
 // SetBusinessRelsS No Remarks
 func (ud *UpdateDocument) SetBusinessRelsS(keyS string, p BusinessRel) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S, keyS)
@@ -558,6 +755,21 @@ func (ud *UpdateDocument) UnsetBusinessRelsS(keyS string) *UpdateDocument {
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetBusinessRelsS No Remarks
+func (ud *UpdateDocument) setOrUnsetBusinessRelsS(keyS string, p BusinessRel, um UnsetMode) {
+	if !p.IsZero() {
+		ud.SetBusinessRelsS(keyS, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBusinessRelsS(keyS)
+		case SetData2Default:
+			ud.UnsetBusinessRelsS(keyS)
+		}
+	}
 }
 
 //----- publisherId - string -  [businessRels.%s.publisherId]
@@ -580,6 +792,21 @@ func (ud *UpdateDocument) UnsetBusinessRelsSPublisherId(keyS string) *UpdateDocu
 	return ud
 }
 
+// setOrUnsetBusinessRelsSPublisherId No Remarks
+func (ud *UpdateDocument) setOrUnsetBusinessRelsSPublisherId(keyS string, p string, um UnsetMode) {
+	if p != "" {
+		ud.SetBusinessRelsSPublisherId(keyS, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBusinessRelsSPublisherId(keyS)
+		case SetData2Default:
+			ud.UnsetBusinessRelsSPublisherId(keyS)
+		}
+	}
+}
+
 //----- publisherName - string -  [businessRels.%s.publisherName]
 
 // SetBusinessRelsSPublisherName No Remarks
@@ -600,7 +827,22 @@ func (ud *UpdateDocument) UnsetBusinessRelsSPublisherName(keyS string) *UpdateDo
 	return ud
 }
 
-//----- contracts - map -  [businessRels.%s.contracts]
+// setOrUnsetBusinessRelsSPublisherName No Remarks
+func (ud *UpdateDocument) setOrUnsetBusinessRelsSPublisherName(keyS string, p string, um UnsetMode) {
+	if p != "" {
+		ud.SetBusinessRelsSPublisherName(keyS, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBusinessRelsSPublisherName(keyS)
+		case SetData2Default:
+			ud.UnsetBusinessRelsSPublisherName(keyS)
+		}
+	}
+}
+
+// ----- contracts - map -  [businessRels.%s.contracts]
 // SetBusinessRelsSContracts No Remarks
 func (ud *UpdateDocument) SetBusinessRelsSContracts(keyS string, p map[string]Contract) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS, keyS)
@@ -619,7 +861,25 @@ func (ud *UpdateDocument) UnsetBusinessRelsSContracts(keyS string) *UpdateDocume
 	return ud
 }
 
-//----- %s - struct - Contract [businessRels.%s.contracts.%s]
+// setOrUnsetBusinessRelsSContracts No Remarks - here2
+func (ud *UpdateDocument) setOrUnsetBusinessRelsSContracts(keyS string, p map[string]Contract, um UnsetMode) {
+
+	//----- map\n
+
+	if len(p) > 0 {
+		ud.SetBusinessRelsSContracts(keyS, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBusinessRelsSContracts(keyS)
+		case SetData2Default:
+			ud.UnsetBusinessRelsSContracts(keyS)
+		}
+	}
+}
+
+// ----- %s - struct - Contract [businessRels.%s.contracts.%s]
 // SetBusinessRelsSContractsT No Remarks
 func (ud *UpdateDocument) SetBusinessRelsSContractsT(keyS string, keyT string, p Contract) *UpdateDocument {
 	mName := fmt.Sprintf(BUSINESSRELS_S_CONTRACTS_T, keyS, keyT)
@@ -636,6 +896,21 @@ func (ud *UpdateDocument) UnsetBusinessRelsSContractsT(keyS string, keyT string)
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetBusinessRelsSContractsT No Remarks
+func (ud *UpdateDocument) setOrUnsetBusinessRelsSContractsT(keyS string, keyT string, p Contract, um UnsetMode) {
+	if !p.IsZero() {
+		ud.SetBusinessRelsSContractsT(keyS, keyT, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBusinessRelsSContractsT(keyS, keyT)
+		case SetData2Default:
+			ud.UnsetBusinessRelsSContractsT(keyS, keyT)
+		}
+	}
 }
 
 //----- contractId - string -  [businessRels.%s.contracts.%s.contractId]
@@ -658,6 +933,21 @@ func (ud *UpdateDocument) UnsetBusinessRelsSContractsTContractId(keyS string, ke
 	return ud
 }
 
+// setOrUnsetBusinessRelsSContractsTContractId No Remarks
+func (ud *UpdateDocument) setOrUnsetBusinessRelsSContractsTContractId(keyS string, keyT string, p string, um UnsetMode) {
+	if p != "" {
+		ud.SetBusinessRelsSContractsTContractId(keyS, keyT, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBusinessRelsSContractsTContractId(keyS, keyT)
+		case SetData2Default:
+			ud.UnsetBusinessRelsSContractsTContractId(keyS, keyT)
+		}
+	}
+}
+
 //----- contractDescr - string -  [businessRels.%s.contracts.%s.contractDescr]
 
 // SetBusinessRelsSContractsTContractDescr No Remarks
@@ -676,4 +966,19 @@ func (ud *UpdateDocument) UnsetBusinessRelsSContractsTContractDescr(keyS string,
 		return bson.E{Key: mName, Value: ""}
 	})
 	return ud
+}
+
+// setOrUnsetBusinessRelsSContractsTContractDescr No Remarks
+func (ud *UpdateDocument) setOrUnsetBusinessRelsSContractsTContractDescr(keyS string, keyT string, p string, um UnsetMode) {
+	if p != "" {
+		ud.SetBusinessRelsSContractsTContractDescr(keyS, keyT, p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.UnsetBusinessRelsSContractsTContractDescr(keyS, keyT)
+		case SetData2Default:
+			ud.UnsetBusinessRelsSContractsTContractDescr(keyS, keyT)
+		}
+	}
 }
