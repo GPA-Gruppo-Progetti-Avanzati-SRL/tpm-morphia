@@ -5,9 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/examples/example1"
+	"github.com/rs/zerolog/log"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +20,7 @@ const (
 	MongoCollection = "examples"
 )
 
-func Setup(logger log.Logger, ctx context.Context) (*mongo.Client, *mongo.Collection, error) {
+func Setup(ctx context.Context) (*mongo.Client, *mongo.Collection, error) {
 	client, err := mongo.NewClient(options.Client().ApplyURI(MongoUrl))
 	if err != nil {
 		return nil, nil, err
@@ -40,26 +39,26 @@ func Setup(logger log.Logger, ctx context.Context) (*mongo.Client, *mongo.Collec
 	database := client.Database(MongoDb)
 	collection := database.Collection(MongoCollection)
 
-	if err := removeAll(logger, collection, ctx); err != nil {
+	if err := removeAll(collection, ctx); err != nil {
 		return client, collection, err
 	}
 
-	if err := insertARecord(logger, ctx, collection, "John", "Smith", "Atlanta", "Marietta St."); err != nil {
+	if err := insertARecord(ctx, collection, "John", "Smith", "Atlanta", "Marietta St."); err != nil {
 		return client, collection, err
 	}
 
-	if err := insertARecord(logger, ctx, collection, "Colin", "Ward", "Naples", "5th Ave"); err != nil {
+	if err := insertARecord(ctx, collection, "Colin", "Ward", "Naples", "5th Ave"); err != nil {
 		return client, collection, err
 	}
 
-	if err := insertARecord(logger, ctx, collection, "Susan", "Red", "", ""); err != nil {
+	if err := insertARecord(ctx, collection, "Susan", "Red", "", ""); err != nil {
 		return client, collection, err
 	}
 
 	return client, collection, nil
 }
 
-func insertARecord(logger log.Logger, ctx context.Context, aCollection *mongo.Collection, fn string, ln string, city string, strt string) error {
+func insertARecord(ctx context.Context, aCollection *mongo.Collection, fn string, ln string, city string, strt string) error {
 	a := example1.Author{
 		FirstName: fn,
 		LastName:  ln,
@@ -68,7 +67,7 @@ func insertARecord(logger log.Logger, ctx context.Context, aCollection *mongo.Co
 		Address:   example1.Address{City: city, Street: strt},
 	}
 
-	_ = level.Info(logger).Log("inserting_record", fmt.Sprintf("%v", a))
+	log.Info().Msgf("inserting_record %s", fmt.Sprintf("%v", a))
 
 	r, err := aCollection.InsertOne(ctx, a)
 	if err != nil {
@@ -78,7 +77,7 @@ func insertARecord(logger log.Logger, ctx context.Context, aCollection *mongo.Co
 		if b, err := json.Marshal(a); err != nil {
 			return err
 		} else {
-			_ = level.Info(logger).Log("document", string(b))
+			log.Info().Msgf("document %s", string(b))
 		}
 	}
 
@@ -88,12 +87,12 @@ func insertARecord(logger log.Logger, ctx context.Context, aCollection *mongo.Co
 /*
  * Boilerplate code to clear the collection
  */
-func removeAll(logger log.Logger, example1Collection *mongo.Collection, ctx context.Context) error {
+func removeAll(example1Collection *mongo.Collection, ctx context.Context) error {
 	deleteResult, err := example1Collection.DeleteMany(ctx, bson.D{})
 	if err != nil {
 		return err
 	}
-	_ = level.Info(logger).Log("number_of_documents_deleted", deleteResult.DeletedCount)
+	log.Info().Msgf("number_of_documents_deleted %d", deleteResult.DeletedCount)
 
 	return nil
 }
@@ -101,7 +100,7 @@ func removeAll(logger log.Logger, example1Collection *mongo.Collection, ctx cont
 /*
  * Boilerplate code to read the resultset and return the number of records.
  */
-func consume(logger log.Logger, ctx context.Context, cur *mongo.Cursor) int {
+func consume(ctx context.Context, cur *mongo.Cursor) int {
 
 	numberOfRecords := 0
 	for cur.Next(ctx) {
@@ -109,14 +108,14 @@ func consume(logger log.Logger, ctx context.Context, cur *mongo.Cursor) int {
 		var document bson.D
 		err := cur.Decode(&document)
 		if err != nil {
-			_ = level.Error(logger).Log("err", err.Error())
+			log.Error().Err(err).Send()
 			panic(err.Error())
 		}
-		_ = level.Info(logger).Log("found_document", fmt.Sprintf("%v", document))
+		log.Info().Msgf("found_document %s", fmt.Sprintf("%v", document))
 	}
 
 	if err := cur.Err(); err != nil {
-		_ = level.Error(logger).Log("err", err.Error())
+		log.Error().Err(err).Send()
 		panic(err.Error())
 	}
 

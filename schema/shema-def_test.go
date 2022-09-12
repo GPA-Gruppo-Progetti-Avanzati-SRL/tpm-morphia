@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
 	"os"
 	"testing"
 )
@@ -64,7 +63,7 @@ func TestParse(t *testing.T) {
 	}
 	defer f.Close()
 
-	_, e := ReadCollectionDefinition(system.GetLogger(), f)
+	_, e := ReadCollectionDefinition(f)
 	if e != nil {
 		t.Error(e)
 	}

@@ -1,0 +1,36 @@
+{
+  "name": "cliente",
+  "properties": {
+    "folder-path": "./example4"
+  ,"struct-name": "Cliente"
+  }
+,"attributes": [
+ { "name": "oId", "type": "object-id", "tags": [ "json", "-", "bson", "_id" ], "queryable": true }
+,{ "name": "ndg"                   , "type": "string", "queryable": true }
+,{ "name": "codiceFiscale"         , "type": "string", "queryable": true }
+,{ "name": "partitaIVA"            , "type": "string", "queryable": true }
+,{ "name": "natura"                , "type": "string" }
+,{ "name": "stato"                 , "type": "string" }
+,{
+    "name": "indirizzi", "type": "map",
+    "item": { "type": "struct", "struct-name": "Indirizzo", "attributes": [
+       { "name": "indirizzo"              , "type": "string"}
+      ,{ "name": "cap"                    , "type": "string"}
+      ,{ "name": "localita"               , "type": "string"}
+      ,{ "name": "provincia"              , "type": "string"}
+      ,{ "name": "nazione"                , "type": "string"}
+    ]
+    }
+  }
+,{ "name": "legati", "type": "array", "item": { "type": "struct", "struct-name": "Legame", "attributes": [
+  { "name": "ndg"                 , "type": "string" }
+ ,{ "name": "cognome"             , "type": "string" }
+ ,{ "name": "nome"                , "type": "string" }
+ ,{ "name": "codiceFiscale"         , "type": "string" }
+ ,{ "name": "partitaIVA"            , "type": "string" }
+ ,{ "name": "natura"                , "type": "string" }
+ ]}}
+,{ "name": "leganti", "type": "array", "item": {  "type": "ref-struct", "struct-ref" : { "struct-name": "Legame" }}}
+]
+}
+

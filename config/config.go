@@ -5,10 +5,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/resources"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -67,44 +65,43 @@ func (cfg *Config) String() string {
 }
 
 func newConfig(_ context.Context, cfgFileName string) (*Config, error) {
-	logger := system.GetLogger()
 
 	cfg := DefaultConfig
 	cfg.ConfigFile = cfgFileName
 
-	_ = level.Debug(logger).Log(system.DefaultLogMessageField, "Embedded Configuration Loaded", "Config", fmt.Sprintf("%+v", cfg))
+	log.Debug().Str("config", fmt.Sprintf("%+v", cfg)).Msg("embedded configuration Loaded")
 
-	if _, err := cfg.readConfigFromFile(logger, cfg.ConfigFile, false); err != nil {
+	if _, err := cfg.readConfigFromFile(cfg.ConfigFile, false); err != nil {
 		return &cfg, err
 	}
 
-	_ = level.Info(logger).Log("Message", "Initializing Flag Set")
+	log.Info().Msg("Initializing Flag Set")
 	cfg.initializeFlagSet()
 
 	currentConfigFile := cfg.ConfigFile
 
-	_ = level.Info(logger).Log("Message", "Parsing Cmd Line Param")
+	log.Info().Msg("Parsing Cmd Line Param")
 	if err := cfg.flagSet.Parse(os.Args[1:]); err != nil {
 		return &cfg, err
 	}
 
 	if len(cfg.flagSet.Args()) != 0 {
-		_ = level.Warn(logger).Log(system.DefaultLogMessageField, "Invalid Command Line flag", "Flag", cfg.flagSet.Arg(0))
+		log.Warn().Interface("Flag", cfg.flagSet.Arg(0)).Msg("Invalid Command Line flag")
 	}
 
-	_ = level.Debug(logger).Log(system.DefaultLogMessageField, "Command Line Parsed", "Config", fmt.Sprintf("%+v", cfg))
+	log.Debug().Str("Config", fmt.Sprintf("%+v", cfg)).Msg("Command Line Parsed")
 
 	if cfg.ConfigFile != currentConfigFile {
 		/*
 		 * Il caricamento dell'ultimo file disponibile non modifica il flagSet. Eventuali flag per path 'dinamici' eventualmente inseriti sono
 		 * censiti tra gli errori....
 		 */
-		if _, err := cfg.readConfigFromFile(logger, cfg.ConfigFile, true); err != nil {
+		if _, err := cfg.readConfigFromFile(cfg.ConfigFile, true); err != nil {
 			return &cfg, err
 		}
 	}
 
-	_ = level.Info(logger).Log(system.DefaultLogMessageField, "Configuration Loaded", "Config", fmt.Sprintf("%+v", cfg))
+	log.Debug().Str("config", fmt.Sprintf("%+v", cfg)).Msg("configuration Loaded")
 
 	if err := cfg.checkValid(); err != nil {
 		return nil, err
@@ -127,11 +124,11 @@ func (cfg *Config) initializeFlagSet() {
 	cfg.flagSet.StringVar(&cfg.CollectionDefScanPath, "collection-def-scan-path", cfg.CollectionDefScanPath, "scan directory for collection definition")
 }
 
-func (cfg *Config) readConfigFromFile(logger log.Logger, aConfigFileName string, mustExists bool) (bool, error) {
+func (cfg *Config) readConfigFromFile(aConfigFileName string, mustExists bool) (bool, error) {
 
 	fileLoaded := false
 
-	_ = level.Info(logger).Log(system.DefaultLogMessageField, "Loading Config File", "FileName", aConfigFileName)
+	log.Info().Str("FileName", aConfigFileName).Msg("Loading Config File")
 
 	var configContent []byte
 	var err error
@@ -143,10 +140,10 @@ func (cfg *Config) readConfigFromFile(logger log.Logger, aConfigFileName string,
 
 		if !resources.Has("/resources/" + aConfigFileName) {
 			if mustExists {
-				_ = level.Error(logger).Log(system.DefaultLogMessageField, "config file not found", "FileName", aConfigFileName, "mustExists", true)
+				log.Error().Str("FileName", aConfigFileName).Bool("mustExists", true).Msg("config file not found")
 				return false, err
 			} else {
-				_ = level.Warn(logger).Log(system.DefaultLogMessageField, "config file not found", "FileName", aConfigFileName, "mustExists", false)
+				log.Warn().Str("FileName", aConfigFileName).Bool("mustExists", false).Msg("config file not found")
 				return false, nil
 			}
 		} else {
@@ -162,10 +159,10 @@ func (cfg *Config) readConfigFromFile(logger log.Logger, aConfigFileName string,
 
 	if configContent != nil {
 		if yerr := cfg.readConfigFromByteArray(configContent); yerr != nil {
-			_ = level.Error(logger).Log(system.DefaultLogMessageField, "Config file YAML error", "FileName", aConfigFileName, "YAML Error", yerr.Error())
+			log.Error().Err(yerr).Str("FileName", aConfigFileName).Msg("Config file YAML error")
 			return false, yerr
 		} else {
-			_ = level.Info(logger).Log(system.DefaultLogMessageField, "Configuration file loaded", "FileName", aConfigFileName)
+			log.Info().Str("FileName", aConfigFileName).Msg("Configuration file loaded")
 			cfg.ConfigFile = aConfigFileName
 			fileLoaded = true
 		}
@@ -224,7 +221,7 @@ func (cfg *Config) checkValid() error {
 	return nil
 }
 
-func (cfg *Config) FindCollectionToProcess(logger log.Logger) ([]string, error) {
+func (cfg *Config) FindCollectionToProcess() ([]string, error) {
 
 	if cfg.CollectionDefFile != "" {
 		if _, err := os.Stat(cfg.CollectionDefFile); err == nil {
@@ -243,14 +240,14 @@ func (cfg *Config) FindCollectionToProcess(logger log.Logger) ([]string, error) 
 			}
 			if filterPath(info.Name(), info.IsDir()) {
 				if !info.IsDir() {
-					_ = level.Debug(logger).Log("msg", "visited file or dir", "name", path)
+					log.Debug().Str("name", path).Msg("visited file or dir")
 					defs = append(defs, path)
 				}
 				return nil
 			} else {
 				if info.IsDir() {
 					// fmt.Printf("skipping dir: %+v \n", info.Name())
-					_ = level.Debug(logger).Log("msg", "skipping dir", "name", info.Name())
+					log.Debug().Str("name", info.Name()).Msg("skipping dir")
 					return filepath.SkipDir
 				}
 			}

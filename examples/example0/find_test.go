@@ -3,9 +3,8 @@ package example0_test
 import (
 	"context"
 	"fmt"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/rs/zerolog/log"
+	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"testing"
@@ -14,38 +13,28 @@ import (
 
 func TestFind(t *testing.T) {
 
-	logger := system.GetLogger()
-
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	client, collection, err := Setup(logger, ctx)
+	client, collection, err := Setup(ctx)
 
 	if client != nil {
 		defer client.Disconnect(ctx)
 	}
+	require.NoError(t, err)
 
-	if err != nil {
-		_ = level.Error(logger).Log("msg", err.Error())
-		return
-	}
+	err = find(ctx, collection, "John", "Ward", "Naples")
+	require.NoError(t, err)
 
-	if err := find(logger, ctx, collection, "John", "Ward", "Naples"); err != nil {
-		_ = level.Error(logger).Log("msg", err.Error())
-		return
-	}
-
-	if err := find(logger, ctx, collection, "John", "Ward", "Atlanta"); err != nil {
-		_ = level.Error(logger).Log("msg", err.Error())
-		return
-	}
+	err = find(ctx, collection, "John", "Ward", "Atlanta")
+	require.NoError(t, err)
 }
 
-func find(logger log.Logger, ctx context.Context, aCollection *mongo.Collection, fn string, ln string, cy string) error {
+func find(ctx context.Context, aCollection *mongo.Collection, fn string, ln string, cy string) error {
 
 	filter := bson.D{
 		{"$or", bson.A{bson.D{{"fn", fn}}, bson.D{{"ln", ln}, {"addr.city", cy}}}},
 	}
 
-	_ = level.Info(logger).Log("using_filter: ", fmt.Sprintf("%v", filter))
+	log.Info().Str("filter", fmt.Sprintf("%v", filter)).Msg("using filter")
 
 	cur, err := aCollection.Find(ctx, filter)
 	if err != nil {
@@ -53,7 +42,7 @@ func find(logger log.Logger, ctx context.Context, aCollection *mongo.Collection,
 	}
 
 	defer cur.Close(ctx)
-	numRecords := consume(logger, ctx, cur)
-	_ = level.Info(logger).Log("number_of_recs_found", numRecords)
+	numRecords := consume(ctx, cur)
+	log.Info().Int("number_of_recs_found", numRecords).Send()
 	return nil
 }

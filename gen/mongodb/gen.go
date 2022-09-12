@@ -7,8 +7,8 @@ import (
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/resources"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/util"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/rs/zerolog/log"
+
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -92,14 +92,14 @@ func updateMethodsTmplList(tmplVersion string) []string {
 	return s
 }
 
-func Generate(logger log.Logger, cfg *config.Config, gen *CodeGenCollection) error {
+func Generate(cfg *config.Config, gen *CodeGenCollection) error {
 
 	genFolder, err := gen.GetGeneratedContentPath(cfg.TargetDirectory)
 	if err != nil {
 		return err
 	}
 
-	_ = level.Info(logger).Log("msg", "output directory", "dir", genFolder)
+	log.Info().Str("dir", genFolder).Msg("output directory")
 
 	tmplVersion := "v1"
 	if cfg.Version != "" {
@@ -111,7 +111,7 @@ func Generate(logger log.Logger, cfg *config.Config, gen *CodeGenCollection) err
 	/*
 	 * Readme.md
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "readme.md"), readmeTmplList(tmplVersion), false); err != nil {
+	if err := emit(genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "readme.md"), readmeTmplList(tmplVersion), false); err != nil {
 		return err
 	}
 
@@ -131,7 +131,7 @@ func Generate(logger log.Logger, cfg *config.Config, gen *CodeGenCollection) err
 	/*
 	 * model.go
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "model.go"), modelTmplList(tmplVersion), cfg.FormatCode); err != nil {
+	if err := emit(genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "model.go"), modelTmplList(tmplVersion), cfg.FormatCode); err != nil {
 		return err
 	}
 
@@ -151,45 +151,45 @@ func Generate(logger log.Logger, cfg *config.Config, gen *CodeGenCollection) err
 	/*
 	 * filter-methods.go
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "filter-methods.go"), filterTmplList(tmplVersion), cfg.FormatCode); err != nil {
+	if err := emit(genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "filter-methods.go"), filterTmplList(tmplVersion), cfg.FormatCode); err != nil {
 		return err
 	}
 
 	/*
 	 * filter.go: get generated without prefixing because is common across any collection that might be created.
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename("", "filter.go"), criteriaTmplList(tmplVersion), cfg.FormatCode); err != nil {
+	if err := emit(genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename("", "filter.go"), criteriaTmplList(tmplVersion), cfg.FormatCode); err != nil {
 		return err
 	}
 
 	/*
 	 * Update get generated without prefixing because is common across any collection that might be created.
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename("", "update.go"), updateTmplList(tmplVersion), cfg.FormatCode); err != nil {
+	if err := emit(genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename("", "update.go"), updateTmplList(tmplVersion), cfg.FormatCode); err != nil {
 		return err
 	}
 
 	/*
 	 * update-methods.go
 	 */
-	if err := emit(logger, genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "update-methods.go"), updateMethodsTmplList(tmplVersion), cfg.FormatCode); err != nil {
+	if err := emit(genCtx, cfg.ResourceDirectory, genFolder, getOutputFilename(gen.GetPrefix("lower"), "update-methods.go"), updateMethodsTmplList(tmplVersion), cfg.FormatCode); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func emit(logger log.Logger, genCtx GenerationContext, resDir string, outFolder string, generatedFileName string, templates []string, formatCode bool) error {
+func emit(genCtx GenerationContext, resDir string, outFolder string, generatedFileName string, templates []string, formatCode bool) error {
 	if t, ok := loadTemplate(resDir, templates...); ok {
 		destinationFile := filepath.Join(outFolder, generatedFileName)
-		_ = level.Info(logger).Log("msg", "generating text from template", "dest", destinationFile)
+		log.Info().Str("dest", destinationFile).Msgf("generating text from template")
 
 		if err := parseTemplateWithFuncMapsProcessWrite2File(t, getTemplateUtilityFunctions(), genCtx, destinationFile, formatCode); err != nil {
-			_ = level.Info(logger).Log("msg", "parse template failed", "err", err.Error())
+			log.Error().Err(err).Msgf("parse template failed")
 			return err
 		}
 	} else {
-		_ = level.Info(logger).Log("msg", "unable to load template ...skipping")
+		log.Info().Msgf("unable to load template ...skipping")
 		return errors.New("unable to load template ...skipping")
 	}
 

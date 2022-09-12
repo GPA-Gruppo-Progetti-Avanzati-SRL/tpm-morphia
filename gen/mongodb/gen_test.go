@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/config"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
+
 	"io/ioutil"
 	"os"
 	"testing"
@@ -23,7 +23,7 @@ func TestGeneration(t *testing.T) {
 	}
 	defer f.Close()
 
-	schema, e := schema.ReadCollectionDefinition(system.GetLogger(), f)
+	schema, e := schema.ReadCollectionDefinition(f)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -33,7 +33,7 @@ func TestGeneration(t *testing.T) {
 	if e != nil {
 		t.Error(e)
 	} else {
-		e = Generate(system.GetLogger(), &genCfg, genDriver)
+		e = Generate(&genCfg, genDriver)
 		if e != nil {
 			t.Error(e)
 		}
@@ -48,7 +48,7 @@ func TestCodeGenTree(t *testing.T) {
 	}
 
 	r := bytes.NewReader(b)
-	schema, e := schema.ReadCollectionDefinition(system.GetLogger(), r)
+	schema, e := schema.ReadCollectionDefinition(r)
 	if e != nil {
 		t.Error(e)
 	}

@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/examples/example1"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/rs/zerolog/log"
+	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"testing"
@@ -15,27 +14,20 @@ import (
 
 func TestUpdate(t *testing.T) {
 
-	logger := system.GetLogger()
-
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	client, collection, err := Setup(logger, ctx)
+	client, collection, err := Setup(ctx)
 
 	if client != nil {
 		defer client.Disconnect(ctx)
 	}
 
-	if err != nil {
-		_ = level.Error(logger).Log("msg", err.Error())
-		return
-	}
+	require.NoError(t, err)
 
-	if err := update(logger, ctx, collection, "Susan", "Red", "Atlanta"); err != nil {
-		_ = level.Info(logger).Log("err", err.Error())
-	}
-
+	err = update(ctx, collection, "Susan", "Red", "Atlanta")
+	require.NoError(t, err)
 }
 
-func update(logger log.Logger, ctx context.Context, aCollection *mongo.Collection, fn string, ln string, cy string) error {
+func update(ctx context.Context, aCollection *mongo.Collection, fn string, ln string, cy string) error {
 
 	opts := options.Update().SetUpsert(true)
 
@@ -43,7 +35,7 @@ func update(logger log.Logger, ctx context.Context, aCollection *mongo.Collectio
 	f.Or().AndFirstNameEqTo(fn).AndLastNameEqTo(ln)
 
 	filterDocument := f.Build()
-	_ = level.Info(logger).Log("resulting_filter: ", fmt.Sprintf("%v", filterDocument))
+	log.Info().Msg("resulting_filter: " + fmt.Sprintf("%v", filterDocument))
 
 	updateDoc := example1.UpdateDocument{}
 	updateDoc.SetAddressCity(cy)
@@ -51,7 +43,7 @@ func update(logger log.Logger, ctx context.Context, aCollection *mongo.Collectio
 	if ur, err := aCollection.UpdateOne(ctx, filterDocument, updateDoc.Build(), opts); err != nil {
 		return err
 	} else {
-		_ = level.Info(logger).Log("msg", "update result", "upsertedCound", ur.UpsertedCount, "modifiedCount", ur.ModifiedCount)
+		log.Info().Msgf("update result - upsertedCound: %d, modifiedCount: %d", ur.UpsertedCount, ur.ModifiedCount)
 	}
 
 	return nil

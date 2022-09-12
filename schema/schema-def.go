@@ -5,8 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/util"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
+	"github.com/rs/zerolog/log"
 	"io"
 	"strings"
 )
@@ -348,9 +347,9 @@ func (f Field) String() string {
 /*
  * Read and Validate Function
  */
-func ReadCollectionDefinition(logger log.Logger, reader io.Reader) (*Collection, error) {
+func ReadCollectionDefinition(reader io.Reader) (*Collection, error) {
 
-	_ = level.Debug(logger).Log("msg", "start reading collection definition")
+	log.Debug().Msg("start reading collection definition")
 
 	schema := &Collection{}
 
@@ -369,7 +368,7 @@ func ReadCollectionDefinition(logger log.Logger, reader io.Reader) (*Collection,
 	/* Since I just deserialized stuff, just try to check that pretty much che stuff is correct or at least
 	 * not massively wrong.
 	 */
-	if e := validateCollectionDef(logger, schema); e != nil {
+	if e := validateCollectionDef(schema); e != nil {
 		return nil, e
 	}
 
@@ -394,9 +393,9 @@ func ReadCollectionDefinition(logger log.Logger, reader io.Reader) (*Collection,
 	return schema, nil
 }
 
-func validateCollectionDef(logger log.Logger, c *Collection) error {
+func validateCollectionDef(c *Collection) error {
 
-	_ = level.Debug(logger).Log("msg", "start validating collection definition", "name", c.Name)
+	log.Debug().Str("name", c.Name).Msg("start validating collection definition")
 
 	/*
 	 * Pre-validation of collection name to assign the root path..
@@ -411,14 +410,14 @@ func validateCollectionDef(logger log.Logger, c *Collection) error {
 		return ce
 	}
 
-	if e := validateProperties(logger, c); e != nil {
+	if e := validateProperties(c); e != nil {
 		return e
 	}
 
-	return validateAttributes(logger, c.Attributes, pPath, nil)
+	return validateAttributes(c.Attributes, pPath, nil)
 }
 
-func validateProperties(logger log.Logger, c *Collection) error {
+func validateProperties(c *Collection) error {
 
 	cp := &c.Properties
 	// Doing a XOR...
@@ -428,15 +427,15 @@ func validateProperties(logger log.Logger, c *Collection) error {
 
 	if cp.StructName == "" {
 		cp.StructName = util.ToCapitalCase(c.Name)
-		_ = level.Debug(logger).Log("msg", "no name provided for struct name...using "+cp.StructName)
+		log.Debug().Msg("no name provided for struct name...using " + cp.StructName)
 	}
 
 	return nil
 }
 
-func validateAttributes(logger log.Logger, props []Field, pPath string, parentField *Field) error {
+func validateAttributes(props []Field, pPath string, parentField *Field) error {
 
-	_ = level.Debug(logger).Log("msg", "start validating attributes", "path", pPath)
+	log.Debug().Str("path", pPath).Msg("start validating attributes")
 
 	if len(props) == 0 {
 		return &CollectionDefError{ctx: pPath, msg: "attributes missing from schema"}
@@ -444,7 +443,7 @@ func validateAttributes(logger log.Logger, props []Field, pPath string, parentFi
 
 	for i := range props {
 		// Use the indexing property to address the underlay-ing object and not a copy.
-		if e := validateField(logger, &props[i], pPath, parentField); e != nil {
+		if e := validateField(&props[i], pPath, parentField); e != nil {
 			return e
 		}
 	}
@@ -452,7 +451,7 @@ func validateAttributes(logger log.Logger, props []Field, pPath string, parentFi
 	return nil
 }
 
-func validateField(logger log.Logger, f *Field, pPath string, parentField *Field) error {
+func validateField(f *Field, pPath string, parentField *Field) error {
 
 	arrayItemDefinition := false
 
@@ -461,9 +460,9 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 	}
 
 	if !arrayItemDefinition {
-		_ = level.Debug(logger).Log("msg", "start validating field", "name", f.Name, "path", pPath)
+		log.Debug().Str("name", f.Name).Str("path", pPath).Msg("start validating field")
 	} else {
-		_ = level.Debug(logger).Log("msg", "start validating array item", "path", pPath)
+		log.Debug().Str("path", pPath).Msg("start validating array item")
 	}
 
 	if !arrayItemDefinition && !util.FieldNameWellFormed(f.Name) {
@@ -503,13 +502,13 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 		}
 
 		if f.StructRef.IsExternal && f.StructRef.Package == "" {
-			_ = level.Warn(logger).Log("msg", "struct reference declared external but missing package info "+f.StructRef.StructName)
+			log.Warn().Msg("struct reference declared external but missing package info " + f.StructRef.StructName)
 		}
 	case AttributeTypeStruct:
 		if f.IsKey {
 			vErr = &CollectionDefError{ctx: pPath, msg: "is-key not supported on " + f.Typ}
 		} else {
-			vErr = validateAttributes(logger, f.Attributes, pPath, f)
+			vErr = validateAttributes(f.Attributes, pPath, f)
 		}
 
 		if f.StructName == "" {
@@ -518,20 +517,20 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 			} else {
 				f.StructName = util.ToCapitalCase(f.Name) + "Struct"
 			}
-			_ = level.Debug(logger).Log("msg", "no name provided for struct name...using "+f.StructName, "path", pPath)
+			log.Debug().Str("path", pPath).Msg("no name provided for struct name...using " + f.StructName)
 		}
 
 	case AttributeTypeArray:
 		if f.IsKey {
 			vErr = &CollectionDefError{ctx: pPath, msg: "is-key not supported on " + f.Typ}
 		} else {
-			vErr = validateItem(logger, f.Item, pPath, f)
+			vErr = validateItem(f.Item, pPath, f)
 		}
 	case AttributeTypeMap:
 		if f.IsKey {
 			vErr = &CollectionDefError{ctx: pPath, msg: "is-key not supported on " + f.Typ}
 		} else {
-			vErr = validateItem(logger, f.Item, pPath, f)
+			vErr = validateItem(f.Item, pPath, f)
 		}
 	default:
 		vErr = &CollectionDefError{ctx: pPath, msg: "unsupported type: " + f.Typ}
@@ -540,9 +539,9 @@ func validateField(logger log.Logger, f *Field, pPath string, parentField *Field
 	return vErr
 }
 
-func validateItem(logger log.Logger, f *Field, pPath string, containerField *Field) error {
+func validateItem(f *Field, pPath string, containerField *Field) error {
 
-	_ = level.Debug(logger).Log("msg", "start validating array item definition", "path", pPath)
+	log.Debug().Str("path", pPath).Msg("start validating array item definition")
 
 	if f == nil {
 		return &CollectionDefError{ctx: pPath, msg: "no item provided for type array"}
@@ -559,5 +558,5 @@ func validateItem(logger log.Logger, f *Field, pPath string, containerField *Fie
 		pPath = strings.Join([]string{pPath, "%s"}, ".")
 	}
 
-	return validateField(logger, f, pPath, containerField)
+	return validateField(f, pPath, containerField)
 }

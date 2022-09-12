@@ -1,8 +1,7 @@
 {
   "name": "author",
   "properties": {
-    "package-name": "example3",
-    "folder-path": "./example-3",
+    "folder-path": "./example3",
     "struct-name": "Author"
   },
   "attributes": [
