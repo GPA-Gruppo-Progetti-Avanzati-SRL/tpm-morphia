@@ -1,4 +1,4 @@
-### cliente
+### Schema cliente
 
 #### Collection schema definition.
 

@@ -1,4 +1,4 @@
-### {{ .Schema.Name }}
+### Schema {{ .Schema.Name }}
 
 #### Collection schema definition.
 

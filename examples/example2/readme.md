@@ -1,4 +1,4 @@
-### author
+### Schema author
 
 #### Collection schema definition.
 

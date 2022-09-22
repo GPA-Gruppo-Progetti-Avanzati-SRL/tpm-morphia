@@ -5,28 +5,29 @@ package main
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/config"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/gen/mongodb"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/resources"
 	"github.com/rs/zerolog/log"
 
 	"io/ioutil"
 	"os"
-	"runtime"
 )
+
+//go:embed VERSION
+var version string
+
+// appLogo contains the ASCII splash screen
+//
+//go:embed app-logo.txt
+var appLogo []byte
 
 func main() {
 
-	if !resources.Has("/resources/version.txt") {
-		log.Info().Msgf("Welcome To TPM-Morphia! goos: %s - goarch: %s", runtime.GOOS, runtime.GOARCH)
-		log.Error().Msg("go generate not invoked during the build!")
-		// os.Exit(-1)
-	} else {
-		versionInfo, _ := resources.Get("/resources/version.txt")
-		_, _ = os.Stderr.WriteString(fmt.Sprintf("%s\n", versionInfo))
-	}
+	fmt.Println(string(appLogo))
+	fmt.Printf("Version: %s\n", version)
 
 	cfg, err := config.NewBuilder().Build(context.Background())
 	if err != nil {

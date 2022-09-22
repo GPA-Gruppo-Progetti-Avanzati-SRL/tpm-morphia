@@ -1,15 +1,14 @@
 package mongodb
 
 import (
+	"embed"
 	"errors"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/config"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/resources"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/util"
 	"github.com/rs/zerolog/log"
 
-	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -20,26 +19,29 @@ type GenerationContext struct {
 	Collection *CodeGenCollection
 }
 
+//go:embed templates/*
+var templates embed.FS
+
 const (
-	TmplCollectionReadme         = "/resources/mongodb-%s/readme.txt"
-	TmplCollectionModel          = "/resources/mongodb-%s/model.txt"
-	TmplCollectionFilter         = "/resources/mongodb-%s/filter-methods.txt"
-	TmplCollectionCriteria       = "/resources/mongodb-%s/filter.txt"
-	TmplCollectionFilterString   = "/resources/mongodb-%s/filter-string.txt"
-	TmplCollectionFilterInt      = "/resources/mongodb-%s/filter-int.txt"
-	TmplCollectionFilterLong     = "/resources/mongodb-%s/filter-long.txt"
-	TmplCollectionFilterBool     = "/resources/mongodb-%s/filter-bool.txt"
-	TmplCollectionFilterDate     = "/resources/mongodb-%s/filter-date.txt"
-	TmplCollectionFilterObjectId = "/resources/mongodb-%s/filter-object-id.txt"
-	TmplCollectionUpdate         = "/resources/mongodb-%s/update.txt"
-	TmplCollectionUpdateMethods  = "/resources/mongodb-%s/update-methods.txt"
-	TmplCollectionUpdateString   = "/resources/mongodb-%s/update-string.txt"
-	TmplCollectionUpdateInt      = "/resources/mongodb-%s/update-int.txt"
-	TmplCollectionUpdateLong     = "/resources/mongodb-%s/update-long.txt"
-	TmplCollectionUpdateBool     = "/resources/mongodb-%s/update-bool.txt"
-	TmplCollectionUpdateDate     = "/resources/mongodb-%s/update-date.txt"
-	TmplCollectionUpdateDocument = "/resources/mongodb-%s/update-document.txt"
-	TmplCollectionUpdateObjectId = "/resources/mongodb-%s/update-object-id.txt"
+	TmplCollectionReadme         = "templates/mongodb-%s/readme.txt"
+	TmplCollectionModel          = "templates/mongodb-%s/model.txt"
+	TmplCollectionFilter         = "templates/mongodb-%s/filter-methods.txt"
+	TmplCollectionCriteria       = "templates/mongodb-%s/filter.txt"
+	TmplCollectionFilterString   = "templates/mongodb-%s/filter-string.txt"
+	TmplCollectionFilterInt      = "templates/mongodb-%s/filter-int.txt"
+	TmplCollectionFilterLong     = "templates/mongodb-%s/filter-long.txt"
+	TmplCollectionFilterBool     = "templates/mongodb-%s/filter-bool.txt"
+	TmplCollectionFilterDate     = "templates/mongodb-%s/filter-date.txt"
+	TmplCollectionFilterObjectId = "templates/mongodb-%s/filter-object-id.txt"
+	TmplCollectionUpdate         = "templates/mongodb-%s/update.txt"
+	TmplCollectionUpdateMethods  = "templates/mongodb-%s/update-methods.txt"
+	TmplCollectionUpdateString   = "templates/mongodb-%s/update-string.txt"
+	TmplCollectionUpdateInt      = "templates/mongodb-%s/update-int.txt"
+	TmplCollectionUpdateLong     = "templates/mongodb-%s/update-long.txt"
+	TmplCollectionUpdateBool     = "templates/mongodb-%s/update-bool.txt"
+	TmplCollectionUpdateDate     = "templates/mongodb-%s/update-date.txt"
+	TmplCollectionUpdateDocument = "templates/mongodb-%s/update-document.txt"
+	TmplCollectionUpdateObjectId = "templates/mongodb-%s/update-object-id.txt"
 )
 
 // List of templates for mongoDbGeneration
@@ -219,17 +221,11 @@ func loadTemplate(resDirectory string, templatePath ...string) ([]util.TemplateI
 		}
 
 		var b []byte
-		var ok bool
 		var e error
-		if resDirectory == "" {
-			if b, ok = resources.Get(tpath); !ok {
-				return nil, false
-			}
-		} else {
-			templateFileName := filepath.Join(resDirectory, tpath)
-			if b, e = ioutil.ReadFile(templateFileName); e != nil {
-				return nil, false
-			}
+
+		b, e = templates.ReadFile(tpath)
+		if e != nil {
+			return nil, false
 		}
 
 		res = append(res, util.TemplateInfo{Name: tname, Content: string(b)})
