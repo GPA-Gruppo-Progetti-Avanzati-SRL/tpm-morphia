@@ -35,5 +35,15 @@ func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p }}({{ updateMeth
 		}
 	}
 }
+
+func UpdateWith{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} p {{$a.GetGoAttributeType}}) UpdateOption {
+    return func(ud *UpdateDocument) {
+	if p  {
+       ud.Set{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "after" }} p)
+    } else {
+       ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+    }
+    }
+}
 {{- end }}
 {{- end }}

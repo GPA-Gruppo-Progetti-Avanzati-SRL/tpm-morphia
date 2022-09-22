@@ -29,6 +29,18 @@ func (ca *Criteria) AndOIdEqTo(oId primitive.ObjectID) *Criteria {
 	return ca
 }
 
+func (ca *Criteria) AndOIdIn(p []primitive.ObjectID) *Criteria {
+
+	if len(p) == 0 {
+		return ca
+	}
+
+	mName := fmt.Sprintf(OID)
+	c := func() bson.E { return bson.E{Key: mName, Value: bson.D{{"$in", p}}} }
+	*ca = append(*ca, c)
+	return ca
+}
+
 //----- ndg of type string
 //----- ndg - string -  [ndg]
 

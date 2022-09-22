@@ -479,7 +479,7 @@ func (b *CodeGenAttributeImpl) GetGoAttributeIsZeroCondition() string {
 	case schema.AttributeTypeLong:
 		s = fmt.Sprintf("s.%s == 0", b.GetGoAttributeName())
 	case schema.AttributeTypeBool:
-		s = fmt.Sprintf("s.%s", b.GetGoAttributeName())
+		s = fmt.Sprintf("!s.%s", b.GetGoAttributeName())
 	case schema.AttributeTypeDate:
 		s = fmt.Sprintf("s.%s == 0", b.GetGoAttributeName())
 	case schema.AttributeTypeArray:

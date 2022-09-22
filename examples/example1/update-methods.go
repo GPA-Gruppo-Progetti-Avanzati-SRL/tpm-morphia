@@ -78,6 +78,19 @@ func WithAddressUnsetMode(m UnsetMode) UnsetOption {
 	}
 }
 
+type UpdateOption func(ud *UpdateDocument)
+type UpdateOptions []UpdateOption
+
+// GetUpdateDocument convenience method to create an update document from single updates instead of a whole object
+func (uopts UpdateOptions) GetUpdateDocument(opts ...UpdateOption) UpdateDocument {
+	ud := UpdateDocument{}
+	for _, o := range opts {
+		o(&ud)
+	}
+
+	return ud
+}
+
 // GetUpdateDocument
 // Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
 // the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
@@ -177,6 +190,16 @@ func (ud *UpdateDocument) setOrUnsetFirstName(p string, um UnsetMode) {
 	}
 }
 
+func UpdateWithFirstName(p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetFirstName(p)
+		} else {
+			ud.UnsetFirstName()
+		}
+	}
+}
+
 //----- lastName - string -  [lastName]
 
 // SetLastName No Remarks
@@ -207,6 +230,16 @@ func (ud *UpdateDocument) setOrUnsetLastName(p string, um UnsetMode) {
 		case UnsetData:
 			ud.UnsetLastName()
 		case SetData2Default:
+			ud.UnsetLastName()
+		}
+	}
+}
+
+func UpdateWithLastName(p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetLastName(p)
+		} else {
 			ud.UnsetLastName()
 		}
 	}
@@ -256,6 +289,22 @@ func (ud *UpdateDocument) IncAge(p int32) *UpdateDocument {
 	return ud
 }
 
+func UpdateWithAge(p int32) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != 0 {
+			ud.SetAge(p)
+		} else {
+			ud.UnsetAge()
+		}
+	}
+}
+
+func UpdateWithAgeIncrement(p int32) UpdateOption {
+	return func(ud *UpdateDocument) {
+		ud.IncAge(p)
+	}
+}
+
 //----- doc - document -  [doc]
 
 // SetDoc No Remarks
@@ -286,6 +335,16 @@ func (ud *UpdateDocument) setOrUnsetDoc(p bson.M, um UnsetMode) {
 		case UnsetData:
 			ud.UnsetDoc()
 		case SetData2Default:
+			ud.UnsetDoc()
+		}
+	}
+}
+
+func UpdateWithDoc(p bson.M) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if len(p) > 0 {
+			ud.SetDoc(p)
+		} else {
 			ud.UnsetDoc()
 		}
 	}
@@ -328,6 +387,17 @@ func (ud *UpdateDocument) setOrUnsetAddress(p Address, um UnsetMode) {
 	}
 }
 
+func UpdateWithAddress(p Address) UpdateOption {
+	return func(ud *UpdateDocument) {
+
+		if !p.IsZero() {
+			ud.SetAddress(p)
+		} else {
+			ud.UnsetAddress()
+		}
+	}
+}
+
 //----- city - string -  [address.city]
 
 // SetAddressCity No Remarks
@@ -363,6 +433,16 @@ func (ud *UpdateDocument) setOrUnsetAddressCity(p string, um UnsetMode) {
 	}
 }
 
+func UpdateWithAddressCity(p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetAddressCity(p)
+		} else {
+			ud.UnsetAddressCity()
+		}
+	}
+}
+
 //----- street - string -  [address.street]
 
 // SetAddressStreet No Remarks
@@ -393,6 +473,16 @@ func (ud *UpdateDocument) setOrUnsetAddressStreet(p string, um UnsetMode) {
 		case UnsetData:
 			ud.UnsetAddressStreet()
 		case SetData2Default:
+			ud.UnsetAddressStreet()
+		}
+	}
+}
+
+func UpdateWithAddressStreet(p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetAddressStreet(p)
+		} else {
 			ud.UnsetAddressStreet()
 		}
 	}

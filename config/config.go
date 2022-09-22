@@ -34,7 +34,7 @@ var DefaultConfig = Config{
 	flagSet:    nil,
 	ConfigFile: DefaultConfigFile,
 	Version:    "v2",
-	FormatCode: true,
+	FormatCode: false,
 }
 
 type configBuilder struct {

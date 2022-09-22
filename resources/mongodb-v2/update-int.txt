@@ -44,5 +44,21 @@ func (ud *UpdateDocument) Inc{{ updateMethodSignature $p }} ({{ updateMethodVarP
     })
 	return ud
 }
+
+func UpdateWith{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} p {{$a.GetGoAttributeType}}) UpdateOption {
+    return func(ud *UpdateDocument) {
+	if p != 0 {
+       ud.Set{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "after" }} p)
+    } else {
+       ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+    }
+    }
+}
+
+func UpdateWith{{ updateMethodSignature $p }}Increment({{ updateMethodVarParams $p true "after" }} p {{$a.GetGoAttributeType}}) UpdateOption {
+    return func(ud *UpdateDocument) {
+       ud.Inc{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "after" }} p)
+    }
+}
 {{- end }}
 {{- end }}

@@ -96,6 +96,19 @@ func WithLegantiUnsetMode(m UnsetMode) UnsetOption {
 	}
 }
 
+type UpdateOption func(ud *UpdateDocument)
+type UpdateOptions []UpdateOption
+
+// GetUpdateDocument convenience method to create an update document from single updates instead of a whole object
+func (uopts UpdateOptions) GetUpdateDocument(opts ...UpdateOption) UpdateDocument {
+	ud := UpdateDocument{}
+	for _, o := range opts {
+		o(&ud)
+	}
+
+	return ud
+}
+
 // GetUpdateDocument
 // Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
 // the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
@@ -202,6 +215,16 @@ func (ud *UpdateDocument) setOrUnsetNdg(p string, um UnsetMode) {
 	}
 }
 
+func UpdateWithNdg(p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetNdg(p)
+		} else {
+			ud.UnsetNdg()
+		}
+	}
+}
+
 //----- codiceFiscale - string -  [codiceFiscale]
 
 // SetCodiceFiscale No Remarks
@@ -232,6 +255,16 @@ func (ud *UpdateDocument) setOrUnsetCodiceFiscale(p string, um UnsetMode) {
 		case UnsetData:
 			ud.UnsetCodiceFiscale()
 		case SetData2Default:
+			ud.UnsetCodiceFiscale()
+		}
+	}
+}
+
+func UpdateWithCodiceFiscale(p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetCodiceFiscale(p)
+		} else {
 			ud.UnsetCodiceFiscale()
 		}
 	}
@@ -272,6 +305,16 @@ func (ud *UpdateDocument) setOrUnsetPartitaIVA(p string, um UnsetMode) {
 	}
 }
 
+func UpdateWithPartitaIVA(p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetPartitaIVA(p)
+		} else {
+			ud.UnsetPartitaIVA()
+		}
+	}
+}
+
 //----- natura - string -  [natura]
 
 // SetNatura No Remarks
@@ -302,6 +345,16 @@ func (ud *UpdateDocument) setOrUnsetNatura(p string, um UnsetMode) {
 		case UnsetData:
 			ud.UnsetNatura()
 		case SetData2Default:
+			ud.UnsetNatura()
+		}
+	}
+}
+
+func UpdateWithNatura(p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetNatura(p)
+		} else {
 			ud.UnsetNatura()
 		}
 	}
@@ -342,6 +395,16 @@ func (ud *UpdateDocument) setOrUnsetStato(p string, um UnsetMode) {
 	}
 }
 
+func UpdateWithStato(p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetStato(p)
+		} else {
+			ud.UnsetStato()
+		}
+	}
+}
+
 // ----- indirizzi - map -  [indirizzi]
 // SetIndirizzi No Remarks
 func (ud *UpdateDocument) SetIndirizzi(p map[string]Indirizzo) *UpdateDocument {
@@ -374,6 +437,16 @@ func (ud *UpdateDocument) setOrUnsetIndirizzi(p map[string]Indirizzo, um UnsetMo
 		case UnsetData:
 			ud.UnsetIndirizzi()
 		case SetData2Default:
+			ud.UnsetIndirizzi()
+		}
+	}
+}
+
+func UpdateWithIndirizzi(p map[string]Indirizzo) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if len(p) > 0 {
+			ud.SetIndirizzi(p)
+		} else {
 			ud.UnsetIndirizzi()
 		}
 	}
@@ -448,6 +521,16 @@ func (ud *UpdateDocument) setOrUnsetIndirizziSIndirizzo(keyS string, p string, u
 	}
 }
 
+func UpdateWithIndirizziSIndirizzo(keyS string, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetIndirizziSIndirizzo(keyS, p)
+		} else {
+			ud.UnsetIndirizziSIndirizzo(keyS)
+		}
+	}
+}
+
 //----- cap - string -  [indirizzi.%s.cap]
 
 // SetIndirizziSCap No Remarks
@@ -478,6 +561,16 @@ func (ud *UpdateDocument) setOrUnsetIndirizziSCap(keyS string, p string, um Unse
 		case UnsetData:
 			ud.UnsetIndirizziSCap(keyS)
 		case SetData2Default:
+			ud.UnsetIndirizziSCap(keyS)
+		}
+	}
+}
+
+func UpdateWithIndirizziSCap(keyS string, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetIndirizziSCap(keyS, p)
+		} else {
 			ud.UnsetIndirizziSCap(keyS)
 		}
 	}
@@ -518,6 +611,16 @@ func (ud *UpdateDocument) setOrUnsetIndirizziSLocalita(keyS string, p string, um
 	}
 }
 
+func UpdateWithIndirizziSLocalita(keyS string, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetIndirizziSLocalita(keyS, p)
+		} else {
+			ud.UnsetIndirizziSLocalita(keyS)
+		}
+	}
+}
+
 //----- provincia - string -  [indirizzi.%s.provincia]
 
 // SetIndirizziSProvincia No Remarks
@@ -548,6 +651,16 @@ func (ud *UpdateDocument) setOrUnsetIndirizziSProvincia(keyS string, p string, u
 		case UnsetData:
 			ud.UnsetIndirizziSProvincia(keyS)
 		case SetData2Default:
+			ud.UnsetIndirizziSProvincia(keyS)
+		}
+	}
+}
+
+func UpdateWithIndirizziSProvincia(keyS string, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetIndirizziSProvincia(keyS, p)
+		} else {
 			ud.UnsetIndirizziSProvincia(keyS)
 		}
 	}
@@ -588,6 +701,16 @@ func (ud *UpdateDocument) setOrUnsetIndirizziSNazione(keyS string, p string, um 
 	}
 }
 
+func UpdateWithIndirizziSNazione(keyS string, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetIndirizziSNazione(keyS, p)
+		} else {
+			ud.UnsetIndirizziSNazione(keyS)
+		}
+	}
+}
+
 // ----- legati - array -  [legati]
 // SetLegati No Remarks
 func (ud *UpdateDocument) SetLegati(p []Legame) *UpdateDocument {
@@ -620,6 +743,16 @@ func (ud *UpdateDocument) setOrUnsetLegati(p []Legame, um UnsetMode) {
 		case UnsetData:
 			ud.UnsetLegati()
 		case SetData2Default:
+			ud.UnsetLegati()
+		}
+	}
+}
+
+func UpdateWithLegati(p []Legame) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if len(p) > 0 {
+			ud.SetLegati(p)
+		} else {
 			ud.UnsetLegati()
 		}
 	}
@@ -694,6 +827,16 @@ func (ud *UpdateDocument) setOrUnsetLegatiINdg(ndxI int, p string, um UnsetMode)
 	}
 }
 
+func UpdateWithLegatiINdg(ndxI int, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetLegatiINdg(ndxI, p)
+		} else {
+			ud.UnsetLegatiINdg(ndxI)
+		}
+	}
+}
+
 //----- cognome - string -  [legati.[].cognome legati.cognome]
 
 // SetLegatiICognome No Remarks
@@ -724,6 +867,16 @@ func (ud *UpdateDocument) setOrUnsetLegatiICognome(ndxI int, p string, um UnsetM
 		case UnsetData:
 			ud.UnsetLegatiICognome(ndxI)
 		case SetData2Default:
+			ud.UnsetLegatiICognome(ndxI)
+		}
+	}
+}
+
+func UpdateWithLegatiICognome(ndxI int, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetLegatiICognome(ndxI, p)
+		} else {
 			ud.UnsetLegatiICognome(ndxI)
 		}
 	}
@@ -764,6 +917,16 @@ func (ud *UpdateDocument) setOrUnsetLegatiINome(ndxI int, p string, um UnsetMode
 	}
 }
 
+func UpdateWithLegatiINome(ndxI int, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetLegatiINome(ndxI, p)
+		} else {
+			ud.UnsetLegatiINome(ndxI)
+		}
+	}
+}
+
 //----- codiceFiscale - string -  [legati.[].codiceFiscale legati.codiceFiscale]
 
 // SetLegatiICodiceFiscale No Remarks
@@ -794,6 +957,16 @@ func (ud *UpdateDocument) setOrUnsetLegatiICodiceFiscale(ndxI int, p string, um 
 		case UnsetData:
 			ud.UnsetLegatiICodiceFiscale(ndxI)
 		case SetData2Default:
+			ud.UnsetLegatiICodiceFiscale(ndxI)
+		}
+	}
+}
+
+func UpdateWithLegatiICodiceFiscale(ndxI int, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetLegatiICodiceFiscale(ndxI, p)
+		} else {
 			ud.UnsetLegatiICodiceFiscale(ndxI)
 		}
 	}
@@ -834,6 +1007,16 @@ func (ud *UpdateDocument) setOrUnsetLegatiIPartitaIVA(ndxI int, p string, um Uns
 	}
 }
 
+func UpdateWithLegatiIPartitaIVA(ndxI int, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetLegatiIPartitaIVA(ndxI, p)
+		} else {
+			ud.UnsetLegatiIPartitaIVA(ndxI)
+		}
+	}
+}
+
 //----- natura - string -  [legati.[].natura legati.natura]
 
 // SetLegatiINatura No Remarks
@@ -864,6 +1047,16 @@ func (ud *UpdateDocument) setOrUnsetLegatiINatura(ndxI int, p string, um UnsetMo
 		case UnsetData:
 			ud.UnsetLegatiINatura(ndxI)
 		case SetData2Default:
+			ud.UnsetLegatiINatura(ndxI)
+		}
+	}
+}
+
+func UpdateWithLegatiINatura(ndxI int, p string) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if p != "" {
+			ud.SetLegatiINatura(ndxI, p)
+		} else {
 			ud.UnsetLegatiINatura(ndxI)
 		}
 	}
@@ -901,6 +1094,16 @@ func (ud *UpdateDocument) setOrUnsetLeganti(p []Legame, um UnsetMode) {
 		case UnsetData:
 			ud.UnsetLeganti()
 		case SetData2Default:
+			ud.UnsetLeganti()
+		}
+	}
+}
+
+func UpdateWithLeganti(p []Legame) UpdateOption {
+	return func(ud *UpdateDocument) {
+		if len(p) > 0 {
+			ud.SetLeganti(p)
+		} else {
 			ud.UnsetLeganti()
 		}
 	}

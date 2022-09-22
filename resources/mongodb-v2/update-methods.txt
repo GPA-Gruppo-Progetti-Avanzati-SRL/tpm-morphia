@@ -56,6 +56,19 @@ func With{{$a.GetGoAttributeName}}UnsetMode(m UnsetMode) UnsetOption {
   }
 {{- end}}
 
+type UpdateOption func(ud *UpdateDocument)
+type UpdateOptions []UpdateOption
+
+// GetUpdateDocument convenience method to create an update document from single updates instead of a whole object
+func (uopts UpdateOptions) GetUpdateDocument(opts ...UpdateOption) UpdateDocument {
+	ud := UpdateDocument{}
+	for _, o := range opts {
+		o(&ud)
+	}
+
+	return ud
+}
+
 // GetUpdateDocument
 // Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
 // the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
@@ -184,6 +197,23 @@ func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p }}({{ updateMeth
 			ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
 		}
 	}
+}
+
+func UpdateWith{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} p {{$a.GetGoAttributeType}}) UpdateOption {
+    return func(ud *UpdateDocument) {
+{{ if or (eq $a.GetDefinition.Typ "array") (eq $a.GetDefinition.Typ "map") -}}
+	if len(p) > 0 {
+{{- else if $a.GetDefinition.IsStructType  }}
+	if !p.IsZero() {
+{{- else }}
+    // Warining.... should not get here
+    if p != "" {
+{{- end }}
+       ud.Set{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "after" }} p)
+    } else {
+       ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+    }
+    }
 }
 {{- end }}
 {{- end -}}

@@ -44,5 +44,15 @@ func (ud *UpdateDocument) Set{{ updateMethodSignature $p }}ToCurrentDate ({{ upd
     })
 	return ud
 }
+
+func UpdateWith{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} p {{$a.GetGoAttributeType}}) UpdateOption {
+    return func(ud *UpdateDocument) {
+	if p != 0 {
+       ud.Set{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "after" }} p)
+    } else {
+       ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+    }
+    }
+}
 {{- end }}
 {{ end }}
