@@ -6,9 +6,8 @@ import (
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/examples/example0"
 	"github.com/rs/zerolog/log"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -73,6 +72,7 @@ func insertARecord(ctx context.Context, aCollection *mongo.Collection, fn string
 	if err != nil {
 		return err
 	} else {
+		log.Info().Interface("_id", r.InsertedID.(primitive.ObjectID)).Msg("hello")
 		a.OId = r.InsertedID.(primitive.ObjectID)
 		if b, err := json.Marshal(a); err != nil {
 			return err

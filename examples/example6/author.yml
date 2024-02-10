@@ -1,0 +1,206 @@
+attributes:
+- name: oId
+  options: with-filter
+  tags:
+  - name: json
+    value: _id
+  - name: bson
+    value: _id
+  - name: yaml
+    value: _id
+  type: object-id
+- name: firstName
+  options: with-filter
+  tags:
+  - name: json
+    options: omitempty
+    value: firstName
+  - name: bson
+    options: omitempty
+    value: firstName
+  - name: yaml
+    options: omitempty
+    value: firstName
+  type: string
+- name: lastName
+  options: with-filter
+  tags:
+  - name: json
+    options: omitempty
+    value: lastName
+  - name: bson
+    options: omitempty
+    value: lastName
+  - name: yaml
+    options: omitempty
+    value: lastName
+  type: string
+- name: age
+  options: with-filter
+  tags:
+  - name: json
+    options: omitempty
+    value: age
+  - name: bson
+    options: omitempty
+    value: age
+  - name: yaml
+    options: omitempty
+    value: age
+  type: int
+- name: longAge
+  options: with-filter
+  tags:
+  - name: json
+    options: omitempty
+    value: longAge
+  - name: bson
+    options: omitempty
+    value: longAge
+  - name: yaml
+    options: omitempty
+    value: longAge
+  type: long
+- name: epoch
+  options: with-filter
+  tags:
+  - name: json
+    options: omitempty
+    value: epoch
+  - name: bson
+    options: omitempty
+    value: epoch
+  - name: yaml
+    options: omitempty
+    value: epoch
+  type: date
+- name: flag
+  options: with-filter
+  tags:
+  - name: json
+    options: omitempty
+    value: flag
+  - name: bson
+    options: omitempty
+    value: flag
+  - name: yaml
+    options: omitempty
+    value: flag
+  type: bool
+- name: postalAddress
+  struct-ref:
+    name: address
+  tags:
+  - name: json
+    options: omitempty
+    value: postalAddress
+  - name: bson
+    options: omitempty
+    value: postalAddress
+  - name: yaml
+    options: omitempty
+    value: postalAddress
+  type: struct
+- name: legalAddress
+  struct-ref:
+    name: address
+  tags:
+  - name: json
+    options: omitempty
+    value: legalAddress
+  - name: bson
+    options: omitempty
+    value: legalAddress
+  - name: yaml
+    options: omitempty
+    value: legalAddress
+  type: struct
+- name: aBook
+  struct-ref:
+    name: book
+  tags:
+  - name: json
+    options: omitempty
+    value: aBook
+  - name: bson
+    options: omitempty
+    value: aBook
+  - name: yaml
+    options: omitempty
+    value: aBook
+  type: struct
+- item:
+    name: '[]'
+    struct-ref:
+      name: book
+    type: struct
+  name: arrayOfBooks
+  tags:
+  - name: json
+    options: omitempty
+    value: arrayOfBooks
+  - name: bson
+    options: omitempty
+    value: arrayOfBooks
+  - name: yaml
+    options: omitempty
+    value: arrayOfBooks
+  type: array
+- item:
+    name: '%s'
+    struct-ref:
+      name: book
+    type: struct
+  name: mapOfBooks
+  tags:
+  - name: json
+    options: omitempty
+    value: mapOfBooks
+  - name: bson
+    options: omitempty
+    value: mapOfBooks
+  - name: yaml
+    options: omitempty
+    value: mapOfBooks
+  type: map
+- item:
+    item:
+      name: '[]'
+      struct-ref:
+        name: book
+      type: struct
+    name: '[]'
+    type: array
+  name: arrayOfArrayOfBooks
+  tags:
+  - name: json
+    options: omitempty
+    value: arrayOfArrayOfBooks
+  - name: bson
+    options: omitempty
+    value: arrayOfArrayOfBooks
+  - name: yaml
+    options: omitempty
+    value: arrayOfArrayOfBooks
+  type: array
+- item:
+    item:
+      name: '[]'
+      struct-ref:
+        name: book
+      type: struct
+    name: '%s'
+    type: array
+  name: mapOfArrayOfBooks
+  tags:
+  - name: json
+    options: omitempty
+    value: mapOfArrayOfBooks
+  - name: bson
+    options: omitempty
+    value: mapOfArrayOfBooks
+  - name: yaml
+    options: omitempty
+    value: mapOfArrayOfBooks
+  type: map
+name: Author

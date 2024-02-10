@@ -1,0 +1,9 @@
+module: github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia
+package: github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/examples/example7/entities
+imports:
+  - ./beans/schema.yml
+entities:
+  - document: true
+    file-name: ./author.yml
+
+

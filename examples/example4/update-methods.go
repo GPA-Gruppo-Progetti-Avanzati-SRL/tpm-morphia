@@ -100,7 +100,7 @@ type UpdateOption func(ud *UpdateDocument)
 type UpdateOptions []UpdateOption
 
 // GetUpdateDocument convenience method to create an update document from single updates instead of a whole object
-func (uopts UpdateOptions) GetUpdateDocument(opts ...UpdateOption) UpdateDocument {
+func GetUpdateDocumentFromOptions(opts ...UpdateOption) UpdateDocument {
 	ud := UpdateDocument{}
 	for _, o := range opts {
 		o(&ud)

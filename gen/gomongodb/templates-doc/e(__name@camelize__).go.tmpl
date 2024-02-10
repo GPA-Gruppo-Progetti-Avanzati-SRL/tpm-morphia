@@ -1,0 +1,21 @@
+package {{ .Model.PackageName }}
+
+{{range $pkg := .Model.PackageImports }}
+import "{{$pkg}}"
+{{- end}}
+
+// @tpm-schematics:start-region("top-file-section")
+// @tpm-schematics:end-region("top-file-section")
+
+type {{ classify .Model.Name}} struct {
+{{- range $a := .Model.Attributes}}
+{{ $a.GoName }} {{ $a.GoType }}  {{$a.GoTag}}
+{{- end}}
+}
+
+func (s {{classify .Model.Name}}) IsZero() bool {
+    return {{- range $i, $a := .Model.Attributes}} {{ if $i }} && {{- end}} {{ $a.GoIsZeroCondition }} {{- end}}
+}
+
+// @tpm-schematics:start-region("bottom-file-section")
+// @tpm-schematics:end-region("bottom-file-section")

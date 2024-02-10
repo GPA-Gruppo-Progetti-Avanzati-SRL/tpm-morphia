@@ -248,11 +248,11 @@ tpm-morphia -collection-def-scan-path ./model -out-dir ./model
 
 ---
 ### Schema definition
-For the syntax of the schema files please refer to [collection schema](./schema)
+For the syntax of the schema files please refer to [collection schema](./schemaold)
 
 ---
 ### Generation details
-For some details about the generated stuff please see [generation details](./gen/mongodb)
+For some details about the generated stuff please see [generation details](genold/mongodb)
 
 
 ---

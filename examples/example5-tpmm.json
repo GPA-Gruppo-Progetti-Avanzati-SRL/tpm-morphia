@@ -1,0 +1,14 @@
+{
+  "name": "session",
+  "properties": {
+    "folder-path": "./example5"
+  ,"struct-name": "Session"
+  }
+,"attributes": [
+  { "name": "sid", "type": "string", "tags": [ "json", "-", "bson", "_id" ], "queryable": true }
+,{ "name": "nickname"              , "type": "string", "queryable": true }
+,{ "name": "remoteaddr"            , "type": "string", "queryable": true }
+,{ "name": "flags"                 , "type": "string"  }
+]
+}
+

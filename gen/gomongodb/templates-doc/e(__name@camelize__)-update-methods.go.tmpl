@@ -1,0 +1,221 @@
+package {{ .Model.PackageName }}
+
+import (
+	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"time"
+{{range $pkg := .Model.PackageImports }}
+{{- if ne $pkg "go.mongodb.org/mongo-driver/bson" }}
+    "{{$pkg}}"
+{{- end}}
+{{- end}}
+)
+
+// @tpm-schematics:start-region("top-file-section")
+// @tpm-schematics:end-region("top-file-section")
+
+func UpdateMethodsGoInfo() string {
+	i := fmt.Sprintf("tpm_morphia query filter support generated for %s package on %s", "author", time.Now().String())
+	return i
+}
+
+type UnsetMode int64
+
+const (
+	UnSpecified     UnsetMode = 0
+	KeepCurrent               = 1
+	UnsetData                 = 2
+	SetData2Default           = 3
+)
+
+type UnsetOption func(uopt *UnsetOptions)
+
+type UnsetOptions struct {
+	DefaultMode UnsetMode
+	{{- range $a := .Model.Attributes}}
+	{{$a.GoName}} UnsetMode
+	{{- end}}
+}
+
+func (uo *UnsetOptions) ResolveUnsetMode(um UnsetMode) UnsetMode {
+	if um == UnSpecified {
+		um = uo.DefaultMode
+	}
+
+	return um
+}
+
+func WithDefaultUnsetMode(m UnsetMode) UnsetOption {
+	return func(uopt *UnsetOptions) {
+		uopt.DefaultMode = m
+	}
+}
+
+{{- range $a := .Model.Attributes}}
+func With{{$a.GoName}}UnsetMode(m UnsetMode) UnsetOption {
+  	return func(uopt *UnsetOptions) {
+  		uopt.{{$a.GoName}} = m
+  	}
+  }
+{{- end}}
+
+type UpdateOption func(ud *UpdateDocument)
+type UpdateOptions []UpdateOption
+
+// GetUpdateDocumentFromOptions convenience method to create an update document from single updates instead of a whole object
+func GetUpdateDocumentFromOptions(opts ...UpdateOption) UpdateDocument {
+	ud := UpdateDocument{}
+	for _, o := range opts {
+		o(&ud)
+	}
+
+	return ud
+}
+
+// GetUpdateDocument
+// Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
+// the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
+// the issue and delete an existing value without creating an empty struct.
+func GetUpdateDocument(obj *{{.Model.Name}}, opts ...UnsetOption) UpdateDocument {
+
+	uo := &UnsetOptions{ DefaultMode: KeepCurrent }
+	for _, o := range opts {
+		o(uo)
+	}
+
+  ud := UpdateDocument{}
+
+{{- range $a := .Model.Attributes}}
+{{- $f := $a.Definition }}
+{{- range $i, $p := $a.Paths  }}
+{{- if $a.HasOption "cust-upd-handling" }}
+/* Custom Update Handling Option: cust-upd-handling
+{{- end}}
+{{- if $f.IsCollectionType }}
+	ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+{{- end }}
+{{- if $f.IsStructType }}
+    ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+{{- end }}
+{{- if $f.IsValueType }}
+{{- if eq $f.Typ "string" }}
+   ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+{{- end }}
+{{- if eq $f.Typ "int" }}
+   ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+{{- end }}
+{{- if eq $f.Typ "long" }}
+   ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+{{- end }}
+{{- if eq $f.Typ "bool" }}
+   ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+{{- end }}
+{{- if eq $f.Typ "date" }}
+   ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+{{- end }}
+{{- if eq $f.Typ "document" }}
+    ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+{{- end }}
+{{- end }}
+{{- if $a.HasOption "cust-upd-handling" }}
+ */
+{{- end}}
+{{- end }}
+{{- end }}
+
+   return ud
+}
+
+{{- range $a := .Model.Attributes}}
+{{ $f := $a.Definition }}
+{{- if eq $f.Typ "string" }}
+{{ template "update-string" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.Definition.Typ "int" }}
+{{ template "update-int" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.Definition.Typ "long" }}
+{{ template "update-long" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.Definition.Typ "bool" }}
+{{ template "update-bool" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.Definition.Typ "date" }}
+{{ template "update-date" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.Definition.Typ "document" }}
+{{ template "update-document" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.Definition.Typ "object-id" }}
+{{ template "update-object-id" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.Definition.Typ "struct" }}
+{{ template "update-struct" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.Definition.Typ "array" }}
+{{ template "update-array" filterSubTemplateContext $a "*" }}
+{{- else if eq $a.Definition.Typ "map" }}
+{{ template "update-array" filterSubTemplateContext $a "*" }}
+{{- end }}
+{{- end }}
+
+// @tpm-schematics:start-region("bottom-file-section")
+// @tpm-schematics:end-region("bottom-file-section")
+
+{{- /*
+{{- range $a := .Collection.Attributes}}
+{{ $f := $a.GetDefinition }}
+{{- if ne $a.GetDefinition.Typ "string" }}
+
+{{ $f := $a.GetDefinition }}
+//----- {{$f}} {{$f.Paths}}
+
+{{- range $i, $p := $a.GetPaths "preferIndexed" }}
+/
+//----- {{$a.GetDefinition.Typ}}\n
+
+
+
+
+{{- end }}
+{{- end -}}
+
+{{- if or (eq $a.GetDefinition.Typ "array") (eq $a.GetDefinition.Typ "map") -}}
+{{ $f := $a.Item.GetDefinition }}
+//----- {{$f}} {{$f.Paths}}
+
+{{- range $i, $p := $a.Item.GetPaths "preferIndexed"}}
+// Set{{ updateMethodSignature $p }} No Remarks
+func (ud *UpdateDocument) Set{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "after" }} p {{$a.Item.GetGoAttributeType}}) *UpdateDocument {
+	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "index" "indexIjk"}} {{ updateMethodVarParams $p false "before" }})
+	ud.Set().Add(func() bson.E {
+    		return bson.E{ Key: mName, Value: p}
+    })
+	return ud
+}
+
+// Unset{{ updateMethodSignature $p }} No Remarks
+func (ud *UpdateDocument) Unset{{ updateMethodSignature $p }} ({{ updateMethodVarParams $p true "none" }}) *UpdateDocument {
+	mName := fmt.Sprintf({{ formatIdentifier $p "_" "upperCase" "index" "indexIjk"}} {{ updateMethodVarParams $p false "before" }})
+	ud.Unset().Add(func() bson.E {
+    		return bson.E{ Key: mName, Value: ""}
+    })
+	return ud
+}
+
+// setOrUnset{{ updateMethodSignature $p }} No Remarks
+func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p true "after" }} p {{$a.Item.GetGoAttributeType}}, um UnsetMode) {
+{{- if $a.Item.GetDefinition.IsStructType  }}
+	if !p.IsZero() {
+{{- else }}
+    // Warining.... should not get here
+    if p != "" {
+{{- end }}
+		ud.Set{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "after" }} p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }} )
+		case SetData2Default:
+			ud.Unset{{ updateMethodSignature $p }}({{ updateMethodVarParams $p false "none" }})
+		}
+	}
+}
+{{- end }}
+{{- end }}
+
+{{- end }}
+*/ -}}

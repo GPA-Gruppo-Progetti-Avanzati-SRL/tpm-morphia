@@ -1,0 +1,19 @@
+package {{ .Model.PackageName }}
+
+// This file contains the paths to the field in the generated entity.
+// A path is a string with all the identifiers from the root document to the single leaves.
+// In case of maps and arrays place holder for the key (%s) or the index %d have been provided.
+
+// @tpm-schematics:start-region("top-file-section")
+// @tpm-schematics:end-region("top-file-section")
+
+const(
+{{- range $a := .Model.AttributesTree}}
+{{- range $i, $p := $a.Paths}}
+{{ formatIdentifier $p.Path "_" "classify" "index" "indexIjk"}}FieldName = "{{ formatIdentifier $p.BsonPath "." "none" "index" "indexSprintf" }}"
+{{- end }}
+{{- end }}
+)
+
+// @tpm-schematics:start-region("bottom-file-section")
+// @tpm-schematics:end-region("bottom-file-section")

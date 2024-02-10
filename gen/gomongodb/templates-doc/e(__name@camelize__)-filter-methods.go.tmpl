@@ -1,0 +1,46 @@
+package {{ .Model.PackageName }}
+
+import (
+	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"time"
+{{range $pkg := .Model.PackageImports }}
+{{- if ne $pkg "go.mongodb.org/mongo-driver/bson" }}
+    "{{$pkg}}"
+{{- end}}
+{{- end}}
+)
+
+// @tpm-schematics:start-region("top-file-section")
+// @tpm-schematics:end-region("top-file-section")
+
+func FilterMethodsGoInfo() string {
+	i := fmt.Sprintf("tpm_morphia query filter support generated for %s package on %s", "author", time.Now().String())
+	return i
+}
+
+{{- range $a := .Model.AttributesTree}}
+{{- if $a.Definition.HasOption "with-filter" }}
+{{- if eq $a.Definition.Typ "string" }}
+{{ template "filter-string" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- if eq $a.Definition.Typ "int" }}
+{{ template "filter-int" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- if eq $a.Definition.Typ "date" }}
+{{ template "filter-date" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- if eq $a.Definition.Typ "object-id" }}
+{{ template "filter-object-id" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- if eq $a.Definition.Typ "long" }}
+{{ template "filter-long" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- if eq $a.Definition.Typ "bool" }}
+{{ template "filter-bool" filterSubTemplateContext $a "*" }}
+{{- end -}}
+{{- end -}}
+{{- end }}
+
+// @tpm-schematics:start-region("bottom-file-section")
+// @tpm-schematics:end-region("bottom-file-section")

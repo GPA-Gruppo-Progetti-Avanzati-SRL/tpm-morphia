@@ -3,14 +3,19 @@ package examples_test
 import (
 	"bytes"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/config"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/gen/mongodb"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/genold/mongodb"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schemaold"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func TestExamples(t *testing.T) {
+
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	genCfg := config.DefaultConfig
 	genCfg.TargetDirectory = "."
@@ -26,7 +31,7 @@ func TestExamples(t *testing.T) {
 		require.NoError(t, err)
 
 		r := bytes.NewReader([]byte(schemaFile))
-		schema, err := schema.ReadCollectionDefinition(r)
+		schema, err := schemaold.ReadCollectionDefinition(r)
 		require.NoError(t, err)
 
 		genDriver, err := mongodb.NewCodeGenCollection(schema)

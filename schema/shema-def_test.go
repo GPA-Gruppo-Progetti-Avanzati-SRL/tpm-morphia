@@ -1,71 +1,99 @@
-package schema
+package schema_test
 
 import (
+	"fmt"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"github.com/stretchr/testify/require"
+	"io/fs"
 	"os"
+	"path/filepath"
+	"sigs.k8s.io/yaml"
+	"strings"
 	"testing"
 )
 
-var example = `{
-   "name": "author",
-   "properties": {
-       "folder-path": "./author"
-      ,"prefix": "author"
-      ,"struct-name": "Author"
-      ,"morphia-pkg": "../morphia"
-   },
-   "attributes": [
-       { "name": "firstName", "type": "string", "tags": [ "json", "fn", "bson", "fn" ], "queryable": true }
-      ,{ "name": "lastName", "type": "string", "tags": [ "json", "ln", "bson", "ln" ], "queryable": true }
-      ,{ "name": "age", "type": "int" }
-      ,{ "name": "lastUpdate", "type": "date" }
-      ,{ "name": "address",  "type": "struct", "tags": [ "json", "addr", "bson", "addr" ]
-         ,"struct-name": "Address"
-         ,"attributes": [
-            { "name": "city", "type": "string", "options": "o1,o2" }
-           ,{ "name": "strt", "type": "string" }
-         ]
-      }
-      ,{ "name": "amazon",  "type": "ref-struct", "tags": [ "json", "amazon", "bson", "amz" ], "struct-ref": { "struct-name": "Address", "is-external": true, "package": "zucca/pkg" }}
-      ,{ 
-        "name": "books", "type": "array",
-        "item": {
-           "type": "struct"
-          ,"struct-name": "Book"
-          ,"attributes": [
-               { "name": "title", "type": "string" }
-              ,{ "name": "isbn", "type": "string" }
-              ,{ "name": "posts", "type": "array", "item": { "type": "string" }}
-           ]
-        }
-      }
-      ,{ 
-        "name": "props", "type": "map",
-        "item": {
-           "type": "struct"
-          ,"struct-name": "Property"
-          ,"attributes": [
-               { "name": "ptitle", "type": "string" }
-              ,{ "name": "pisbn", "type": "string" } 
-           ]
-        }
-      } 
-   ] 
-}`
+var ex6BasePath = "../examples/example6"
+var ex7BasePath = "../examples/example7"
 
-var tests_datatypes = "../tests/datatypes-tpmm.json"
-var tests_cliente = "../tests/cliente-tpmm.json"
+type fmtVisitor struct {
+}
 
-func TestParse(t *testing.T) {
+func (v *fmtVisitor) startVisit(f *schema.Field) {
+	const semLogContext = "fmt-visitor::start-visit"
+	log.Info().Str("field-name", f.Name).Msg(semLogContext)
+}
 
-	f, err := os.Open(tests_cliente)
-	if err != nil {
-		t.Fatal(err)
+func (v *fmtVisitor) visit(f *schema.Field) {
+	const semLogContext = "fmt-visitor::visit"
+	log.Info().Str("field-name", f.Name).Msg(semLogContext)
+}
+
+func (v *fmtVisitor) endVisit(f *schema.Field) {
+	const semLogContext = "fmt-visitor::end-visit"
+	log.Info().Str("field-name", f.Name).Msg(semLogContext)
+}
+
+func TestReadSchema(t *testing.T) {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	b, err := os.ReadFile(filepath.Join(ex6BasePath, "schema.json"))
+	require.NoError(t, err)
+
+	sch, err := schema.ReadSchemaDefinition(schema.JSONFormat, b, schema.IncludeResolver(schema.NewPathResolver(ex6BasePath)))
+	require.NoError(t, err)
+
+	yamlSchema, err := yaml.Marshal(sch)
+	require.NoError(t, err)
+
+	fmt.Println(string(yamlSchema))
+	pv := schema.PathFinderVisitor{}
+	sch.VisitStruct("author", &pv)
+	for _, a := range pv.Attributes {
+		t.Log(a.Name, a.Paths)
 	}
-	defer f.Close()
+}
 
-	_, e := ReadCollectionDefinition(f)
-	if e != nil {
-		t.Error(e)
+func TestConvertSchema(t *testing.T) {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	b, err := os.ReadFile(filepath.Join(ex6BasePath, "schema.json"))
+	require.NoError(t, err)
+
+	sch, err := schema.ReadSchemaDefinition(schema.JSONFormat, b, schema.IncludeResolver(schema.NewPathResolver(ex6BasePath)))
+	require.NoError(t, err)
+
+	for i := range sch.EntityRefs {
+		sch.EntityRefs[i].Filename = strings.TrimSuffix(sch.EntityRefs[i].Filename, ".json") + ".yml"
 	}
+	yamlSchema, err := yaml.Marshal(sch)
+	require.NoError(t, err)
 
+	yamlFile := filepath.Join(ex6BasePath, "schema.yml")
+	err = os.WriteFile(yamlFile, yamlSchema, fs.ModePerm)
+	require.NoError(t, err)
+
+	for _, s := range sch.Structs {
+		yamlStruct, err := yaml.Marshal(s)
+		require.NoError(t, err)
+
+		yamlFile = filepath.Join(ex6BasePath, s.LoadedFrom)
+		yamlFile = strings.TrimSuffix(yamlFile, ".json") + ".yml"
+		err = os.WriteFile(yamlFile, yamlStruct, fs.ModePerm)
+		require.NoError(t, err)
+
+		t.Logf("structure %s loaded from %s", s.Name, s.LoadedFrom)
+	}
+}
+
+func TestReadSchemaWithImports(t *testing.T) {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	b, err := os.ReadFile(filepath.Join(ex7BasePath, "schema.yml"))
+	require.NoError(t, err)
+
+	sch, err := schema.ReadSchemaDefinition(schema.YAMLFormat, b, schema.IncludeResolver(schema.NewPathResolver(ex7BasePath)))
+	require.NoError(t, err)
+
+	for _, a := range sch.Structs {
+		t.Log(a.Name, a.LoadedFrom)
+	}
 }

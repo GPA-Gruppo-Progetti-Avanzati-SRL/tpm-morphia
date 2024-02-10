@@ -1,51 +1,62 @@
 ### Schema
 
-Below is reported a slightly more elaborate sample than the one presented in the top readme. 
-This example collection is used in the example2 package under [examples](../examples) 
-With the help of this example the table below should be easier to interpret.
 
 ```json
 {
-  "name": "author",
-  "properties": {
-    "folder-path": "./example1",
-    "struct-name": "Author"
-  },
-  "attributes": [
-    { "name": "oId", "type": "object-id", "tags": [ "json", "-",  "bson", "_id" ], "queryable": true },
-    { "name": "firstName", "type": "string", "tags": [ "json", "fn", "bson", "fn" ], "queryable": true },
-    { "name": "lastName", "type": "string", "tags": [ "json", "ln", "bson", "ln" ], "queryable": true },
-    { "name": "age", "type": "int", "queryable": true },
+  "folder-path": "./example1",
+  "package": "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/system/util",
+  "structs": [
     {
-      "name": "address", "type": "struct", 
-      "tags": [ "json", "addr", "bson", "addr"  ], 
-      "struct-name": "Address",
+      "name": "Author",
+      "is-document": true,
       "attributes": [
-        { "name": "city", "type": "string", "queryable": true },
-        { "name": "strt", "type": "string", "queryable": true }
+        {
+          "name": "oId",
+          "type": "object-id",
+          "tags": [
+            {
+              "name": "json",
+              "value": "_id"
+            }
+          ],
+          "queryable": true
+        },
+        {
+          "name": "firstName",
+          "type": "string",
+          "tags": [
+            "json",
+            "fn",
+            "bson",
+            "fn"
+          ],
+          "queryable": true
+        },
+        {
+          "name": "lastName",
+          "type": "string",
+          "tags": [
+            "json",
+            "ln",
+            "bson",
+            "ln"
+          ],
+          "queryable": true
+        },
+        {
+          "name": "books",
+          "type": "array",
+          "item": {
+            "type": "struct",
+            "ref-struct": {
+              "name": "book"
+            }
+          }
+        }
       ]
     },
-    { "name": "shipAddress", "type": "ref-struct", "struct-ref": { "struct-name": "Address" }, "tags": ["json", "shipaddr", "bson", "shipaddr" ], "queryable": true },
-    { "name": "books", "type": "array", 
-      "item": { "type": "struct", "struct-name": "Book", "attributes": [
-          { "name": "title", "type": "string", "queryable": true },
-          { "name": "isbn",  "type": "string", "queryable": true },
-          { "name": "coAuthors", "type": "array", "item": { "type": "string" }, "queryable": true }
-      ]}
-    },
     {
-      "name": "businessRels", "type": "map",
-      "item": { "type": "struct", "struct-name": "BusinessRel", "attributes": [
-          { "name": "publisherId", "type": "string", "queryable": true },
-          { "name": "publisherName", "type": "string", "queryable": true },
-          { "name": "contracts", "type": "map", 
-              "item": {"type": "struct", "struct-name": "Contract", "attributes": [
-                { "name": "contractId", "type": "string", "queryable": true },
-                { "name": "contractDescr", "type": "string", "queryable": true }
-              ]}
-          }
-        ]
-      }
+      "include": "./book-tpmn.json"
     }
   ]
 }

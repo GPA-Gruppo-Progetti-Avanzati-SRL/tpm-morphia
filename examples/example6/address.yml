@@ -1,0 +1,27 @@
+attributes:
+- name: city
+  options: with-filter
+  tags:
+  - name: json
+    options: omitempty
+    value: city
+  - name: bson
+    options: omitempty
+    value: city
+  - name: yaml
+    options: omitempty
+    value: city
+  type: string
+- name: street
+  tags:
+  - name: json
+    options: omitempty
+    value: street
+  - name: bson
+    options: omitempty
+    value: street
+  - name: yaml
+    options: omitempty
+    value: street
+  type: string
+name: Address

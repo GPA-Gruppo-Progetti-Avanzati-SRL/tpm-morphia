@@ -1,0 +1,39 @@
+{{ define "filter-object-id" }}
+/*
+ * filter-object-id template: {{.Attr.Definition.Name}}
+ */
+{{- $a := .Attr }}
+{{ $f := $a.Definition }}
+{{- range $i, $p := $a.Paths}}
+{{- if not (isIdentifierIndexed $p.Path) }}
+// And{{ criteriaMethodSignature $p.Path }}EqTo No Remarks
+func (ca *Criteria) And{{ criteriaMethodSignature $p.Path }}EqTo ({{ criteriaMethodVarParams $p.Path true "after" }} oId primitive.ObjectID) *Criteria {
+
+	if oId == primitive.NilObjectID {
+   		return ca
+   	}
+
+	mName := fmt.Sprintf({{ formatIdentifier $p.Path "_" "classify" "suppress" "indexIjk"}}FieldName {{ criteriaMethodVarParams $p.Path false "before" }})
+	c := func() bson.E { return bson.E { Key: mName, Value: oId } }
+	*ca = append(*ca, c)
+    return ca
+}
+
+func (ca *Criteria) And{{ criteriaMethodSignature $p.Path }}In ({{ criteriaMethodVarParams $p.Path true "after" }} p []primitive.ObjectID) *Criteria {
+
+    if len(p) == 0 {
+        return ca
+    }
+
+	mName := fmt.Sprintf({{ formatIdentifier $p.Path "_" "classify" "suppress" "indexIjk"}}FieldName {{ criteriaMethodVarParams $p.Path false "before" }})
+	c := func() bson.E { return bson.E { Key: mName, Value: bson.D { {"$in", p} } } }
+	*ca = append(*ca, c)
+    return ca
+}
+
+// @tpm-schematics:start-region("{{ formatIdentifier $p.Path "_" "dasherize" "suppress" "indexIjk"}}-field-filter-section")
+// @tpm-schematics:end-region("{{ formatIdentifier $p.Path "_" "dasherize" "suppress" "indexIjk"}}-field-filter-section")
+
+{{ end }}
+{{- end }}
+{{- end }}

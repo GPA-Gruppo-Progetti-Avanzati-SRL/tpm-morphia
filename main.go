@@ -8,8 +8,9 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/config"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/gen/mongodb"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/genold/mongodb"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schemaold"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"io/ioutil"
@@ -29,6 +30,8 @@ func main() {
 	fmt.Println(string(appLogo))
 	fmt.Printf("Version: %s\n", version)
 
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
 	cfg, err := config.NewBuilder().Build(context.Background())
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -47,7 +50,7 @@ func main() {
 			return
 		} else {
 			r := bytes.NewReader(schemaFile)
-			cDef, err := schema.ReadCollectionDefinition(r)
+			cDef, err := schemaold.ReadCollectionDefinition(r)
 			if err != nil {
 				log.Error().Err(err).Send()
 				return

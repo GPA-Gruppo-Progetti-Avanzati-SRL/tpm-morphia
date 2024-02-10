@@ -1,0 +1,44 @@
+{{ define "update-object-id" }}
+//----- the {{.Attr.Definition}} {{.Attr.Definition.Paths}}
+{{ $a := .Attr }}
+{{ $f := $a.Definition }}
+
+{{- range $i, $p := $a.Paths }}
+// Set{{ updateMethodSignature $p.Path }} No Remarks
+func (ud *UpdateDocument) Set{{ updateMethodSignature $p.Path }} ({{ updateMethodVarParams $p.Path true "after" }} p {{$a.GoType}}) *UpdateDocument {
+	mName := fmt.Sprintf({{ formatIdentifier $p.Path "_" "classify" "index" "indexIjk"}}FieldName {{ updateMethodVarParams $p.Path false "before" }})
+	ud.Set().Add(func() bson.E {
+    		return bson.E{ Key: mName, Value: p}
+    })
+	return ud
+}
+
+// Unset{{ updateMethodSignature $p.Path }} No Remarks
+func (ud *UpdateDocument) Unset{{ updateMethodSignature $p.Path }} ({{ updateMethodVarParams $p.Path true "none" }}) *UpdateDocument {
+	mName := fmt.Sprintf({{ formatIdentifier $p.Path "_" "classify" "index" "indexIjk"}}FieldName {{ updateMethodVarParams $p.Path false "before" }})
+	ud.Unset().Add(func() bson.E {
+    		return bson.E{ Key: mName, Value: ""}
+    })
+	return ud
+}
+
+// setOrUnset{{ updateMethodSignature $p.Path }} No Remarks
+func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} p {{$a.GoType}}, um UnsetMode) {
+	if !p.IsZero() {
+		ud.Set{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path false "after" }} p)
+	} else {
+		switch um {
+		case KeepCurrent:
+		case UnsetData:
+			ud.Unset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path false "none" }})
+		case SetData2Default:
+			ud.Unset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path false "none" }})
+		}
+	}
+}
+
+// @tpm-schematics:start-region("{{ formatIdentifier $p.Path "_" "dasherize" "suppress" "indexIjk"}}-field-update-section")
+// @tpm-schematics:end-region("{{ formatIdentifier $p.Path "_" "dasherize" "suppress" "indexIjk"}}-field-update-section")
+
+{{- end }}
+{{- end }}

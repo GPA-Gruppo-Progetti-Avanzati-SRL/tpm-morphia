@@ -1,0 +1,27 @@
+{{ define "filter-date" }}
+/*
+ * filter-date template: {{.Attr.Definition.Name}}
+ */
+{{- $a := .Attr }}
+{{ $f := $a.Definition }}
+{{- range $i, $p := $a.Paths}}
+{{- if not (isIdentifierIndexed $p.Path) }}
+// And{{ criteriaMethodSignature $p.Path }}EqTo No Remarks
+func (ca *Criteria) And{{ criteriaMethodSignature $p.Path }}EqTo ({{ criteriaMethodVarParams $p.Path true "after" }} dt primitive.DateTime) *Criteria {
+
+	if dt == 0 {
+   		return ca
+   	}
+
+	mName := fmt.Sprintf({{ formatIdentifier $p.Path "_" "classify" "suppress" "indexIjk"}}FieldName {{ criteriaMethodVarParams $p.Path false "before" }})
+	c := func() bson.E { return bson.E { Key: mName, Value: dt }}
+	*ca = append(*ca, c)
+    return ca
+}
+
+// @tpm-schematics:start-region("{{ formatIdentifier $p.Path "_" "dasherize" "suppress" "indexIjk"}}-field-filter-section")
+// @tpm-schematics:end-region("{{ formatIdentifier $p.Path "_" "dasherize" "suppress" "indexIjk"}}-field-filter-section")
+
+{{ end }}
+{{- end }}
+{{- end }}

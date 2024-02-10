@@ -1,0 +1,70 @@
+attributes:
+- name: oId
+  options: with-filter
+  tags:
+  - name: json
+    value: _id
+  - name: bson
+    value: _id
+  - name: yaml
+    value: _id
+  type: object-id
+- name: firstName
+  options: with-filter
+  type: string
+- name: lastName
+  options: with-filter
+  type: string
+- name: age
+  options: with-filter
+  type: int
+- name: longAge
+  options: with-filter
+  type: long
+- name: epoch
+  options: with-filter
+  type: date
+- name: flag
+  options: with-filter
+  type: bool
+- name: postalAddress
+  struct-ref:
+    name: address
+  type: struct
+- name: legalAddress
+  struct-ref:
+    name: address
+  type: struct
+- name: aBook
+  struct-ref:
+    name: book
+  type: struct
+- item:
+    struct-ref:
+      name: book
+    type: struct
+  name: arrayOfBooks
+  type: array
+- item:
+    struct-ref:
+      name: book
+    type: struct
+  name: mapOfBooks
+  type: map
+- item:
+    item:
+      struct-ref:
+        name: book
+      type: struct
+    type: array
+  name: arrayOfArrayOfBooks
+  type: array
+- item:
+    item:
+      struct-ref:
+        name: book
+      type: struct
+    type: array
+  name: mapOfArrayOfBooks
+  type: map
+name: Author
