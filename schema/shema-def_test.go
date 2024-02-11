@@ -15,7 +15,7 @@ import (
 )
 
 var ex6BasePath = "../examples/example6"
-var ex7BasePath = "../examples/example7"
+var ex7BasePath = "../examples/example7/schema"
 
 type fmtVisitor struct {
 }
@@ -40,7 +40,7 @@ func TestReadSchema(t *testing.T) {
 	b, err := os.ReadFile(filepath.Join(ex6BasePath, "schema.json"))
 	require.NoError(t, err)
 
-	sch, err := schema.ReadSchemaDefinition(schema.JSONFormat, b, schema.IncludeResolver(schema.NewPathResolver(ex6BasePath)))
+	sch, err := schema.ReadSchemaDefinitionFromBuffer(schema.JSONFormat, b, schema.IncludeResolver(schema.NewPathResolver(ex6BasePath)))
 	require.NoError(t, err)
 
 	yamlSchema, err := yaml.Marshal(sch)
@@ -59,7 +59,7 @@ func TestConvertSchema(t *testing.T) {
 	b, err := os.ReadFile(filepath.Join(ex6BasePath, "schema.json"))
 	require.NoError(t, err)
 
-	sch, err := schema.ReadSchemaDefinition(schema.JSONFormat, b, schema.IncludeResolver(schema.NewPathResolver(ex6BasePath)))
+	sch, err := schema.ReadSchemaDefinitionFromBuffer(schema.JSONFormat, b, schema.IncludeResolver(schema.NewPathResolver(ex6BasePath)))
 	require.NoError(t, err)
 
 	for i := range sch.EntityRefs {
@@ -90,7 +90,7 @@ func TestReadSchemaWithImports(t *testing.T) {
 	b, err := os.ReadFile(filepath.Join(ex7BasePath, "schema.yml"))
 	require.NoError(t, err)
 
-	sch, err := schema.ReadSchemaDefinition(schema.YAMLFormat, b, schema.IncludeResolver(schema.NewPathResolver(ex7BasePath)))
+	sch, err := schema.ReadSchemaDefinitionFromBuffer(schema.YAMLFormat, b, schema.IncludeResolver(schema.NewPathResolver(ex7BasePath)))
 	require.NoError(t, err)
 
 	for _, a := range sch.Structs {

@@ -12,7 +12,7 @@ import (
 )
 
 var ex6BasePath = "../../examples/example6"
-var ex7BasePath = "../../examples/example7"
+var ex7BasePath = "../../examples/example7/schema"
 
 func TestGenerate(t *testing.T) {
 	const FormatCode = true
@@ -21,7 +21,7 @@ func TestGenerate(t *testing.T) {
 	b, err := os.ReadFile(filepath.Join(ex7BasePath, schemaFileName))
 	require.NoError(t, err)
 
-	sch, err := schema.ReadSchemaDefinition(schema.FormatOfFile(schemaFileName), b, schema.IncludeResolver(schema.NewPathResolver(ex7BasePath)))
+	sch, err := schema.ReadSchemaDefinitionFromBuffer(schema.FormatOfFile(schemaFileName), b, schema.IncludeResolver(schema.NewPathResolver(ex7BasePath)))
 	if err != nil {
 		t.Error(err)
 	}
@@ -34,7 +34,7 @@ func TestGenerate(t *testing.T) {
 		Version:      "tpm-morphia@v0.0.0",
 		FormatCode:   FormatCode,
 	}
-	err = gomongodb.Generate(&cfg)
+	err = gomongodb.GenerateEntity(&cfg)
 	require.NoError(t, err)
 
 	cfg = gomongodb.GeneratorConfig{
@@ -44,7 +44,7 @@ func TestGenerate(t *testing.T) {
 		Version:      "tpm-morphia@v0.0.0",
 		FormatCode:   FormatCode,
 	}
-	err = gomongodb.Generate(&cfg)
+	err = gomongodb.GenerateEntity(&cfg)
 	require.NoError(t, err)
 
 	cfg = gomongodb.GeneratorConfig{
@@ -54,7 +54,7 @@ func TestGenerate(t *testing.T) {
 		Version:      "tpm-morphia@v0.0.0",
 		FormatCode:   FormatCode,
 	}
-	err = gomongodb.Generate(&cfg)
+	err = gomongodb.GenerateEntity(&cfg)
 	require.NoError(t, err)
 
 }

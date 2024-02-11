@@ -1,0 +1,8 @@
+module: github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia
+package: github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/examples/example7/entities/beans
+entities:
+  - file-name: ./book.yml
+    package: github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/examples/example7/entities/beans/book
+  - file-name: ./address.yml
+
+

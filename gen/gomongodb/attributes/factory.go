@@ -2,7 +2,6 @@ package attributes
 
 import (
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schemaold"
 	"strings"
 )
 
@@ -10,11 +9,11 @@ func NewAttribute(structDef *schema.StructDef, attrDefinition *schema.Field, rec
 
 	var a GoAttribute
 	switch attrDefinition.Typ {
-	case schemaold.AttributeTypeStruct:
+	case schema.AttributeTypeStruct:
 		a = NewStructAttribute(structDef, attrDefinition, recurse)
-	case schemaold.AttributeTypeArray:
+	case schema.AttributeTypeArray:
 		a = NewArrayAttribute(structDef, attrDefinition, recurse)
-	case schemaold.AttributeTypeMap:
+	case schema.AttributeTypeMap:
 		a = NewMapAttribute(structDef, attrDefinition, recurse)
 	default:
 		a = NewValueTypeAttribute(structDef, attrDefinition)
@@ -28,15 +27,15 @@ func NewValueTypeAttribute(parentStruct *schema.StructDef, attrDefinition *schem
 	v.AttrDefinition = attrDefinition
 
 	switch strings.ToLower(attrDefinition.Typ) {
-	case schemaold.AttributeTypeDate:
+	case schema.AttributeTypeDate:
 		v.Imports = make([]string, 0, 1)
 		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/bson/primitive")
 
-	case schemaold.AttributeTypeObjectId:
+	case schema.AttributeTypeObjectId:
 		v.Imports = make([]string, 0, 1)
 		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/bson/primitive")
 
-	case schemaold.AttributeTypeDocument:
+	case schema.AttributeTypeDocument:
 		v.Imports = make([]string, 0, 1)
 		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/bson")
 	}

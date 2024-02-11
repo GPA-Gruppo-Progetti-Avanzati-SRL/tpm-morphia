@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"os"
 	"path/filepath"
 	yaml "sigs.k8s.io/yaml/goyaml.v3"
 )
@@ -32,8 +33,25 @@ func FormatOfFile(fn string) Format {
 	return f
 }
 
-func ReadSchemaDefinition(f Format, def []byte, includeResolver IncludeResolver) (*Schema, error) {
-	const semLogContext = "tpm-morphia::read-schema-def"
+func ReadSchemaDefinitionFromFile(fn string) (*Schema, error) {
+	const semLogContext = "tpm-morphia::read-schema-def-from-file"
+	b, err := os.ReadFile(fn)
+	if err != nil {
+		log.Error().Err(err).Msg(semLogContext)
+		return nil, err
+	}
+
+	sch, err := ReadSchemaDefinitionFromBuffer(FormatOfFile(fn), b, IncludeResolver(NewPathResolver(filepath.Dir(fn))))
+	if err != nil {
+		log.Error().Err(err).Msg(semLogContext)
+		return nil, err
+	}
+
+	return sch, nil
+}
+
+func ReadSchemaDefinitionFromBuffer(f Format, def []byte, includeResolver IncludeResolver) (*Schema, error) {
+	const semLogContext = "tpm-morphia::read-schema-def-from-buffer"
 	var err error
 
 	log.Debug().Msg(semLogContext)

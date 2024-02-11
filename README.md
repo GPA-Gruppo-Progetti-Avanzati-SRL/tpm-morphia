@@ -1,5 +1,8 @@
 ## TPM-Morphia
 
+> **NOTE:** This documentation is outdated. tpm-morphia underwent a significant restructuring in the format of the inputs (the way you specify the definitions of various structures)
+> and in the way it does it. This docs will be updated in the near future to describe the new layout.
+
 tpm-morphia is simple stuff. It is simple in the name and in substance. 
 It's a generation tool to support easier coding in golang with mongo.
 The following notes try to clarify the way it works and the rationale. May be out there you can find tons of code that pretty much overlap.

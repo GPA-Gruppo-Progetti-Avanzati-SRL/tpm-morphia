@@ -14,11 +14,12 @@ import (
 )
 
 type GeneratorConfig struct {
-	Schema       *schema.Schema
-	TargetFolder string
-	EntityName   string
-	Version      string
-	FormatCode   bool
+	Schema               *schema.Schema
+	TargetFolder         string
+	EntityName           string
+	Version              string
+	ConflictModeHandling string
+	FormatCode           bool
 }
 
 //go:embed templates-pogs/*
@@ -27,8 +28,23 @@ var templatesPogs embed.FS
 //go:embed templates-doc/*
 var templatesDoc embed.FS
 
-func Generate(cfg *GeneratorConfig) error {
-	const semLogContext = "go-mongo-db::generate"
+func GenerateAllEntities(cfg *GeneratorConfig) error {
+	const semLogContext = "go-mongo-db::generate-all-entities"
+
+	for _, s := range cfg.Schema.Structs {
+		cfg.EntityName = s.Name
+		err := GenerateEntity(cfg)
+		if err != nil {
+			log.Error().Err(err).Msg(semLogContext)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func GenerateEntity(cfg *GeneratorConfig) error {
+	const semLogContext = "go-mongo-db::generate-entity"
 
 	var err error
 

@@ -1,0 +1,42 @@
+attributes:
+- name: title
+  options: with-filter
+  tags:
+  - name: json
+    options: omitempty
+    value: title
+  - name: bson
+    options: omitempty
+    value: title
+  - name: yaml
+    options: omitempty
+    value: title
+  type: string
+- name: isbn
+  tags:
+  - name: json
+    options: omitempty
+    value: isbn
+  - name: bson
+    options: omitempty
+    value: isbn
+  - name: yaml
+    options: omitempty
+    value: isbn
+  type: string
+- item:
+    name: '[]'
+    type: string
+  name: coAuthors
+  tags:
+  - name: json
+    options: omitempty
+    value: coAuthors
+  - name: bson
+    options: omitempty
+    value: coAuthors
+  - name: yaml
+    options: omitempty
+    value: coAuthors
+  type: array
+name: Book

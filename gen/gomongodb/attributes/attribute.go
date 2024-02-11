@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common/util"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schemaold"
 	"github.com/rs/zerolog/log"
 	"strings"
 )
@@ -117,27 +116,25 @@ func (b *GoAttributeImpl) GoIsNOTZeroCondition() string {
 
 	s := ""
 	switch b.AttrDefinition.Typ {
-	case schemaold.AttributeTypeObjectId:
+	case schema.AttributeTypeObjectId:
 		s = fmt.Sprintf("s.%s != primitive.NilObjectID", b.GoName())
-	case schemaold.AttributeTypeInt:
+	case schema.AttributeTypeInt:
 		s = fmt.Sprintf("s.%s != 0", b.GoName())
-	case schemaold.AttributeTypeLong:
+	case schema.AttributeTypeLong:
 		s = fmt.Sprintf("s.%s != 0", b.GoName())
-	case schemaold.AttributeTypeBool:
+	case schema.AttributeTypeBool:
 		s = fmt.Sprintf("s.%s", b.GoName())
-	case schemaold.AttributeTypeDate:
+	case schema.AttributeTypeDate:
 		s = fmt.Sprintf("s.%s != 0", b.GoName())
-	case schemaold.AttributeTypeArray:
+	case schema.AttributeTypeArray:
 		s = fmt.Sprintf("len(s.%s) != 0", b.GoName())
-	case schemaold.AttributeTypeStruct:
+	case schema.AttributeTypeStruct:
 		s = fmt.Sprintf("!s.%s.IsZero()", b.GoName())
-	case schemaold.AttributeTypeRefStruct:
-		s = fmt.Sprintf("!s.%s.IsZero()", b.GoName())
-	case schemaold.AttributeTypeString:
+	case schema.AttributeTypeString:
 		s = fmt.Sprintf("s.%s != \"\"", b.GoName())
-	case schemaold.AttributeTypeMap:
+	case schema.AttributeTypeMap:
 		s = fmt.Sprintf("len(s.%s) != 0", b.GoName())
-	case schemaold.AttributeTypeDocument:
+	case schema.AttributeTypeDocument:
 		s = fmt.Sprintf("len(s.%s) != 0", b.GoName())
 	}
 
@@ -148,27 +145,25 @@ func (b *GoAttributeImpl) GoIsZeroCondition() string {
 
 	s := ""
 	switch b.AttrDefinition.Typ {
-	case schemaold.AttributeTypeObjectId:
+	case schema.AttributeTypeObjectId:
 		s = fmt.Sprintf("s.%s == primitive.NilObjectID", b.GoName())
-	case schemaold.AttributeTypeInt:
+	case schema.AttributeTypeInt:
 		s = fmt.Sprintf("s.%s == 0", b.GoName())
-	case schemaold.AttributeTypeLong:
+	case schema.AttributeTypeLong:
 		s = fmt.Sprintf("s.%s == 0", b.GoName())
-	case schemaold.AttributeTypeBool:
+	case schema.AttributeTypeBool:
 		s = fmt.Sprintf("!s.%s", b.GoName())
-	case schemaold.AttributeTypeDate:
+	case schema.AttributeTypeDate:
 		s = fmt.Sprintf("s.%s == 0", b.GoName())
-	case schemaold.AttributeTypeArray:
+	case schema.AttributeTypeArray:
 		s = fmt.Sprintf("len(s.%s) == 0", b.GoName())
-	case schemaold.AttributeTypeStruct:
+	case schema.AttributeTypeStruct:
 		s = fmt.Sprintf("s.%s.IsZero()", b.GoName())
-	case schemaold.AttributeTypeRefStruct:
-		s = fmt.Sprintf("s.%s.IsZero()", b.GoName())
-	case schemaold.AttributeTypeString:
+	case schema.AttributeTypeString:
 		s = fmt.Sprintf("s.%s == \"\"", b.GoName())
-	case schemaold.AttributeTypeMap:
+	case schema.AttributeTypeMap:
 		s = fmt.Sprintf("len(s.%s) == 0", b.GoName())
-	case schemaold.AttributeTypeDocument:
+	case schema.AttributeTypeDocument:
 		s = fmt.Sprintf("len(s.%s) == 0", b.GoName())
 	}
 

@@ -1,7 +1,7 @@
 package attributes
 
 import (
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schemaold"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
 )
 
 type ValueTypeAttribute struct {
@@ -12,19 +12,19 @@ func (v *ValueTypeAttribute) GoType() string {
 	var t string
 
 	switch v.AttrDefinition.Typ {
-	case schemaold.AttributeTypeString:
+	case schema.AttributeTypeString:
 		t = AttributeTypeStringGoType
-	case schemaold.AttributeTypeInt:
+	case schema.AttributeTypeInt:
 		t = AttributeTypeIntGoType
-	case schemaold.AttributeTypeLong:
+	case schema.AttributeTypeLong:
 		t = AttributeTypeLongGoType
-	case schemaold.AttributeTypeBool:
+	case schema.AttributeTypeBool:
 		t = AttributeTypeBoolGoType
-	case schemaold.AttributeTypeDate:
+	case schema.AttributeTypeDate:
 		t = AttributeTypeDateGoType
-	case schemaold.AttributeTypeObjectId:
+	case schema.AttributeTypeObjectId:
 		t = AttributeTypeObjectIdGoType
-	case schemaold.AttributeTypeDocument:
+	case schema.AttributeTypeDocument:
 		t = AttributeTypeDocumentGoType
 	default:
 		t = "-- NotYetImplemented --"
