@@ -95,6 +95,7 @@ func FormatIdentifier(aName string, aSeparator string, aCasingMode FormatMode, i
 
 		actualFormattingMode := indexHandling
 		if s == "[]" || s == "%s" {
+
 			/*
 				if (numberOfArrayBrackets + numberOfMapBrackets) == (totalNumberOfBrackets-1) &&
 					(anIndexingHandlingMode == indexIjkWoLast || anIndexingHandlingMode == indexSprintfWoLast) {
@@ -208,3 +209,107 @@ func adaptCasing(s string, casing FormatMode) string {
 
 	return s
 }
+
+func criteriaMethodVarParams(p string, withType bool, commaHandling string) string {
+
+	if !(strings.Contains(p, "[]") || strings.Contains(p, "%s")) {
+		if strings.Contains(commaHandling, "addonempty") {
+			return ", "
+		}
+
+		return ""
+	}
+
+	var sb strings.Builder
+
+	arr := strings.Split(p, ".")
+
+	numIjk := 0
+	numStw := 0
+	for _, s := range arr {
+		switch s {
+		case "[]":
+			if (numIjk + numStw) > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString("ndx")
+			sb.WriteRune(rune('I' + numIjk))
+			if withType {
+				sb.WriteString(" int")
+			}
+			numIjk++
+		case "%s":
+			if (numIjk + numStw) > 0 {
+				sb.WriteString(", ")
+			}
+			sb.WriteString("key")
+			sb.WriteRune(rune('S' + numStw))
+			if withType {
+				sb.WriteString(" string")
+			}
+			numStw++
+		default:
+			// No-op
+		}
+	}
+
+	if strings.Contains(commaHandling, "before") {
+		return ", " + sb.String()
+	} else if strings.Contains(commaHandling, "after") {
+		return sb.String() + ", "
+	}
+
+	return sb.String()
+}
+
+/*
+func updateMethodVarParams(p string, withType bool, commaHandling string) string {
+
+	if strings.Contains(p, "[]") || strings.Contains(p, "%s") {
+
+		var sb strings.Builder
+
+		arr := strings.Split(p, ".")
+
+		numIjk := 0
+		numStw := 0
+		for _, s := range arr {
+			if s == "[]" {
+				if (numIjk + numStw) > 0 {
+					sb.WriteString(", ")
+				}
+				sb.WriteString("ndx")
+				sb.WriteRune(rune('I' + numIjk))
+				if withType {
+					sb.WriteString(" int")
+				}
+				numIjk++
+			} else if s == "%s" {
+				if (numIjk + numStw) > 0 {
+					sb.WriteString(", ")
+				}
+				sb.WriteString("key")
+				sb.WriteRune(rune('S' + numStw))
+				if withType {
+					sb.WriteString(" string")
+				}
+				numStw++
+			}
+		}
+
+		if strings.Contains(commaHandling, "before") {
+			return ", " + sb.String()
+		} else if strings.Contains(commaHandling, "after") {
+			return sb.String() + ", "
+		}
+
+		return sb.String()
+	}
+
+	if strings.Contains(commaHandling, "addonempty") {
+		return ", "
+	}
+
+	return ""
+}
+*/

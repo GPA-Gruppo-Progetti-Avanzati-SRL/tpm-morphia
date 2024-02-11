@@ -54,7 +54,7 @@ func ReadSchemaDefinitionFromBuffer(f Format, def []byte, includeResolver Includ
 	const semLogContext = "tpm-morphia::read-schema-def-from-buffer"
 	var err error
 
-	log.Debug().Msg(semLogContext)
+	log.Trace().Msg(semLogContext)
 
 	schema, err := UnmarshalSchemaFromBuffer(includeResolver, f, def)
 	if err != nil {

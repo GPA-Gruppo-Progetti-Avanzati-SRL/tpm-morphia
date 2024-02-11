@@ -27,11 +27,13 @@ func TestGenerate(t *testing.T) {
 	}
 
 	const targetFolder = "../.."
+	const tpmMorphiaVersion = "tpm-morphia@v0.0.0"
+
 	cfg := gomongodb.GeneratorConfig{
 		Schema:       sch,
 		TargetFolder: targetFolder,
 		EntityName:   "address",
-		Version:      "tpm-morphia@v0.0.0",
+		Version:      tpmMorphiaVersion,
 		FormatCode:   FormatCode,
 	}
 	err = gomongodb.GenerateEntity(&cfg)
@@ -41,7 +43,7 @@ func TestGenerate(t *testing.T) {
 		Schema:       sch,
 		TargetFolder: targetFolder,
 		EntityName:   "book",
-		Version:      "tpm-morphia@v0.0.0",
+		Version:      tpmMorphiaVersion,
 		FormatCode:   FormatCode,
 	}
 	err = gomongodb.GenerateEntity(&cfg)
@@ -51,7 +53,7 @@ func TestGenerate(t *testing.T) {
 		Schema:       sch,
 		TargetFolder: targetFolder,
 		EntityName:   "author",
-		Version:      "tpm-morphia@v0.0.0",
+		Version:      tpmMorphiaVersion,
 		FormatCode:   FormatCode,
 	}
 	err = gomongodb.GenerateEntity(&cfg)

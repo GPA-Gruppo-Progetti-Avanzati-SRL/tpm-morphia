@@ -47,14 +47,14 @@ type AttributesTreeVisitor struct {
 }
 
 func (av *AttributesTreeVisitor) StartVisit(a attributes.GoAttribute) {
-	const semLogContext = "go-attribute-visitor::start-visit"
-	log.Info().Str("name", a.GoName()).Msg(semLogContext)
+	const semLogContext = "go-attribute-tree-visitor::start-visit"
+	log.Trace().Str("name", a.GoName()).Msg(semLogContext)
 	// lv.attrs = append(lv.attrs, a)
 }
 
 func (av *AttributesTreeVisitor) Visit(a attributes.GoAttribute) bool {
-	const semLogContext = "go-attribute-visitor::visit"
-	log.Info().Str("name", a.GoName()).Msg(semLogContext)
+	const semLogContext = "go-attribute-tree-visitor::visit"
+	log.Trace().Str("name", a.GoName()).Msg(semLogContext)
 	av.attrs = append(av.attrs, a)
 	qn := a.StructQualifiedName()
 	rc := true
@@ -75,8 +75,8 @@ func (av *AttributesTreeVisitor) Visit(a attributes.GoAttribute) bool {
 }
 
 func (av *AttributesTreeVisitor) EndVisit(a attributes.GoAttribute) {
-	const semLogContext = "go-attribute-visitor::end-visit"
-	log.Info().Str("name", a.GoName()).Msg(semLogContext)
+	const semLogContext = "go-attribute-tree-visitor::end-visit"
+	log.Trace().Str("name", a.GoName()).Msg(semLogContext)
 	// lv.attrs = append(lv.attrs, a)
 }
 

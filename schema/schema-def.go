@@ -94,7 +94,7 @@ func (c *Schema) GetStructByName(n string) *StructDef {
 
 func (c *Schema) finalize() error {
 	const semLogContext = "tpm-morphia::validate-schema-def"
-	log.Debug().Msg(semLogContext)
+	log.Trace().Msg(semLogContext)
 
 	// Doing a XOR...
 	if c.Package == "" {
@@ -132,7 +132,7 @@ type StructReference struct {
 
 func (s *StructDef) finalize(structResolver StructResolver) error {
 	const semLogContext = "schema-struct::validate"
-	log.Debug().Msg("start validating attributes")
+	log.Trace().Msg("start validating attributes")
 
 	if len(s.Attributes) == 0 {
 		return fmt.Errorf("attributes missing from schema")
@@ -226,8 +226,10 @@ func (f *Field) GetTagValueByName(tagName string) (string, string) {
 
 func (f *Field) finalize(structResolver StructResolver) error {
 	const semLogContext = "schema-field::validate"
+	const isKeyNotSupportedErrorFormat = "is-key not supported on %s"
+	const noItemDeclaredOnType = "no item declared on type %s"
 
-	log.Debug().Str("name", f.Name).Msg(semLogContext + " start validating field")
+	log.Trace().Str("name", f.Name).Msg(semLogContext + " start validating field")
 
 	if !util.FieldNameWellFormed(f.Name) {
 		return fmt.Errorf("field name is not well formed")
@@ -248,7 +250,7 @@ func (f *Field) finalize(structResolver StructResolver) error {
 	case AttributeTypeDocument:
 	case AttributeTypeStruct:
 		if f.IsKey {
-			vErr = fmt.Errorf("is-key not supported on %s", f.Typ)
+			vErr = fmt.Errorf(isKeyNotSupportedErrorFormat, f.Typ)
 			return vErr
 		}
 
@@ -274,24 +276,24 @@ func (f *Field) finalize(structResolver StructResolver) error {
 		}
 	case AttributeTypeArray:
 		if f.IsKey {
-			vErr = fmt.Errorf("is-key not supported on %s", f.Typ)
+			vErr = fmt.Errorf(isKeyNotSupportedErrorFormat, f.Typ)
 			return vErr
 		}
 
 		if f.Item == nil {
-			vErr = fmt.Errorf("no item declared on type %s", f.Typ)
+			vErr = fmt.Errorf(noItemDeclaredOnType, f.Typ)
 			return vErr
 		}
 
 		vErr = f.finalizeItem(strings.ToLower(f.Typ), structResolver)
 	case AttributeTypeMap:
 		if f.IsKey {
-			vErr = fmt.Errorf("is-key not supported on %s", f.Typ)
+			vErr = fmt.Errorf(isKeyNotSupportedErrorFormat, f.Typ)
 			return vErr
 		}
 
 		if f.Item == nil {
-			vErr = fmt.Errorf("no item declared on type %s", f.Typ)
+			vErr = fmt.Errorf(noItemDeclaredOnType, f.Typ)
 			return vErr
 		}
 
@@ -305,25 +307,30 @@ func (f *Field) finalize(structResolver StructResolver) error {
 
 func (f *Field) FinalizeTags() {
 
+	const omitempty = ",omitempty"
+	const jsonTag = "json"
+	const yamlTg = "yaml"
+	const bsonTag = "bson"
+
 	tagFieldName := f.Name
 	if len(f.Tags) == 0 {
 		f.Tags = []Tag{
-			NewTag("json", f.Name+",omitempty"),
-			NewTag("bson", tagFieldName+",omitempty"),
-			NewTag("yaml", tagFieldName+",omitempty"),
+			NewTag(jsonTag, f.Name+omitempty),
+			NewTag(bsonTag, tagFieldName+omitempty),
+			NewTag(yamlTg, tagFieldName+omitempty),
 		}
 	}
 
-	if t := FindTag(f.Tags, "json"); t.Name == "" {
-		f.Tags = append(f.Tags, NewTag("json", tagFieldName+",omitempty"))
+	if t := FindTag(f.Tags, jsonTag); t.Name == "" {
+		f.Tags = append(f.Tags, NewTag(jsonTag, tagFieldName+omitempty))
 	}
 
-	if t := FindTag(f.Tags, "yaml"); t.Name == "" {
-		f.Tags = append(f.Tags, NewTag("yaml", tagFieldName+",omitempty"))
+	if t := FindTag(f.Tags, yamlTg); t.Name == "" {
+		f.Tags = append(f.Tags, NewTag(yamlTg, tagFieldName+omitempty))
 	}
 
-	if t := FindTag(f.Tags, "bson"); t.Name == "" {
-		f.Tags = append(f.Tags, NewTag("json", tagFieldName+",omitempty"))
+	if t := FindTag(f.Tags, bsonTag); t.Name == "" {
+		f.Tags = append(f.Tags, NewTag(bsonTag, tagFieldName+omitempty))
 	}
 }
 
@@ -351,7 +358,7 @@ func (f *Field) visit(v Visitor) {
 
 func (f *Field) finalizeItem(parentAttributeType string, structResolver StructResolver) error {
 	const semLogContext = "schema-field::finalize-item"
-	log.Debug().Str("path", f.Name).Msg("start validating array item definition")
+	log.Trace().Str("path", f.Name).Msg("start validating array item definition")
 
 	f.Item.Name = "[]"
 	if parentAttributeType == AttributeTypeMap {

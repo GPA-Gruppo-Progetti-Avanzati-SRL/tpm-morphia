@@ -67,19 +67,19 @@ type LogVisitor struct {
 }
 
 func (lv *LogVisitor) StartVisit(a GoAttribute) {
-	const semLogContext = "go-attribute-visitor::start-visit"
-	log.Info().Str("name", a.GoName()).Msg(semLogContext)
+	const semLogContext = "go-attribute-log-visitor::start-visit"
+	log.Trace().Str("name", a.GoName()).Msg(semLogContext)
 }
 
 func (lv *LogVisitor) Visit(a GoAttribute) bool {
-	const semLogContext = "go-attribute-visitor::visit"
-	log.Info().Str("name", a.GoName()).Msg(semLogContext)
+	const semLogContext = "go-attribute-log-visitor::visit"
+	log.Trace().Str("name", a.GoName()).Msg(semLogContext)
 	return true
 }
 
 func (lv *LogVisitor) EndVisit(a GoAttribute) {
-	const semLogContext = "go-attribute-visitor::end-visit"
-	log.Info().Str("name", a.GoName()).Msg(semLogContext)
+	const semLogContext = "go-attribute-log-visitor::end-visit"
+	log.Trace().Str("name", a.GoName()).Msg(semLogContext)
 }
 
 func (cg *GoAttributeImpl) ChildrenAttrs() []GoAttribute {

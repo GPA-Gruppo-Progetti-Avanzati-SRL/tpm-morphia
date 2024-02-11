@@ -180,52 +180,7 @@ func getFuncMap() template.FuncMap {
 		},
 		"criteriaMethodVarParams": func(p string, withType bool, commaHandling string) string {
 
-			if strings.Contains(p, "[]") || strings.Contains(p, "%s") {
-
-				var sb strings.Builder
-
-				arr := strings.Split(p, ".")
-
-				numIjk := 0
-				numStw := 0
-				for _, s := range arr {
-					if s == "[]" {
-						if (numIjk + numStw) > 0 {
-							sb.WriteString(", ")
-						}
-						sb.WriteString("ndx")
-						sb.WriteRune(rune('I' + numIjk))
-						if withType {
-							sb.WriteString(" int")
-						}
-						numIjk++
-					} else if s == "%s" {
-						if (numIjk + numStw) > 0 {
-							sb.WriteString(", ")
-						}
-						sb.WriteString("key")
-						sb.WriteRune(rune('S' + numStw))
-						if withType {
-							sb.WriteString(" string")
-						}
-						numStw++
-					}
-				}
-
-				if strings.Contains(commaHandling, "before") {
-					return ", " + sb.String()
-				} else if strings.Contains(commaHandling, "after") {
-					return sb.String() + ", "
-				}
-
-				return sb.String()
-			}
-
-			if strings.Contains(commaHandling, "addonempty") {
-				return ", "
-			}
-
-			return ""
+			return criteriaMethodVarParams(p, withType, commaHandling)
 		},
 		"updateMethodSignature": func(p string) string {
 			// Do a Camel case conversion with segments separated by '.'
@@ -234,53 +189,7 @@ func getFuncMap() template.FuncMap {
 			return strings.ReplaceAll(s, ".", "")
 		},
 		"updateMethodVarParams": func(p string, withType bool, commaHandling string) string {
-
-			if strings.Contains(p, "[]") || strings.Contains(p, "%s") {
-
-				var sb strings.Builder
-
-				arr := strings.Split(p, ".")
-
-				numIjk := 0
-				numStw := 0
-				for _, s := range arr {
-					if s == "[]" {
-						if (numIjk + numStw) > 0 {
-							sb.WriteString(", ")
-						}
-						sb.WriteString("ndx")
-						sb.WriteRune(rune('I' + numIjk))
-						if withType {
-							sb.WriteString(" int")
-						}
-						numIjk++
-					} else if s == "%s" {
-						if (numIjk + numStw) > 0 {
-							sb.WriteString(", ")
-						}
-						sb.WriteString("key")
-						sb.WriteRune(rune('S' + numStw))
-						if withType {
-							sb.WriteString(" string")
-						}
-						numStw++
-					}
-				}
-
-				if strings.Contains(commaHandling, "before") {
-					return ", " + sb.String()
-				} else if strings.Contains(commaHandling, "after") {
-					return sb.String() + ", "
-				}
-
-				return sb.String()
-			}
-
-			if strings.Contains(commaHandling, "addonempty") {
-				return ", "
-			}
-
-			return ""
+			return criteriaMethodVarParams(p, withType, commaHandling)
 		},
 	}
 
