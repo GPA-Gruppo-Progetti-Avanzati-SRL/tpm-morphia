@@ -169,8 +169,8 @@ type Field struct {
 	Tags      []Tag            `json:"tags,omitempty" yaml:"tags,omitempty"`
 	Item      *Field           `json:"item,omitempty" yaml:"item,omitempty"`
 	Options   string           `json:"options,omitempty" yaml:"options,omitempty"`
-	Paths     []string         `json:"-"`
-	BsonPaths []string         `json:"-"`
+	Paths     []string         `json:"-" yaml:"-"`
+	BsonPaths []string         `json:"-" yaml:"-"`
 }
 
 /*
