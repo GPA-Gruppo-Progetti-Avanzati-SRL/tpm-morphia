@@ -1,7 +1,9 @@
 package gomongodb
 
 import (
+	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common/util"
+	"github.com/rs/zerolog/log"
 	"regexp"
 	"strings"
 	"unicode"
@@ -69,10 +71,13 @@ const (
 )
 
 func FormatIdentifier(aName string, aSeparator string, aCasingMode FormatMode, indexHandling FormatMode, indexFormat FormatMode) string {
+	const semLogContext = "func-map-format-identifier"
 
 	if aName == "" {
 		return ""
 	}
+
+	params := fmt.Sprintf("path: \"%s\", separator: \"%s\", casingMode: \"%s\", indexHandling: \"%s\", indexFormat: \"%s\"", aName, aSeparator, aCasingMode, indexHandling, indexFormat)
 
 	if indexHandling == indexWoLast {
 		aName = strings.TrimSuffix(aName, ".[]")
@@ -158,6 +163,7 @@ func FormatIdentifier(aName string, aSeparator string, aCasingMode FormatMode, i
 
 	s := stb.String()
 	// fmt.Printf("%-30s %s %-10s %-10s %-10s = %s\n", aName, aSeparator, aCasingMode, indexHandling, indexFormat, stb.String())
+	log.Trace().Msgf("%s - { %s, wanted: \"%s\" },", semLogContext, params, s)
 	return s
 }
 
