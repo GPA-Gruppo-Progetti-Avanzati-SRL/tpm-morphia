@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/tpm-morphia-cli/cmds"
+	_ "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/tpm-morphia-cli/cmds/genAllEntities"
 	_ "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/tpm-morphia-cli/cmds/genEntity"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
