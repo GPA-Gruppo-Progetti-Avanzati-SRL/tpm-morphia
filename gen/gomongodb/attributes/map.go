@@ -5,8 +5,8 @@ type MapAttribute struct {
 	Item GoAttribute
 }
 
-func (a *MapAttribute) GoType() string {
-	return "map[string]" + a.Item.GoType()
+func (a *MapAttribute) GoType(currentPkg string) string {
+	return "map[string]" + a.Item.GoType(currentPkg)
 }
 
 func (s *MapAttribute) Visit(visitor Visitor) {

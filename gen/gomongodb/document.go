@@ -27,13 +27,13 @@ func (s *DocumentGeneratorModel) PackageImports() []string {
 
 	// Duplications removal
 	for _, a := range s.Attributes {
-		for _, i := range a.PackageImports() {
+		for _, i := range a.PackageImports(s.Package) {
 			if len(imports) == 0 {
 				imports = make(map[string]struct{})
 			}
 			if _, ok := imports[i]; !ok {
 				imports[i] = struct{}{}
-				res = append(res, a.PackageImports()...)
+				res = append(res, a.PackageImports(s.Package)...)
 			}
 		}
 	}
@@ -48,7 +48,7 @@ type AttributesTreeVisitor struct {
 
 func (av *AttributesTreeVisitor) StartVisit(a attributes.GoAttribute) {
 	const semLogContext = "go-attribute-tree-visitor::start-visit"
-	log.Trace().Str("name", a.GoName()).Msg(semLogContext)
+	//log.Trace().Str("name", a.GoName()).Msg(semLogContext)
 	// lv.attrs = append(lv.attrs, a)
 }
 
@@ -76,7 +76,7 @@ func (av *AttributesTreeVisitor) Visit(a attributes.GoAttribute) bool {
 
 func (av *AttributesTreeVisitor) EndVisit(a attributes.GoAttribute) {
 	const semLogContext = "go-attribute-tree-visitor::end-visit"
-	log.Trace().Str("name", a.GoName()).Msg(semLogContext)
+	//log.Trace().Str("name", a.GoName()).Msg(semLogContext)
 	// lv.attrs = append(lv.attrs, a)
 }
 

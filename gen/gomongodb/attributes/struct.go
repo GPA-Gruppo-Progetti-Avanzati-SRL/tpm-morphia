@@ -24,10 +24,10 @@ type StructAttribute struct {
 	return qn.String()
 }*/
 
-func (s *StructAttribute) GoType() string {
-	if s.ExternalPackage != "" {
+func (s *StructAttribute) GoType(currentPkg string) string {
+	if s.Pkg != "" && s.Pkg != currentPkg {
 		var sb strings.Builder
-		sb.WriteString(filepath.Base(s.ExternalPackage))
+		sb.WriteString(filepath.Base(s.Pkg))
 		sb.WriteString(".")
 		sb.WriteString(util.Classify(s.AttrDefinition.StructRef.Name))
 		return sb.String()

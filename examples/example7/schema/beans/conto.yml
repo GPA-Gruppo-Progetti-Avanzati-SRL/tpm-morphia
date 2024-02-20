@@ -1,0 +1,22 @@
+name: conto
+attributes:
+- name: categoria
+  type: string
+- name: filiale
+  type: string
+- name: frazionario
+  type: string
+- name: frazionarioApertura
+  type: string
+- name: intestazione
+  type: string
+- name: ndg
+  type: string
+- name: numero
+  type: string
+- name: numeroMovimento
+  type: string
+- name: servizio
+  type: string
+- name: tipo
+  type: string

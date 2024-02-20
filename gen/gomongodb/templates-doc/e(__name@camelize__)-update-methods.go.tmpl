@@ -1,10 +1,11 @@
 package {{ .Model.PackageName }}
+{{ $currentPkg := .Model.Package }}
 
 import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"time"
-{{range $pkg := .Model.PackageImports }}
+{{range $pkg := .Model.PackageImports  }}
 {{- if ne $pkg "go.mongodb.org/mongo-driver/bson" }}
     "{{$pkg}}"
 {{- end}}
@@ -129,25 +130,25 @@ func GetUpdateDocument(obj *{{ classify .Model.Name}}, opts ...UnsetOption) Upda
 {{- range $a := .Model.Attributes}}
 {{ $f := $a.Definition }}
 {{- if eq $f.Typ "string" }}
-{{ template "update-string" filterSubTemplateContext $a "*" }}
+{{ template "update-string" filterSubTemplateContext $a $currentPkg }}
 {{- else if eq $a.Definition.Typ "int" }}
-{{ template "update-int" filterSubTemplateContext $a "*" }}
+{{ template "update-int" filterSubTemplateContext $a $currentPkg }}
 {{- else if eq $a.Definition.Typ "long" }}
-{{ template "update-long" filterSubTemplateContext $a "*" }}
+{{ template "update-long" filterSubTemplateContext $a $currentPkg }}
 {{- else if eq $a.Definition.Typ "bool" }}
-{{ template "update-bool" filterSubTemplateContext $a "*" }}
+{{ template "update-bool" filterSubTemplateContext $a $currentPkg }}
 {{- else if eq $a.Definition.Typ "date" }}
-{{ template "update-date" filterSubTemplateContext $a "*" }}
+{{ template "update-date" filterSubTemplateContext $a $currentPkg }}
 {{- else if eq $a.Definition.Typ "document" }}
-{{ template "update-document" filterSubTemplateContext $a "*" }}
+{{ template "update-document" filterSubTemplateContext $a $currentPkg }}
 {{- else if eq $a.Definition.Typ "object-id" }}
-{{ template "update-object-id" filterSubTemplateContext $a "*" }}
+{{ template "update-object-id" filterSubTemplateContext $a $currentPkg }}
 {{- else if eq $a.Definition.Typ "struct" }}
-{{ template "update-struct" filterSubTemplateContext $a "*" }}
+{{ template "update-struct" filterSubTemplateContext $a $currentPkg }}
 {{- else if eq $a.Definition.Typ "array" }}
-{{ template "update-array" filterSubTemplateContext $a "*" }}
+{{ template "update-array" filterSubTemplateContext $a $currentPkg }}
 {{- else if eq $a.Definition.Typ "map" }}
-{{ template "update-array" filterSubTemplateContext $a "*" }}
+{{ template "update-array" filterSubTemplateContext $a $currentPkg }}
 {{- end }}
 {{- end }}
 

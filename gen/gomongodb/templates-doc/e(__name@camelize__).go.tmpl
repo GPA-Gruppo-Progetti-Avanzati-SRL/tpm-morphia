@@ -1,6 +1,7 @@
 package {{ .Model.PackageName }}
+{{ $currentPkg := .Model.Package }}
 
-{{range $pkg := .Model.PackageImports }}
+{{range $pkg := .Model.PackageImports  }}
 import "{{$pkg}}"
 {{- end}}
 
@@ -9,7 +10,7 @@ import "{{$pkg}}"
 
 type {{ classify .Model.Name}} struct {
 {{- range $a := .Model.Attributes}}
-{{ $a.GoName }} {{ $a.GoType }}  {{$a.GoTag}}
+{{ $a.GoName }} {{ $a.GoType $currentPkg }}  {{$a.GoTag}}
 {{- end}}
 
 // @tpm-schematics:start-region("struct-section")

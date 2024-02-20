@@ -39,4 +39,8 @@ attributes:
     options: omitempty
     value: coAuthors
   type: array
+- name: legalAddress
+  struct-ref:
+    name: address
+  type: struct
 name: Book

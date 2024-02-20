@@ -35,6 +35,14 @@ attributes:
   struct-ref:
     name: address
   type: struct
+- name: docAccredito
+  struct-ref:
+    name: docAccredito
+  type: struct
+- name: conto
+  struct-ref:
+    name: conto
+  type: struct
 - name: aBook
   struct-ref:
     name: book

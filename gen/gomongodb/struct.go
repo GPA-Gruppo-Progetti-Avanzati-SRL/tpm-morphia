@@ -27,13 +27,13 @@ func (s *StructGeneratorModel) PackageImports() []string {
 
 	// Duplications removal
 	for _, a := range s.Attributes {
-		for _, i := range a.PackageImports() {
+		for _, i := range a.PackageImports(s.Package) {
 			if len(imports) == 0 {
 				imports = make(map[string]struct{})
 			}
 			if _, ok := imports[i]; !ok {
 				imports[i] = struct{}{}
-				res = append(res, a.PackageImports()...)
+				res = append(res, a.PackageImports(s.Package)...)
 			}
 		}
 	}

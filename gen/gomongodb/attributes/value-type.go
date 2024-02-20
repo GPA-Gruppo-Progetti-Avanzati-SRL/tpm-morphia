@@ -8,7 +8,7 @@ type ValueTypeAttribute struct {
 	GoAttributeImpl
 }
 
-func (v *ValueTypeAttribute) GoType() string {
+func (v *ValueTypeAttribute) GoType(currentPkg string) string {
 	var t string
 
 	switch v.AttrDefinition.Typ {

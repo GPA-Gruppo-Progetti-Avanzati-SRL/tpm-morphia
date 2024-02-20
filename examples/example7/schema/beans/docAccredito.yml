@@ -1,0 +1,6 @@
+name: docAccredito
+attributes:
+- name: rapporto
+  type: struct
+  struct-ref:
+    name: Conto

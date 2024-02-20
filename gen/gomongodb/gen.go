@@ -160,10 +160,10 @@ func getFuncMap() template.FuncMap {
 		"numberOfArrayIndicesInQualifiedName": func(n string) int {
 			return strings.Count(n, "[]") + strings.Count(n, "%s")
 		},
-		"filterSubTemplateContext": func(attribute attributes.GoAttribute, criteriaObjectName string) map[string]interface{} {
+		"filterSubTemplateContext": func(attribute attributes.GoAttribute, currentPackage string) map[string]interface{} {
 			return map[string]interface{}{
-				"Attr":              attribute,
-				"CriteriaStructRef": criteriaObjectName,
+				"Attr":           attribute,
+				"CurrentPackage": currentPackage,
 			}
 		},
 		"isIdentifierIndexed": func(n string) bool {

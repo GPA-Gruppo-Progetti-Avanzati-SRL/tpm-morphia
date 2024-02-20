@@ -26,11 +26,12 @@ type PathInfo struct {
 
 type GoAttribute interface {
 	StructQualifiedName() string
+	Package() string
 	Definition() *schema.Field
 	BsonPropertyName(qualified bool) string
-	PackageImports() []string
+	PackageImports(currentPkg string) []string
 	GoName() string
-	GoType() string
+	GoType(currentPkg string) string
 	GoTag() string
 	GoIsZeroCondition() string
 	ChildrenAttrs() []GoAttribute
@@ -39,10 +40,11 @@ type GoAttribute interface {
 }
 
 type GoAttributeImpl struct {
-	AttrDefinition  *schema.Field
-	ExternalPackage string
-	StructTypeName  string
-	Imports         []string
+	AttrDefinition *schema.Field
+	// ExternalPackage string
+	Pkg            string
+	StructTypeName string
+	Imports        []string
 }
 
 func (cg *GoAttributeImpl) Paths() []PathInfo {
@@ -93,15 +95,19 @@ func (cg *GoAttributeImpl) StructQualifiedName() string {
 	}
 
 	var qn strings.Builder
-	if cg.ExternalPackage != "" {
-		qn.WriteString(cg.ExternalPackage)
+	if cg.Pkg != "" {
+		qn.WriteString(cg.Pkg /* ExternalPackage */)
 		qn.WriteString("/")
 	} else {
-		qn.WriteString("./")
+		qn.WriteString("" /* "./" */)
 	}
 
 	qn.WriteString(util.Classify(cg.StructTypeName))
 	return qn.String()
+}
+
+func (cg *GoAttributeImpl) Package() string {
+	return cg.Pkg
 }
 
 func (cg *GoAttributeImpl) Definition() *schema.Field {
@@ -170,8 +176,14 @@ func (b *GoAttributeImpl) GoIsZeroCondition() string {
 	return s
 }
 
-func (b *GoAttributeImpl) PackageImports() []string {
-	return b.Imports
+func (b *GoAttributeImpl) PackageImports(currentPkg string) []string {
+	var externalPkgs []string
+	for _, pkg := range b.Imports {
+		if pkg != currentPkg {
+			externalPkgs = append(externalPkgs, pkg)
+		}
+	}
+	return externalPkgs
 }
 
 func (b *GoAttributeImpl) BsonPropertyName(qualified bool) string {
@@ -227,7 +239,7 @@ func (b *GoAttributeImpl) String() string {
 	return fmt.Sprintf("%s of type: %s and ns: %s", b.AttrDefinition.Name, b.AttrDefinition.Typ)
 }
 
-func (b *GoAttributeImpl) GoType() string {
+func (b *GoAttributeImpl) GoType(currentPkg string) string {
 	panic(errors.New("GoAttributeImpl does not implement GetGoAttributeType"))
 }
 

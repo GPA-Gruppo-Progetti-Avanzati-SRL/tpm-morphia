@@ -49,14 +49,23 @@ func NewStructAttribute(parentStruct *schema.StructDef, attrDefinition *schema.F
 
 	sn, pkg := attrDefinition.Package()
 	s.StructTypeName = sn
-	if pkg != "" && pkg != parentStruct.Package {
-		s.ExternalPackage = pkg
-	}
-
-	if s.ExternalPackage != "" {
+	s.Pkg = pkg
+	if pkg != "" {
 		s.Imports = make([]string, 0, 1)
-		s.Imports = append(s.Imports, s.ExternalPackage)
+		s.Imports = append(s.Imports, s.Pkg)
 	}
+	/*
+		if pkg != "" && pkg != parentStruct.Package {
+			s.ExternalPackage = pkg
+		}
+	*/
+
+	/*
+		if s.ExternalPackage != "" {
+			s.Imports = make([]string, 0, 1)
+			s.Imports = append(s.Imports, s.ExternalPackage)
+		}
+	*/
 
 	for _, member := range attrDefinition.StructRef.StructDefRef.Attributes {
 		child := NewAttribute(attrDefinition.StructRef.StructDefRef, member, recurse)
@@ -72,15 +81,21 @@ func NewArrayAttribute(parentStruct *schema.StructDef, attrDefinition *schema.Fi
 
 	sn, pkg := attrDefinition.Package()
 	a.StructTypeName = sn
-	if pkg != "" && pkg != parentStruct.Package {
-		a.ExternalPackage = pkg
-	}
-
-	if a.ExternalPackage != "" {
+	a.Pkg = pkg
+	if a.Pkg != "" {
 		a.Imports = make([]string, 0, 1)
-		a.Imports = append(a.Imports, a.ExternalPackage)
+		a.Imports = append(a.Imports, a.Pkg)
 	}
+	/*
+		if pkg != "" && pkg != parentStruct.Package {
+			a.ExternalPackage = pkg
+		}
 
+		if a.ExternalPackage != "" {
+			a.Imports = make([]string, 0, 1)
+			a.Imports = append(a.Imports, a.ExternalPackage)
+		}
+	*/
 	return a
 }
 
@@ -91,14 +106,21 @@ func NewMapAttribute(parentStruct *schema.StructDef, attrDefinition *schema.Fiel
 
 	sn, pkg := attrDefinition.Package()
 	a.StructTypeName = sn
-	if pkg != "" && pkg != parentStruct.Package {
-		a.ExternalPackage = pkg
-	}
-
-	if a.ExternalPackage != "" {
+	a.Pkg = pkg
+	if a.Pkg != "" {
 		a.Imports = make([]string, 0, 1)
-		a.Imports = append(a.Imports, a.ExternalPackage)
+		a.Imports = append(a.Imports, a.Pkg)
 	}
+	/*
+		if pkg != "" && pkg != parentStruct.Package {
+			a.ExternalPackage = pkg
+		}
+
+		if a.ExternalPackage != "" {
+			a.Imports = make([]string, 0, 1)
+			a.Imports = append(a.Imports, a.ExternalPackage)
+		}
+	*/
 
 	return a
 }

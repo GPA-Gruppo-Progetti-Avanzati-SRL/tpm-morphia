@@ -5,8 +5,8 @@ type ArrayAttribute struct {
 	Item GoAttribute
 }
 
-func (a *ArrayAttribute) GoType() string {
-	return "[]" + a.Item.GoType()
+func (a *ArrayAttribute) GoType(currentPkg string) string {
+	return "[]" + a.Item.GoType(currentPkg)
 }
 
 func (s *ArrayAttribute) Visit(visitor Visitor) {
