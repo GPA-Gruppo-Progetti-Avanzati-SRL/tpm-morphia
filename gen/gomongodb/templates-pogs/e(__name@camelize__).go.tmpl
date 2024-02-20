@@ -11,6 +11,9 @@ type {{ classify .Model.Name}} struct {
 {{- range $a := .Model.Attributes}}
 {{ $a.GoName }} {{ $a.GoType }}  {{$a.GoTag}}
 {{- end}}
+
+// @tpm-schematics:start-region("struct-section")
+// @tpm-schematics:end-region("struct-section")
 }
 
 func (s {{classify .Model.Name}}) IsZero() bool {
