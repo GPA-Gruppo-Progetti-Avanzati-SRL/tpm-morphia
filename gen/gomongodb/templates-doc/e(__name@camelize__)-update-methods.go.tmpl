@@ -76,7 +76,7 @@ func GetUpdateDocumentFromOptions(opts ...UpdateOption) UpdateDocument {
 // Convenience method to create an Update Document from the values of the top fields of the object. The convenience is in the handling
 // the unset because if I pass an empty struct to the update it generates an empty object anyway in the db. Handling the unset eliminates
 // the issue and delete an existing value without creating an empty struct.
-func GetUpdateDocument(obj *{{.Model.Name}}, opts ...UnsetOption) UpdateDocument {
+func GetUpdateDocument(obj *{{ classify .Model.Name}}, opts ...UnsetOption) UpdateDocument {
 
 	uo := &UnsetOptions{ DefaultMode: KeepCurrent }
 	for _, o := range opts {
