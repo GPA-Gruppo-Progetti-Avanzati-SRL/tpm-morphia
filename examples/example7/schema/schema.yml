@@ -5,5 +5,3 @@ imports:
 entities:
   - document: true
     file-name: ./author.yml
-
-
