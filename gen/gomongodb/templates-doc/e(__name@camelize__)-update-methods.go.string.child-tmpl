@@ -1,5 +1,4 @@
 {{ define "update-string" }}
-//----- the {{.Attr.Definition}} {{.Attr.Definition.Paths}}
 {{ $currentPkg := .CurrentPackage }}
 {{ $a := .Attr }}
 {{ $f := $a.Definition }}

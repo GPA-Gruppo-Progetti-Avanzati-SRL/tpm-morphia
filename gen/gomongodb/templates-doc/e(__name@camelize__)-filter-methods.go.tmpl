@@ -1,5 +1,5 @@
 package {{ .Model.PackageName }}
-
+{{ $metadata := .Metadata }}
 import (
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
@@ -22,22 +22,22 @@ func FilterMethodsGoInfo() string {
 {{- range $a := .Model.AttributesTree}}
 {{- if $a.Definition.HasOption "with-filter" }}
 {{- if eq $a.Definition.Typ "string" }}
-{{ template "filter-string" filterSubTemplateContext $a "*" }}
+{{ template "filter-string" filterSubTemplateContext $a "*" $metadata }}
 {{- end -}}
 {{- if eq $a.Definition.Typ "int" }}
-{{ template "filter-int" filterSubTemplateContext $a "*" }}
+{{ template "filter-int" filterSubTemplateContext $a "*" $metadata }}
 {{- end -}}
 {{- if eq $a.Definition.Typ "date" }}
-{{ template "filter-date" filterSubTemplateContext $a "*" }}
+{{ template "filter-date" filterSubTemplateContext $a "*" $metadata }}
 {{- end -}}
 {{- if eq $a.Definition.Typ "object-id" }}
-{{ template "filter-object-id" filterSubTemplateContext $a "*" }}
+{{ template "filter-object-id" filterSubTemplateContext $a "*" $metadata }}
 {{- end -}}
 {{- if eq $a.Definition.Typ "long" }}
-{{ template "filter-long" filterSubTemplateContext $a "*" }}
+{{ template "filter-long" filterSubTemplateContext $a "*" $metadata }}
 {{- end -}}
 {{- if eq $a.Definition.Typ "bool" }}
-{{ template "filter-bool" filterSubTemplateContext $a "*" }}
+{{ template "filter-bool" filterSubTemplateContext $a "*" $metadata }}
 {{- end -}}
 {{- end -}}
 {{- end }}

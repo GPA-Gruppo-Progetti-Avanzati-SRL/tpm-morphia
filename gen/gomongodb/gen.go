@@ -64,6 +64,7 @@ func GenerateEntity(cfg *GeneratorConfig) error {
 	metadata := map[string]interface{}{
 		"name":    cfg.EntityName,
 		"version": cfg.Version,
+		"usePtrs": true,
 	}
 
 	sourceTemplateOptions := []schematics.SourceTemplateOption{
@@ -123,7 +124,7 @@ func GenerateEntity(cfg *GeneratorConfig) error {
 	err = schematics.Apply(
 		filepath.Join(cfg.TargetFolder, pathOfStruct),
 		src,
-		schematics.WithApplyDefaultConflictMode(schematics.ConflictModeOverwrite),
+		schematics.WithApplyDefaultConflictMode(cfg.ConflictModeHandling),
 		schematics.WithApplyProduceDiff())
 	if err != nil {
 		log.Error().Err(err).Msg(semLogContext)
@@ -160,10 +161,11 @@ func getFuncMap() template.FuncMap {
 		"numberOfArrayIndicesInQualifiedName": func(n string) int {
 			return strings.Count(n, "[]") + strings.Count(n, "%s")
 		},
-		"filterSubTemplateContext": func(attribute attributes.GoAttribute, currentPackage string) map[string]interface{} {
+		"filterSubTemplateContext": func(attribute attributes.GoAttribute, currentPackage string, metadata map[string]interface{}) map[string]interface{} {
 			return map[string]interface{}{
 				"Attr":           attribute,
 				"CurrentPackage": currentPackage,
+				"Metadata":       metadata,
 			}
 		},
 		"isIdentifierIndexed": func(n string) bool {

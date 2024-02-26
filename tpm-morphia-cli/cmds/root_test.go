@@ -28,7 +28,7 @@ func TestGenEntityCmd(t *testing.T) {
 }
 
 var genAllEntitiesCmdArgs = []string{
-	"gen", "all-entities", "--out-dir", "../..", "--schema-file", "../../examples/example7/schema/schema.yml", "--with-format",
+	"gen", "all-entities", "--out-dir", "../..", "--schema-file", "../../examples/example7/schema/schema.yml", "--with-format", "--with-bak",
 }
 
 func TestGenAllEntitiesCmd(t *testing.T) {

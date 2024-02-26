@@ -1,5 +1,4 @@
 {{ define "update-array" }}
-//----- the {{.Attr.Definition}} {{.Attr.Definition.Paths}}
 {{ $currentPkg := .CurrentPackage }}
 {{ $a := .Attr }}
 {{ $f := $a.Definition }}
@@ -26,6 +25,7 @@ func (ud *UpdateDocument) Unset{{ updateMethodSignature $p.Path }} ({{ updateMet
 // setOrUnset{{ updateMethodSignature $p.Path }} No Remarks - here2
 func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} p {{$a.GoType $currentPkg}}, um UnsetMode) {
 	if len(p) > 0 {
+	    ud.Set{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path false "after" }} p)
 	} else {
 		switch um {
 		case KeepCurrent:

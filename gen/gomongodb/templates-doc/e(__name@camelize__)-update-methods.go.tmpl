@@ -1,5 +1,13 @@
 package {{ .Model.PackageName }}
+{{ $metadata := .Metadata }}
 {{ $currentPkg := .Model.Package }}
+ {{/* the values cannot be empty strings but have to be at least single blank strings; if empty strings their use generate an error! */}}
+{{ $ptrAddressOf := " " }}
+{{ $ptrDerefOf := " " }}
+{{- if .Metadata.usePtrs }}
+{{ $ptrAddressOf = "&" }}
+{{ $ptrDerefOf = "*" }}
+{{- end }}
 
 import (
 	"fmt"
@@ -96,7 +104,7 @@ func GetUpdateDocument(obj *{{ classify .Model.Name}}, opts ...UnsetOption) Upda
 	ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
 {{- end }}
 {{- if $f.IsStructType }}
-    ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+    ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} {{- $ptrAddressOf -}}obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
 {{- end }}
 {{- if $f.IsValueType }}
 {{- if eq $f.Typ "string" }}
@@ -130,25 +138,25 @@ func GetUpdateDocument(obj *{{ classify .Model.Name}}, opts ...UnsetOption) Upda
 {{- range $a := .Model.Attributes}}
 {{ $f := $a.Definition }}
 {{- if eq $f.Typ "string" }}
-{{ template "update-string" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-string" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "int" }}
-{{ template "update-int" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-int" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "long" }}
-{{ template "update-long" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-long" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "bool" }}
-{{ template "update-bool" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-bool" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "date" }}
-{{ template "update-date" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-date" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "document" }}
-{{ template "update-document" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-document" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "object-id" }}
-{{ template "update-object-id" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-object-id" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "struct" }}
-{{ template "update-struct" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-struct" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "array" }}
-{{ template "update-array" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-array" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "map" }}
-{{ template "update-array" filterSubTemplateContext $a $currentPkg }}
+{{ template "update-array" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- end }}
 {{- end }}
 
