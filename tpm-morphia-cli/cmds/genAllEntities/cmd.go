@@ -16,6 +16,7 @@ var (
 	targetFolder           string
 	schemaFileName         string
 	withBackupConflictMode bool
+	withNewConflictMode    bool
 	withFormatCode         bool
 )
 
@@ -46,7 +47,9 @@ func doWork() error {
 	const semLogContext = semLogContextCmd + "do-work"
 
 	cm := schematics.ConflictModeOverwrite
-	if withBackupConflictMode {
+	if withNewConflictMode {
+		cm = schematics.ConflictModeNew
+	} else if withBackupConflictMode {
 		cm = schematics.ConflictModeBackup
 	}
 
@@ -115,5 +118,6 @@ func init() {
 	genAllEntitiesCmd.Flags().StringVarP(&schemaFileName, "schema-file", "s", "", "the file containing structs definitions")
 	genAllEntitiesCmd.Flags().StringVarP(&targetFolder, "out-dir", "o", "", "the name of target folder the structs will be created in")
 	genAllEntitiesCmd.Flags().BoolVarP(&withBackupConflictMode, "with-bak", "k", false, "the current artifacts if present will be backed-up and a diff file produced")
+	genAllEntitiesCmd.Flags().BoolVarP(&withNewConflictMode, "with-new", "w", false, "if the current artifacts is present the new one will be written to a .new file and a diff file produced")
 	genAllEntitiesCmd.Flags().BoolVarP(&withFormatCode, "with-format", "f", false, "the go code will be formatted")
 }
