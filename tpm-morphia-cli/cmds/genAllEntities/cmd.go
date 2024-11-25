@@ -3,7 +3,7 @@ package genAllEntities
 import (
 	"errors"
 	"fmt"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common/util"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common/util/fileutil"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/gen/gomongodb"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/tpm-morphia-cli/cmds"
@@ -87,7 +87,7 @@ func validateArgs() error {
 		return err
 	}
 
-	if util.FileExists(schemaFileName) {
+	if fileutil.FileExists(schemaFileName) {
 		if err != nil {
 			log.Error().Err(err).Msg(semLogContext)
 			return err
@@ -104,7 +104,7 @@ func validateArgs() error {
 		return err
 	}
 
-	if !util.FileExists(targetFolder) {
+	if !fileutil.FileExists(targetFolder) {
 		err = errors.New("error: out-dir parameter must point to a valid existing folder")
 		log.Error().Err(err).Str("out-dir", targetFolder).Msg(semLogContext)
 		return err

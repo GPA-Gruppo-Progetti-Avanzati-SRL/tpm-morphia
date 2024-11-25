@@ -176,7 +176,8 @@ func getFuncMap() template.FuncMap {
 		},
 		"criteriaMethodSignature": func(p string) string {
 			// Do a Camel case conversion with segments separated by '.'
-			s := FormatIdentifier(p, ".", "camelCase", "index", "indexIjk")
+			// was camelCase.... changed to classify to overcome issues with the _bid type of fields
+			s := FormatIdentifier(p, ".", "classify", "index", "indexIjk")
 			// Remove the period.
 			return strings.ReplaceAll(s, ".", "")
 		},

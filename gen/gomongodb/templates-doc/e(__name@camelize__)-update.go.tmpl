@@ -14,6 +14,8 @@ const (
 	Unset UpdateOperator = "$unset"
 	Inc   UpdateOperator = "$inc"
 	CurrentDate UpdateOperator = "$currentDate"
+    AddToSet UpdateOperator = "$addToSet"
+    Pull     UpdateOperator = "$pull"
 )
 
 
@@ -37,6 +39,14 @@ func (ud *UpdateDocument) CurrentDate() *Updates {
 
 func (ud *UpdateDocument) Inc() *Updates {
 	return ud.op(Inc)
+}
+
+func (ud *UpdateDocument) AddToSet() *Updates {
+	return ud.op(AddToSet)
+}
+
+func (ud *UpdateDocument) Pull() *Updates {
+	return ud.op(Pull)
 }
 
 func (ud *UpdateDocument)op(op UpdateOperator) *Updates {

@@ -15,6 +15,16 @@ func CriteriaGoInfo() string {
 	return i
 }
 
+const (
+   Text  string = "$text"
+   Regex string = "$regex"
+   TextLanguage string = "$language"
+   TextCaseSensitive = "$caseSensitive"
+   TextDiacriticSensitive = "$diacriticSensitive"
+   TextMeta = "$meta"
+   TextMetaTextScore = "textScore"
+)
+
 type Criterion func() bson.E
 type Criteria []Criterion
 

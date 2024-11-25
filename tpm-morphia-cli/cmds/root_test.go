@@ -19,9 +19,13 @@ var genEntityCmdArgs = []string{
 	"gen", "entity", "--out-dir", "../..", "--schema-file", "../../examples/example7/schema/schema.yml", "--name", "author", "--with-format",
 }
 
+var genEntityCmdArgs8 = []string{
+	"gen", "entity", "--out-dir", "../..", "--schema-file", "../../examples/example8/go-collections/schema.yml", "--name", "cedola", "--with-format",
+}
+
 func TestGenEntityCmd(t *testing.T) {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	cmds.RootCmd.SetArgs(genEntityCmdArgs)
+	cmds.RootCmd.SetArgs(genEntityCmdArgs8)
 	cmds.Version = TPMMorphiaCliVersion
 	err := cmds.RootCmd.Execute()
 	require.NoError(t, err)
