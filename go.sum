@@ -1,7 +1,7 @@
 github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common v0.1.66 h1:i3wbIbOiL+iYgANalOZP6c06XOr3mciEPcsE6LNkXM4=
 github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common v0.1.66/go.mod h1:vnI1W77dpctWxMspokeoSVbGAOaU66mKfnCOyyoEYWQ=
-github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-schematics v0.0.6-RC9 h1:bO3294JJxetq/re/oNAsVacFJtBTunqQUkJGRM5gN8M=
-github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-schematics v0.0.6-RC9/go.mod h1:+H4bGwJ79cdpOx9LmxQG2JUe/w3v82QYVh1MrRP7OyU=
+github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-schematics v0.0.6-RCA h1:E5mLzFFxdhE1yywIVLzWQPNbF1mdfA6qJ180301a9U0=
+github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-schematics v0.0.6-RCA/go.mod h1:mn7y+Gkbs7M+DaudmLGFHD6BLrJDb4SeVDCpdIzc5Yo=
 github.com/PaesslerAG/gval v1.2.2 h1:Y7iBzhgE09IGTt5QgGQ2IdaYYYOU134YGHBThD+wm9E=
 github.com/PaesslerAG/gval v1.2.2/go.mod h1:XRFLwvmkTEdYziLdaCeCa5ImcGVrfQbeNUbVR+C6xac=
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=

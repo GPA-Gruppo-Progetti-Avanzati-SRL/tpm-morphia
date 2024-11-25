@@ -6,7 +6,7 @@ toolchain go1.21.5
 
 require (
 	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common v0.1.66
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-schematics v0.0.6-RC9
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-schematics v0.0.6-RCA
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.9.0
