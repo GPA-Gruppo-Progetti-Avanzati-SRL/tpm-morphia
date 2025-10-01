@@ -38,6 +38,10 @@ func NewValueTypeAttribute(parentStruct *schema.StructDef, attrDefinition *schem
 	case schema.AttributeTypeDocument:
 		v.Imports = make([]string, 0, 1)
 		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/bson")
+
+	case schema.AttributeTypeTimestamp:
+		v.Imports = make([]string, 0, 1)
+		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/bson/primitive")
 	}
 
 	return v

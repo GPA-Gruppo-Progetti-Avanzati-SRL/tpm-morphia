@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rs/zerolog/log"
+	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
-	yaml "sigs.k8s.io/yaml/goyaml.v3"
 )
 
 type Format string

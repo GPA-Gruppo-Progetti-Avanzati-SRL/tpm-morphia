@@ -1,4 +1,6 @@
 attributes:
+- name: boh
+  type: document
 - name: city
   options: with-filter
   tags:

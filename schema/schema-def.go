@@ -149,16 +149,17 @@ func (s *StructDef) finalize(structResolver StructResolver) error {
 }
 
 const (
-	AttributeTypeArray    = "array"
-	AttributeTypeMap      = "map"
-	AttributeTypeStruct   = "struct"
-	AttributeTypeString   = "string"
-	AttributeTypeInt      = "int"
-	AttributeTypeLong     = "long"
-	AttributeTypeBool     = "bool"
-	AttributeTypeDate     = "date"
-	AttributeTypeObjectId = "object-id"
-	AttributeTypeDocument = "document"
+	AttributeTypeArray     = "array"
+	AttributeTypeMap       = "map"
+	AttributeTypeStruct    = "struct"
+	AttributeTypeString    = "string"
+	AttributeTypeInt       = "int"
+	AttributeTypeLong      = "long"
+	AttributeTypeBool      = "bool"
+	AttributeTypeDate      = "date"
+	AttributeTypeTimestamp = "timestamp"
+	AttributeTypeObjectId  = "object-id"
+	AttributeTypeDocument  = "document"
 )
 
 type Field struct {
@@ -247,6 +248,7 @@ func (f *Field) finalize(structResolver StructResolver) error {
 	case AttributeTypeLong:
 	case AttributeTypeBool:
 	case AttributeTypeDate:
+	case AttributeTypeTimestamp:
 	case AttributeTypeDocument:
 	case AttributeTypeStruct:
 		if f.IsKey {
@@ -372,6 +374,7 @@ func (f *Field) finalizeItem(parentAttributeType string, structResolver StructRe
 	case AttributeTypeLong:
 	case AttributeTypeBool:
 	case AttributeTypeDate:
+	case AttributeTypeTimestamp:
 	case AttributeTypeDocument:
 	case AttributeTypeStruct:
 		structRef := structResolver.GetStructByName(f.Item.StructRef.Name)

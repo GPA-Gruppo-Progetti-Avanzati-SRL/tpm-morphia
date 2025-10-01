@@ -10,13 +10,14 @@ import (
 )
 
 const (
-	AttributeTypeStringGoType   = "string"
-	AttributeTypeIntGoType      = "int32"
-	AttributeTypeLongGoType     = "int64"
-	AttributeTypeBoolGoType     = "bool"
-	AttributeTypeObjectIdGoType = "primitive.ObjectID"
-	AttributeTypeDateGoType     = "primitive.DateTime"
-	AttributeTypeDocumentGoType = "bson.M"
+	AttributeTypeStringGoType    = "string"
+	AttributeTypeIntGoType       = "int32"
+	AttributeTypeLongGoType      = "int64"
+	AttributeTypeBoolGoType      = "bool"
+	AttributeTypeObjectIdGoType  = "primitive.ObjectID"
+	AttributeTypeDateGoType      = "primitive.DateTime"
+	AttributeTypeTimestampGoType = "primitive.Timestamp"
+	AttributeTypeDocumentGoType  = "bson.M"
 )
 
 type PathInfo struct {
@@ -132,6 +133,8 @@ func (b *GoAttributeImpl) GoIsNOTZeroCondition() string {
 		s = fmt.Sprintf("s.%s", b.GoName())
 	case schema.AttributeTypeDate:
 		s = fmt.Sprintf("s.%s != 0", b.GoName())
+	case schema.AttributeTypeTimestamp:
+		s = fmt.Sprintf("s.%s.T != 0", b.GoName())
 	case schema.AttributeTypeArray:
 		s = fmt.Sprintf("len(s.%s) != 0", b.GoName())
 	case schema.AttributeTypeStruct:
@@ -161,6 +164,8 @@ func (b *GoAttributeImpl) GoIsZeroCondition() string {
 		s = fmt.Sprintf("!s.%s", b.GoName())
 	case schema.AttributeTypeDate:
 		s = fmt.Sprintf("s.%s == 0", b.GoName())
+	case schema.AttributeTypeTimestamp:
+		s = fmt.Sprintf("s.%s.T == 0", b.GoName())
 	case schema.AttributeTypeArray:
 		s = fmt.Sprintf("len(s.%s) == 0", b.GoName())
 	case schema.AttributeTypeStruct:

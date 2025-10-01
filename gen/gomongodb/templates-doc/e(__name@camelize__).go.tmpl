@@ -21,5 +21,10 @@ func (s {{classify .Model.Name}}) IsZero() bool {
     return {{- range $i, $a := .Model.Attributes}} {{ if $i }} && {{- end}} {{ $a.GoIsZeroCondition }} {{- end}}
 }
 
+type QueryResult struct {
+	Records int      `json:"records,omitempty" bson:"records,omitempty" yaml:"records,omitempty"`
+	Data    []{{ classify .Model.Name}} `json:"data,omitempty" bson:"data,omitempty" yaml:"data,omitempty"`
+}
+
 // @tpm-schematics:start-region("bottom-file-section")
 // @tpm-schematics:end-region("bottom-file-section")

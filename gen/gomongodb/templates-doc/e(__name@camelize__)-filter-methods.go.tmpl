@@ -44,6 +44,9 @@ func (ca *Criteria) AndTextSearch(ssearch string) *Criteria {
 {{- if eq $a.Definition.Typ "date" }}
 {{ template "filter-date" filterSubTemplateContext $a "*" $metadata }}
 {{- end -}}
+{{- if eq $a.Definition.Typ "timestamp" }}
+{{ template "filter-timestamp" filterSubTemplateContext $a "*" $metadata }}
+{{- end -}}
 {{- if eq $a.Definition.Typ "object-id" }}
 {{ template "filter-object-id" filterSubTemplateContext $a "*" $metadata }}
 {{- end -}}

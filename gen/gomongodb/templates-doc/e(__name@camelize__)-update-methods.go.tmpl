@@ -122,6 +122,9 @@ func GetUpdateDocument(obj *{{ classify .Model.Name}}, opts ...UnsetOption) Upda
 {{- if eq $f.Typ "date" }}
    ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
 {{- end }}
+{{- if eq $f.Typ "timestamp" }}
+   ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
+{{- end }}
 {{- if eq $f.Typ "document" }}
     ud.setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} obj.{{$a.GoName}}, uo.ResolveUnsetMode(uo.{{$a.GoName}}))
 {{- end }}
@@ -147,6 +150,8 @@ func GetUpdateDocument(obj *{{ classify .Model.Name}}, opts ...UnsetOption) Upda
 {{ template "update-bool" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "date" }}
 {{ template "update-date" filterSubTemplateContext $a $currentPkg  $metadata}}
+{{- else if eq $a.Definition.Typ "timestamp" }}
+{{ template "update-timestamp" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "document" }}
 {{ template "update-document" filterSubTemplateContext $a $currentPkg  $metadata}}
 {{- else if eq $a.Definition.Typ "object-id" }}

@@ -22,6 +22,8 @@ func (v *ValueTypeAttribute) GoType(currentPkg string) string {
 		t = AttributeTypeBoolGoType
 	case schema.AttributeTypeDate:
 		t = AttributeTypeDateGoType
+	case schema.AttributeTypeTimestamp:
+		t = AttributeTypeTimestampGoType
 	case schema.AttributeTypeObjectId:
 		t = AttributeTypeObjectIdGoType
 	case schema.AttributeTypeDocument:

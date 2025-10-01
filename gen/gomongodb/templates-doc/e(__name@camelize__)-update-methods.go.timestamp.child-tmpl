@@ -1,4 +1,4 @@
-{{ define "update-document" }}
+{{ define "update-timestamp" }}
 {{ $currentPkg := .CurrentPackage }}
 {{ $a := .Attr }}
 {{ $f := $a.Definition }}
@@ -24,7 +24,7 @@ func (ud *UpdateDocument) Unset{{ updateMethodSignature $p.Path }} ({{ updateMet
 
 // setOrUnset{{ updateMethodSignature $p.Path }} No Remarks
 func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} p {{$a.GoType $currentPkg}}, um UnsetMode) {
-	if len(p) != 0 {
+	if p != 0 {
 		ud.Set{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path false "after" }} p)
 	} else {
 		switch um {
@@ -39,7 +39,7 @@ func (ud *UpdateDocument) setOrUnset{{ updateMethodSignature $p.Path }}({{ updat
 
 func UpdateWith{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path true "after" }} p {{$a.GoType $currentPkg}}) UpdateOption {
     return func(ud *UpdateDocument) {
-    if len(p) != 0 {
+    if p != 0 {
        ud.Set{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path false "after" }} p)
     } else {
        ud.Unset{{ updateMethodSignature $p.Path }}({{ updateMethodVarParams $p.Path false "none" }})
