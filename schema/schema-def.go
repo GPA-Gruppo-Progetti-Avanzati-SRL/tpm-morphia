@@ -3,11 +3,12 @@ package schema
 import (
 	"errors"
 	"fmt"
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common/util"
-	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common/util"
+	"github.com/rs/zerolog/log"
 )
 
 type IncludeResolver interface {
@@ -135,7 +136,9 @@ func (s *StructDef) finalize(structResolver StructResolver) error {
 	log.Trace().Msg("start validating attributes")
 
 	if len(s.Attributes) == 0 {
-		return fmt.Errorf("attributes missing from schema")
+		err := errors.New("attributes missing from schema")
+		log.Error().Err(err).Str("name", s.Name).Msg(semLogContext)
+		return err
 	}
 
 	for i := range s.Attributes {
