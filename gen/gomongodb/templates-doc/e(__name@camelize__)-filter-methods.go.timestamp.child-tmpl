@@ -7,7 +7,7 @@
 {{- range $i, $p := $a.Paths}}
 {{- if not (isIdentifierIndexed $p.Path) }}
 // And{{ criteriaMethodSignature $p.Path }}EqTo No Remarks
-func (ca *Criteria) And{{ criteriaMethodSignature $p.Path }}EqTo ({{ criteriaMethodVarParams $p.Path true "after" }} dt primitive.Timestamp) *Criteria {
+func (ca *Criteria) And{{ criteriaMethodSignature $p.Path }}EqTo ({{ criteriaMethodVarParams $p.Path true "after" }} dt bson.Timestamp) *Criteria {
 
 	if dt == 0 {
    		return ca

@@ -3,10 +3,11 @@ package attributes
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-common/util"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
 	"github.com/rs/zerolog/log"
-	"strings"
 )
 
 const (
@@ -14,9 +15,9 @@ const (
 	AttributeTypeIntGoType       = "int32"
 	AttributeTypeLongGoType      = "int64"
 	AttributeTypeBoolGoType      = "bool"
-	AttributeTypeObjectIdGoType  = "primitive.ObjectID"
-	AttributeTypeDateGoType      = "primitive.DateTime"
-	AttributeTypeTimestampGoType = "primitive.Timestamp"
+	AttributeTypeObjectIdGoType  = "bson.ObjectID"
+	AttributeTypeDateGoType      = "bson.DateTime"
+	AttributeTypeTimestampGoType = "bson.Timestamp"
 	AttributeTypeDocumentGoType  = "bson.M"
 )
 
@@ -124,7 +125,7 @@ func (b *GoAttributeImpl) GoIsNOTZeroCondition() string {
 	s := ""
 	switch b.AttrDefinition.Typ {
 	case schema.AttributeTypeObjectId:
-		s = fmt.Sprintf("s.%s != primitive.NilObjectID", b.GoName())
+		s = fmt.Sprintf("s.%s != bson.NilObjectID", b.GoName())
 	case schema.AttributeTypeInt:
 		s = fmt.Sprintf("s.%s != 0", b.GoName())
 	case schema.AttributeTypeLong:
@@ -155,7 +156,7 @@ func (b *GoAttributeImpl) GoIsZeroCondition() string {
 	s := ""
 	switch b.AttrDefinition.Typ {
 	case schema.AttributeTypeObjectId:
-		s = fmt.Sprintf("s.%s == primitive.NilObjectID", b.GoName())
+		s = fmt.Sprintf("s.%s == bson.NilObjectID", b.GoName())
 	case schema.AttributeTypeInt:
 		s = fmt.Sprintf("s.%s == 0", b.GoName())
 	case schema.AttributeTypeLong:

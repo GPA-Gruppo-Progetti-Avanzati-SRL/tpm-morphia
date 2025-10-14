@@ -1,8 +1,9 @@
 package attributes
 
 import (
-	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
 	"strings"
+
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/tpm-morphia/schema"
 )
 
 func NewAttribute(structDef *schema.StructDef, attrDefinition *schema.Field, recurse bool) GoAttribute {
@@ -29,19 +30,19 @@ func NewValueTypeAttribute(parentStruct *schema.StructDef, attrDefinition *schem
 	switch strings.ToLower(attrDefinition.Typ) {
 	case schema.AttributeTypeDate:
 		v.Imports = make([]string, 0, 1)
-		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/bson/primitive")
+		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/v2/bson")
 
 	case schema.AttributeTypeObjectId:
 		v.Imports = make([]string, 0, 1)
-		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/bson/primitive")
+		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/v2/bson")
 
 	case schema.AttributeTypeDocument:
 		v.Imports = make([]string, 0, 1)
-		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/bson")
+		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/v2/bson")
 
 	case schema.AttributeTypeTimestamp:
 		v.Imports = make([]string, 0, 1)
-		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/bson/primitive")
+		v.Imports = append(v.Imports, "go.mongodb.org/mongo-driver/v2/bson")
 	}
 
 	return v
